@@ -1,0 +1,8 @@
+@font-face {
+	font-family: 'doodle_gumregular';
+	src: url(../../assets/fonts/doodle_gumregular-7dfd2c904e5a98c530a7c5f22e58aa02.woff2) format('woff2'),
+	url(../../assets/fonts/doodle_gumregular-ab700eda319a3111d6dc94082ea8010a.woff) format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: auto;
+}

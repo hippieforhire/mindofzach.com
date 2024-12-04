@@ -1,0 +1,8 @@
+@font-face {
+	font-family: 'cute_notesregular';
+	src: url(../../assets/fonts/cute_notesregular-7a5dffbb1e82dd364dce20e34f55884d.woff2) format('woff2'),
+	url(../../assets/fonts/cute_notesregular-98defd3ddceaa1d0a3c3960c943718e0.woff) format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: auto;
+}

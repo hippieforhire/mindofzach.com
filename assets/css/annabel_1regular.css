@@ -1,0 +1,17 @@
+@font-face {
+	font-family: 'annabel_1regular';
+	src: url(../../assets/fonts/annabel_1regular-b83f1baa4f17bcbd6d071250dd807160.woff2) format('woff2'),
+	url(../../assets/fonts/annabel_1regular-5986f4a513bd583330aedd029e4d5d80.woff) format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: auto;
+}
+
+@font-face {
+	font-family: 'annabel_1regular';
+	src: url(../../assets/fonts/annabel_1regular-b83f1baa4f17bcbd6d071250dd807160.woff2) format('woff2'),
+	url(../../assets/fonts/annabel_1regular-5986f4a513bd583330aedd029e4d5d80.woff) format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: auto;
+}
