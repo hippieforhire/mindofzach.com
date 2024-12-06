@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mind of Zach</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .fun-font {
+      font-family: 'Pacifico', cursive;
+    }
+    .hidden {
+      display: none;
+    }
+    .game-button {
+      display: inline-block;
+      text-align: center;
+      background-color: #4a5568;
+      color: #f7fafc;
+      padding: 10px 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .game-button:hover {
+      background-color: #2d3748;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center">
+  <header class="py-10 text-center">
+    <h1 class="text-5xl fun-font mb-4">Welcome to the Mind of Zach!</h1>
+    <p class="text-lg text-gray-400">Click a button to start a game or view a fun feature!</p>
+  </header>
+  
+  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-3/4">
+    <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="openFlappyModal()">Flappy Bird</button>
+    <button class="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500" onclick="showGame('tictactoe')">Tic Tac Toe</button>
+    <button class="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-500" onclick="showGame('rps')">Rock Paper Scissors</button>
+    <button class="px-6 py-3 bg-yellow-600 rounded-lg hover:bg-yellow-500" onclick="showGame('quotes')">Quotes</button>
+    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="showGame('spaceinvaders')">Space Invaders</button>
+    <button class="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500" onclick="showGame('zork')">Zork Adventure</button>
+  </main>
+
+  <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
+      <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
+      <canvas id="gameCanvas" width="800" height="400" class="bg-gray-200"></canvas>
+      <p id="score" class="text-center text-lg mt-4">Score: 0</p>
+      <div class="text-center mt-4">
+        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="startGame()">Restart</button>
+        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeFlappyModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="tictactoe" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Tic Tac Toe</h2>
+    <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto" style="max-width: 300px;"></div>
+  </section>
+
+  <section id="rps" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Rock Paper Scissors</h2>
+    <button class="mt-4 game-button" onclick="playRockPaperScissors()">Play Rock Paper Scissors</button>
+  </section>
+
+  <section id="quotes" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
+    <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
+    <button class="mt-4 game-button" onclick="displayRandomQuote()">Get Quote</button>
+  </section>
+
+  <section id="spaceinvaders" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Space Invaders</h2>
+    <canvas id="spaceInvadersCanvas" width="800" height="400" class="bg-black"></canvas>
+    <button id="startSpaceInvaders" class="mt-4 px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700">Start Game</button>
+  </section>
+
+  <section id="zork" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Zork Adventure</h2>
+    <div id="output" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-scroll" style="max-height: 300px;"></div>
+    <input id="input" type="text" class="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg" placeholder="Type your command here..." onkeydown="handleZorkInput(event)">
+  </section>
+
+  <script src="js/flappybird.js"></script>
+  <script src="js/tictactoe.js"></script>
+  <script src="js/rockpaperscissors.js"></script>
+  <script src="js/quotes.js"></script>
+  <script src="js/spaceinvaders.js"></script>
+  <script src="js/zork.js"></script>
+  <script>
+    function showGame(gameId) {
+      document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
+      document.getElementById(gameId).classList.remove("hidden");
+    }
+
+    function openFlappyModal() {
+      const modal = document.getElementById("flappyModal");
+      modal.classList.remove("hidden");
+      startGame(); // Initialize game directly
+    }
+
+    function closeFlappyModal() {
+      document.getElementById("flappyModal").classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
