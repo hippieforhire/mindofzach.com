@@ -1,2 +1,2 @@
 # mindofzach.pro
-My .pro address
+My .com address
