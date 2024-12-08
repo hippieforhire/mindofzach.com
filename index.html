@@ -55,11 +55,12 @@
   <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
       <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
-      <canvas id="gameCanvas" width="800" height="400" class="bg-gray-200"></canvas>
+      <canvas id="gameCanvas" class="bg-gray-200"></canvas>
       <p id="score" class="text-center text-lg mt-4">Score: 0</p>
       <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="startGame()">Restart</button>
+        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startGameButton">Start</button>
         <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeFlappyModal()">Close</button>
+        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="restartButton" style="display: none;">Restart</button>
       </div>
     </div>
   </div>
@@ -111,15 +112,18 @@
     function showGame(gameId) {
       document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
       document.getElementById(gameId).classList.remove("hidden");
+      if (gameId === 'zork') {
+        startZorkGame();
+      }
     }
 
     function openFlappyModal() {
       const modal = document.getElementById("flappyModal");
       modal.classList.remove("hidden");
-      startGame(); // Initialize game directly
     }
 
     function closeFlappyModal() {
+      stopGame(); // Stop flappy bird game logic when closing
       document.getElementById("flappyModal").classList.add("hidden");
     }
   </script>
