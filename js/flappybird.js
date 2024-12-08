@@ -1,5 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const startButton = document.getElementById("startGameButton");
+const restartButton = document.getElementById("restartButton");
 let bird, pipes, score, isGameOver, timer, gameLoopId;
 
 function initGame() {
@@ -10,26 +12,37 @@ function initGame() {
     timer = 0;
     updateScore();
     document.getElementById("score").style.display = "block";
+    restartButton.style.display = "none";
 }
 
-function resizeCanvas() {
-    canvas.width = 800; // Fixed width for the modal
-    canvas.height = 400; // Fixed height for the modal
+function startGame() {
+    // Fixed canvas size for better fit
+    canvas.width = 800;
+    canvas.height = 400;
+    initGame();
+    canvas.style.display = "block";
+    canvas.addEventListener("click", startMovement);
+    canvas.addEventListener("touchstart", startMovement, { passive: false });
+}
+
+function stopGame() {
+    cancelAnimationFrame(gameLoopId);
+    window.removeEventListener("click", birdFlap);
+    window.removeEventListener("touchstart", birdFlap);
+}
+
+function startMovement(event) {
+    event.preventDefault();
+    window.addEventListener("click", birdFlap);
+    window.addEventListener("touchstart", birdFlap, { passive: false });
+    gameLoop();
+    canvas.removeEventListener("click", startMovement);
+    canvas.removeEventListener("touchstart", startMovement);
 }
 
 function birdFlap(event) {
     event.preventDefault();
-    if (isGameOver) {
-        restartGame(); // Restart the game if it's over
-    } else {
-        bird.velocity = bird.lift; // Make the bird flap
-    }
-}
-
-function startGame() {
-    resizeCanvas();
-    initGame();
-    gameLoop();
+    bird.velocity = bird.lift;
 }
 
 function gameLoop() {
@@ -38,14 +51,16 @@ function gameLoop() {
     drawBackground();
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
-    if (bird.y + bird.height > canvas.height || bird.y < 0) {
+
+    // End game if bird hits grass line or goes above top
+    if (bird.y + bird.height > canvas.height * 0.75 || bird.y < 0) {
         endGame();
     }
+
     drawBird();
     updatePipes();
     drawPipes();
     checkCollisions();
-    updateScore();
     timer++;
     gameLoopId = requestAnimationFrame(gameLoop);
 }
@@ -79,26 +94,32 @@ function drawBird() {
 }
 
 function updatePipes() {
-    if (timer % 60 === 0 && !isGameOver) {
-        const pipeHeight = Math.floor(Math.random() * (canvas.height / 2)) + 100;
-        const gap = 200;
-        pipes.push({ x: canvas.width, y: pipeHeight, gap: gap });
+    const gap = 150;
+    // Spawn pipes every 90 frames for proper spacing
+    if (timer % 90 === 0 && !isGameOver) {
+        const maxPipeHeight = Math.floor((canvas.height * 0.75) - gap - 50);
+        const pipeHeight = Math.floor(Math.random() * maxPipeHeight) + 50;
+        pipes.push({ x: canvas.width, y: pipeHeight, gap: gap, passed: false });
     }
+
     pipes.forEach(pipe => {
         pipe.x -= 3;
-        if (pipe.x + 3 === bird.x) {
+        // Score increments by 1 once the bird fully passes a pipe
+        if (!pipe.passed && bird.x > pipe.x + 50) {
+            pipe.passed = true;
             score++;
             updateScore();
         }
     });
+
     pipes = pipes.filter(pipe => pipe.x + 50 > 0);
 }
 
 function drawPipes() {
     ctx.fillStyle = "green";
     pipes.forEach(pipe => {
-        ctx.fillRect(pipe.x, 0, 50, pipe.y);
-        ctx.fillRect(pipe.x, pipe.y + pipe.gap, 50, canvas.height - pipe.y - pipe.gap);
+        ctx.fillRect(pipe.x, 0, 50, pipe.y); // top pipe
+        ctx.fillRect(pipe.x, pipe.y + pipe.gap, 50, canvas.height - (pipe.y + pipe.gap)); // bottom pipe
     });
 }
 
@@ -114,19 +135,32 @@ function checkCollisions() {
 
 function endGame() {
     isGameOver = true;
+    window.removeEventListener("click", birdFlap);
+    window.removeEventListener("touchstart", birdFlap);
     document.getElementById("score").textContent += " - Game Over!";
+    // Tapping canvas after game over to restart
+    canvas.addEventListener("click", tryRestartAfterGameOver);
+    canvas.addEventListener("touchstart", tryRestartAfterGameOver, { passive: false });
+}
+
+function tryRestartAfterGameOver(event) {
+    event.preventDefault();
+    if (isGameOver) {
+        canvas.removeEventListener("click", tryRestartAfterGameOver);
+        canvas.removeEventListener("touchstart", tryRestartAfterGameOver);
+        restartGame();
+    }
 }
 
 function restartGame() {
     initGame();
-    gameLoop();
+    canvas.addEventListener("click", startMovement);
+    canvas.addEventListener("touchstart", startMovement, { passive: false });
 }
 
 function updateScore() {
     document.getElementById("score").textContent = `Score: ${score}`;
 }
 
-// Initialize game
-resizeCanvas();
-canvas.addEventListener("click", birdFlap);
-canvas.addEventListener("touchstart", birdFlap, { passive: false });
+startButton.addEventListener("click", startGame);
+restartButton.addEventListener("click", restartGame);
