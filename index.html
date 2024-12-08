@@ -43,19 +43,25 @@
   </header>
   
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-3/4">
+    <!-- Flappy Bird button unchanged -->
     <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="openFlappyModal()">Flappy Bird</button>
-    <button class="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500" onclick="showGame('tictactoe')">Tic Tac Toe</button>
+    <!-- Instead of showGame('tictactoe'), we now open a modal -->
+    <button class="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500" onclick="openTicTacToeModal()">Tic Tac Toe</button>
+    <!-- Instead of showGame('rps') etc., unchanged for other sections -->
     <button class="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-500" onclick="showGame('rps')">Rock Paper Scissors</button>
     <button class="px-6 py-3 bg-yellow-600 rounded-lg hover:bg-yellow-500" onclick="showGame('quotes')">Quotes</button>
-    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="showGame('spaceinvaders')">Space Invaders</button>
+    <!-- Space Invaders now a modal -->
+    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="openSpaceInvadersModal()">Space Invaders</button>
     <button class="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500" onclick="showGame('zork')">Zork Adventure</button>
     <button class="px-6 py-3 bg-teal-600 rounded-lg hover:bg-teal-500" onclick="showGame('numberguess')">Number Guess</button>
   </main>
 
+  <!-- Flappy Bird Modal (unchanged except setting fixed canvas size) -->
   <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
       <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
-      <canvas id="gameCanvas" class="bg-gray-200"></canvas>
+      <!-- Fixed size to fit better -->
+      <canvas id="gameCanvas" width="800" height="400" class="bg-gray-200"></canvas>
       <p id="score" class="text-center text-lg mt-4">Score: 0</p>
       <div class="text-center mt-4">
         <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startGameButton">Start</button>
@@ -65,12 +71,32 @@
     </div>
   </div>
 
-  <section id="tictactoe" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Tic Tac Toe</h2>
-    <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto"></div>
-    <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
-  </section>
+  <!-- Tic Tac Toe Modal -->
+  <div id="ticTacToeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
+      <h2 class="text-3xl fun-font my-4 text-center">Tic Tac Toe</h2>
+      <!-- Board and start button as before -->
+      <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto"></div>
+      <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
+      <div class="text-center mt-4">
+        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeTicTacToeModal()">Close</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Space Invaders Modal -->
+  <div id="spaceInvadersModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
+      <h2 class="text-3xl fun-font my-4 text-center">Space Invaders</h2>
+      <canvas id="spaceInvadersCanvas" width="800" height="400" class="bg-black"></canvas>
+      <button id="startSpaceInvaders" class="mt-4 px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700">Start Game</button>
+      <div class="text-center mt-4">
+        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeSpaceInvadersModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Other sections remain the same, hidden by default -->
   <section id="rps" class="hidden">
     <h2 class="text-3xl fun-font my-4">Rock Paper Scissors</h2>
     <button class="mt-4 game-button" onclick="playRockPaperScissors()">Play Rock Paper Scissors</button>
@@ -80,12 +106,6 @@
     <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
     <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
     <button class="mt-4 game-button" onclick="displayRandomQuote()">Get Quote</button>
-  </section>
-
-  <section id="spaceinvaders" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Space Invaders</h2>
-    <canvas id="spaceInvadersCanvas" width="800" height="400" class="bg-black"></canvas>
-    <button id="startSpaceInvaders" class="mt-4 px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700">Start Game</button>
   </section>
 
   <section id="zork" class="hidden">
@@ -101,8 +121,9 @@
     <button class="mt-4 game-button" onclick="playNumberGuess()">Play Number Guess</button>
   </section>
 
+  <!-- Ensure script names match your actual filenames -->
   <script src="js/flappybird.js"></script>
-  <script src="js/tictactoe.js"></script>
+  <script src="js/tic-tac-toe.js"></script> <!-- or tictactoe.js if that’s your actual filename -->
   <script src="js/rockpaperscissors.js"></script>
   <script src="js/quotes.js"></script>
   <script src="js/spaceinvaders.js"></script>
@@ -118,13 +139,26 @@
     }
 
     function openFlappyModal() {
-      const modal = document.getElementById("flappyModal");
-      modal.classList.remove("hidden");
+      document.getElementById("flappyModal").classList.remove("hidden");
+    }
+    function closeFlappyModal() {
+      document.getElementById("flappyModal").classList.add("hidden");
     }
 
-    function closeFlappyModal() {
-      stopGame(); // Stop flappy bird game logic when closing
-      document.getElementById("flappyModal").classList.add("hidden");
+    function openTicTacToeModal() {
+      document.getElementById("ticTacToeModal").classList.remove("hidden");
+      // We can initialize after showing modal or when user clicks "Start Game".
+      // initializeTicTacToe(); // If you want board immediately
+    }
+    function closeTicTacToeModal() {
+      document.getElementById("ticTacToeModal").classList.add("hidden");
+    }
+
+    function openSpaceInvadersModal() {
+      document.getElementById("spaceInvadersModal").classList.remove("hidden");
+    }
+    function closeSpaceInvadersModal() {
+      document.getElementById("spaceInvadersModal").classList.add("hidden");
     }
   </script>
 </body>
