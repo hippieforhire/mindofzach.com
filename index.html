@@ -34,6 +34,9 @@
       display: block;
       margin: 0 auto;
     }
+    .text-center {
+      text-align: center;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center">
@@ -69,7 +72,10 @@
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Tic Tac Toe</h2>
       <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto"></div>
-      <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
+      <!-- Centered start button inside a text-center div -->
+      <div class="text-center">
+        <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
+      </div>
       <div class="text-center mt-4">
         <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeTicTacToeModal()">Close</button>
       </div>
@@ -101,8 +107,9 @@
   <section id="zork" class="hidden">
     <h2 class="text-3xl fun-font my-4">Zork Adventure</h2>
     <div id="output" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-scroll" style="max-height: 300px;"></div>
-    <input id="input" type="text" class="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg" placeholder="Type your command here..." onkeydown="handleZorkInput(event)">
-    <p class="text-sm text-gray-400 mt-2">Type commands like "go north", "take torch", or "attack goblin".</p>
+    <!-- Removed onkeydown attribute here to avoid double triggers -->
+    <input id="input" type="text" class="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg" placeholder="Type your command here...">
+    <p class="text-sm text-gray-400 mt-2">Type commands like "go north", "take sword", or "attack goblin".</p>
   </section>
 
   <section id="numberguess" class="hidden">
@@ -111,9 +118,8 @@
     <button class="mt-4 game-button" onclick="playNumberGuess()">Play Number Guess</button>
   </section>
 
-  <!-- Make sure this matches your actual file name. If your file is named tic-tac-toe.js, use tic-tac-toe.js here. -->
   <script src="js/flappybird.js"></script>
-  <script src="js/tic-tac-toe.js"></script>
+  <script src="js/tictactoe.js"></script>
   <script src="js/rockpaperscissors.js"></script>
   <script src="js/quotes.js"></script>
   <script src="js/spaceinvaders.js"></script>
@@ -137,6 +143,8 @@
 
     function openTicTacToeModal() {
       document.getElementById("ticTacToeModal").classList.remove("hidden");
+      // Initialize game as soon as modal opens, ensuring element is there
+      initializeTicTacToe();
     }
     function closeTicTacToeModal() {
       document.getElementById("ticTacToeModal").classList.add("hidden");

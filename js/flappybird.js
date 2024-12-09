@@ -16,9 +16,11 @@ function initGame() {
 }
 
 function startGame() {
-    // Fixed canvas size for better fit
+    // Fixed canvas size and scale to fit
     canvas.width = 800;
     canvas.height = 400;
+    canvas.style.maxWidth = "100%";
+    canvas.style.height = "auto";
     initGame();
     canvas.style.display = "block";
     canvas.addEventListener("click", startMovement);
@@ -52,7 +54,6 @@ function gameLoop() {
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
 
-    // End game if bird hits grass line or goes above top
     if (bird.y + bird.height > canvas.height * 0.75 || bird.y < 0) {
         endGame();
     }
@@ -66,15 +67,15 @@ function gameLoop() {
 }
 
 function drawBackground() {
-    ctx.fillStyle = "#87CEEB"; // Sky blue
+    ctx.fillStyle = "#87CEEB";
     ctx.fillRect(0, 0, canvas.width, canvas.height * 0.75);
-    ctx.fillStyle = "#228B22"; // Grassy green
+    ctx.fillStyle = "#228B22";
     ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height * 0.25);
-    ctx.fillStyle = "#FFD700"; // Sun yellow
+    ctx.fillStyle = "#FFD700";
     ctx.beginPath();
     ctx.arc(canvas.width - 50, 50, 30, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.fillStyle = "#FFFFFF"; // Cloud white
+    ctx.fillStyle = "#FFFFFF";
     drawCloud(100, 100);
     drawCloud(200, 150);
     drawCloud(300, 120);
@@ -95,7 +96,6 @@ function drawBird() {
 
 function updatePipes() {
     const gap = 150;
-    // Spawn pipes every 90 frames for proper spacing
     if (timer % 90 === 0 && !isGameOver) {
         const maxPipeHeight = Math.floor((canvas.height * 0.75) - gap - 50);
         const pipeHeight = Math.floor(Math.random() * maxPipeHeight) + 50;
@@ -104,7 +104,6 @@ function updatePipes() {
 
     pipes.forEach(pipe => {
         pipe.x -= 3;
-        // Score increments by 1 once the bird fully passes a pipe
         if (!pipe.passed && bird.x > pipe.x + 50) {
             pipe.passed = true;
             score++;
@@ -118,8 +117,8 @@ function updatePipes() {
 function drawPipes() {
     ctx.fillStyle = "green";
     pipes.forEach(pipe => {
-        ctx.fillRect(pipe.x, 0, 50, pipe.y); // top pipe
-        ctx.fillRect(pipe.x, pipe.y + pipe.gap, 50, canvas.height - (pipe.y + pipe.gap)); // bottom pipe
+        ctx.fillRect(pipe.x, 0, 50, pipe.y);
+        ctx.fillRect(pipe.x, pipe.y + pipe.gap, 50, canvas.height - (pipe.y + pipe.gap));
     });
 }
 
@@ -138,7 +137,6 @@ function endGame() {
     window.removeEventListener("click", birdFlap);
     window.removeEventListener("touchstart", birdFlap);
     document.getElementById("score").textContent += " - Game Over!";
-    // Tapping canvas after game over to restart
     canvas.addEventListener("click", tryRestartAfterGameOver);
     canvas.addEventListener("touchstart", tryRestartAfterGameOver, { passive: false });
 }

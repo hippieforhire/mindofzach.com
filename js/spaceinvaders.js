@@ -1,13 +1,20 @@
-document.getElementById('startSpaceInvaders').addEventListener('click', function() {
+// spaceinvaders.js
+
+function startSpaceInvadersGame() {
     const canvas = document.getElementById('spaceInvadersCanvas');
-    canvas.style.display = 'block';
+    canvas.width = 800;
+    canvas.height = 400;
+    canvas.style.maxWidth = "100%";
+    canvas.style.height = "auto";
+    canvas.style.touchAction = 'none';
+
     const ctx = canvas.getContext('2d');
 
     const player = {
         width: 40,
         height: 20,
         x: canvas.width / 2 - 20,
-        y: canvas.height - 30,
+        y: canvas.height - 50,
         speed: 5,
         dx: 0,
         doubleBullets: false
@@ -16,13 +23,33 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
     const bullets = [];
     const enemies = [];
     const powerUps = [];
-    const enemyRows = 5;
-    const enemyCols = 10;
+    const enemyRows = 3;
+    const enemyCols = 7;
     const enemyWidth = 30;
     const enemyHeight = 20;
-    const enemyMargin = 10;
-    const enemySpeed = 1;
+    const enemyMargin = 20;
+    const enemySpeed = 2;
     let score = 0;
+
+    const stars = [];
+    for (let i = 0; i < 100; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5
+        });
+    }
+
+    function drawBackground() {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        stars.forEach(star => {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
 
     function drawPlayer() {
         ctx.fillStyle = 'green';
@@ -61,14 +88,18 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
             enemy.x += enemy.dx;
         });
 
-        const leftmostEnemy = enemies[0];
-        const rightmostEnemy = enemies[enemies.length - 1];
+        if (enemies.length > 0) {
+            const leftmostEnemy = enemies[0];
+            const rightmostEnemy = enemies[enemies.length - 1];
 
-        if (leftmostEnemy.x <= 0 || rightmostEnemy.x + enemyWidth >= canvas.width) {
-            enemies.forEach(enemy => {
-                enemy.dx *= -1;
-                enemy.y += enemyMargin;
-            });
+            if (leftmostEnemy && rightmostEnemy) {
+                if (leftmostEnemy.x <= 0 || rightmostEnemy.x + enemyWidth >= canvas.width) {
+                    enemies.forEach(enemy => {
+                        enemy.dx *= -1;
+                        enemy.y += enemyMargin;
+                    });
+                }
+            }
         }
     }
 
@@ -76,8 +107,8 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
         for (let row = 0; row < enemyRows; row++) {
             for (let col = 0; col < enemyCols; col++) {
                 const enemy = {
-                    x: col * (enemyWidth + enemyMargin),
-                    y: row * (enemyHeight + enemyMargin),
+                    x: 50 + col * (enemyWidth + enemyMargin),
+                    y: 50 + row * (enemyHeight + enemyMargin),
                     width: enemyWidth,
                     height: enemyHeight,
                     dx: enemySpeed
@@ -141,7 +172,7 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
     }
 
     function update() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
         drawPlayer();
         movePlayer();
         drawBullets();
@@ -188,9 +219,18 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
     }
 
     function touchStart(e) {
+        const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        if (touch.clientX < canvas.width / 2) player.dx = -player.speed;
-        else player.dx = player.speed;
+        const xPos = touch.clientX - rect.left;
+        const yPos = touch.clientY - rect.top;
+
+        if (yPos < canvas.height / 2) {
+            shoot();
+            player.dx = 0;
+        } else {
+            if (xPos < canvas.width / 2) player.dx = -player.speed;
+            else player.dx = player.speed;
+        }
     }
 
     function touchEnd() {
@@ -199,10 +239,27 @@ document.getElementById('startSpaceInvaders').addEventListener('click', function
 
     document.addEventListener('keydown', keyDown);
     document.addEventListener('keyup', keyUp);
-    canvas.addEventListener('touchstart', touchStart);
-    canvas.addEventListener('touchend', touchEnd);
+
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        touchStart(e);
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        touchEnd(e);
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+    }, { passive: false });
 
     createEnemies();
     createPowerUps();
     update();
+}
+
+// Hook up the startSpaceInvaders button
+document.getElementById('startSpaceInvaders').addEventListener('click', function() {
+    startSpaceInvadersGame();
 });
