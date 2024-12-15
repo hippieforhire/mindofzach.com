@@ -2,20 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mind of Zach</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap');
+
     body {
       font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a202c, #2d3748);
+      /* Subtle star-like background */
+      background-image: radial-gradient(#444 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: #fff;
+      position: relative;
+      overflow-x: hidden;
     }
+
     .fun-font {
       font-family: 'Pacifico', cursive;
     }
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
+
     .game-button {
       display: inline-block;
       text-align: center;
@@ -25,41 +33,287 @@
       margin: 10px 0;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
     .game-button:hover {
       background-color: #2d3748;
+      transform: scale(1.05);
     }
+    .game-button:active {
+      transform: scale(0.95);
+    }
+
     canvas {
       display: block;
       margin: 0 auto;
     }
-    .text-center {
+
+    .text-center { text-align: center; }
+
+    header {
+      animation: fadeInDown 1.5s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInDown {
+      from { opacity:0; transform: translateY(-20px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    main button {
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    main button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+    }
+
+    section {
+      animation: fadeIn 1s ease forwards;
+      opacity:0;
+    }
+    @keyframes fadeIn {
+      to { opacity:1; }
+    }
+
+    /* Wordle Styles */
+    #wordleBoard {
+      display: grid;
+      gap: 5px;
+      justify-items: center;
+      margin-bottom: 20px;
+      perspective: 1000px;
+    }
+    .wordle-row {
+      display: grid;
+      gap: 5px;
+    }
+    .wordle-cell {
+      width: 50px;
+      height: 50px;
+      background-color: #add8e6; /* light blue for "white" tiles */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: black;
+      border-radius: 5px;
+      border: 2px solid #d3d6da;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      backface-visibility: hidden;
+      transform: rotateY(0deg);
+      transform-style: preserve-3d;
+    }
+    .wordle-cell.correct {
+      background-color: #6aaa64;
+      color: white;
+      border-color: #6aaa64;
+    }
+    .wordle-cell.present {
+      background-color: #c9b458;
+      color: white;
+      border-color: #c9b458;
+    }
+    .wordle-cell.absent {
+      background-color: #787c7e;
+      color: white;
+      border-color: #787c7e;
+    }
+
+    #wordleKeyboard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .wordle-key {
+      width: 35px; /* slightly smaller to fit ENT/BCK fully on screen */
+      height: 48px;
+      background-color: #d3d6da;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+      backface-visibility: hidden;
+      transform: scale(1);
+      margin: 3px;
+      font-size: 0.85rem; /* slightly smaller font */
+    }
+    .wordle-key.correct {
+      background-color: #6aaa64;
+      color: white;
+    }
+    .wordle-key.present {
+      background-color: #c9b458;
+      color: white;
+    }
+    .wordle-key.absent {
+      background-color: #787c7e;
+      color: white;
+    }
+    .wordle-key:hover {
+      background-color: #b0bec5;
+      transform: scale(1.05);
+    }
+    .wordle-key:active {
+      transform: scale(0.95);
+    }
+
+    #roundIndicator {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #correctGuessMessage {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(106, 170, 100, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    #confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      opacity: 0;
+      animation: confetti-fall 3s forwards;
+    }
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    #progressBarContainer {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    #progressBar {
+      width: 0%;
+      height: 10px;
+      background-color: #4caf50;
+      transition: width 0.3s ease;
+    }
+    .modal-content {
+      background: linear-gradient(135deg, #ffffff, #f0f0f0);
+      border-radius: 15px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    .modal-open .modal-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal {
+      transition: opacity 0.5s ease;
+      z-index: 50;
+    }
+    .active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-header {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
       text-align: center;
+      color: #1f2937;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: color 0.3s;
+    }
+    .modal-close:hover {
+      color: #374151;
+    }
+
+    /* Make quotes readable */
+    #quotes {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #quote {
+      color: #fff;
     }
   </style>
-  <!-- Open Graph meta tags for social media preview -->
-  <meta property="og:title" content="Mind of Zach">
-  <meta property="og:description" content="Zach Rogers made this website, so you know it's going to be strange.">
-  <meta property="og:image" content="assets/img/Mind of.jpg">
-  <meta property="og:type" content="website">
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center">
+<body class="min-h-screen flex flex-col items-center">
   <header class="py-10 text-center">
     <h1 class="text-5xl fun-font mb-4">Welcome to the Mind of Zach!</h1>
-    <p class="text-lg text-gray-400">Click a button to start a game or view a fun feature!</p>
+    <p class="text-lg text-gray-300">Hello! I’m Zach Rogers, welcome to my page. Click a button!</p>
   </header>
-  
-  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-3/4">
+
+  <!-- Quotes Section -->
+  <section id="quotes" class="hidden">
+    <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
+    <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
+    <button class="mt-4 game-button" onclick="displayRandomQuote()">Get Quote</button>
+  </section>
+
+  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-3/4 mt-10">
     <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="openFlappyModal()">Flappy Bird</button>
     <button class="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500" onclick="openTicTacToeModal()">Tic Tac Toe</button>
-    <button class="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-500" onclick="showGame('rps')">Rock Paper Scissors</button>
+    <button class="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-500" onclick="openRpsModal()">Rock Paper Scissors</button>
     <button class="px-6 py-3 bg-yellow-600 rounded-lg hover:bg-yellow-500" onclick="showGame('quotes')">Quotes</button>
-    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="openSpaceInvadersModal()">Space Invaders</button>
+    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="window.location.href='space.html'">Space Invaders</button>
     <button class="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500" onclick="showGame('zork')">Zork Adventure</button>
     <button class="px-6 py-3 bg-teal-600 rounded-lg hover:bg-teal-500" onclick="showGame('numberguess')">Number Guess</button>
+    <button class="px-6 py-3 bg-pink-600 rounded-lg hover:bg-pink-500" onclick="openWordleModal()">Zachdle</button>
+    <button class="px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-500" onclick="openWritings()">Writings</button>
   </main>
 
+  <!-- Flappy Bird Modal -->
   <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
       <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
@@ -73,11 +327,11 @@
     </div>
   </div>
 
+  <!-- Tic Tac Toe Modal -->
   <div id="ticTacToeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Tic Tac Toe</h2>
       <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto"></div>
-      <!-- Centered start button inside a text-center div -->
       <div class="text-center">
         <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
       </div>
@@ -87,32 +341,99 @@
     </div>
   </div>
 
-  <div id="spaceInvadersModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
-      <h2 class="text-3xl fun-font my-4 text-center">Space Invaders</h2>
-      <canvas id="spaceInvadersCanvas" width="800" height="400" class="bg-black"></canvas>
-      <button id="startSpaceInvaders" class="mt-4 px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700">Start Game</button>
+  <!-- Zachdle Modal -->
+  <div id="wordleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl mx-4 relative modal-content">
+      <div id="roundIndicator"></div>
+      <div id="correctGuessMessage"></div>
+      <div id="confetti"></div>
+      <div id="progressBarContainer">
+        <div id="progressBar"></div>
+      </div>
+      <h2 class="text-3xl fun-font my-4 text-center">Zachdle</h2>
+      <p id="wordleTheme" class="text-center text-lg mb-4">Theme: <span id="currentTheme">Loading...</span></p>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-4">
+        <button id="startWordleButton" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition transform hover:scale-105 shadow">Start Game</button>
+        <button id="rulesButton" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition transform hover:scale-105 shadow">Rules</button>
+        <button id="resetButton" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition transform hover:scale-105 shadow">Reset</button>
+        <button id="powerUpButton" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition transform hover:scale-105 shadow">Use Power-Up</button>
+      </div>
+
+      <div id="wordleBoard" class="mt-4"></div>
+      <div id="wordleKeyboard" class="mt-4"></div>
+      <input id="wordleInput" type="text" class="invisible-input" autofocus>
+      <p id="wordleMessage" class="text-center text-gray-800 mt-4"></p>
       <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeSpaceInvadersModal()">Close</button>
+        <button class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-500" onclick="closeWordleModal()">Close</button>
       </div>
     </div>
   </div>
 
-  <section id="rps" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Rock Paper Scissors</h2>
-    <button class="mt-4 game-button" onclick="playRockPaperScissors()">Play Rock Paper Scissors</button>
-  </section>
+  <!-- Rules Modal for Zachdle -->
+  <div id="rulesModal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="relative bg-white rounded-lg p-6 w-full max-w-md shadow-lg modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-header mb-4 text-2xl font-bold">How to Play</h2>
+      <p class="mb-6 text-center">Guess the secret word, based on the theme, within six tries each round. There are a total of 3 rounds.</p>
+      <!-- Example Tiles with correct instructions -->
+      <div class="mb-6">
+        <div class="flex space-x-2 justify-center mb-2">
+          <!-- Correct (Z) green -->
+          <div class="wordle-cell correct" style="background-color:#6aaa64;color:white;border:none;">Z</div>
+          <!-- Blue "white" tiles -->
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">A</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">C</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">H</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">S</div>
+        </div>
+        <p class="text-center">The letter <strong>Z</strong> is in the word and in the correct spot.</p>
+      </div>
 
-  <section id="quotes" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
-    <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
-    <button class="mt-4 game-button" onclick="displayRandomQuote()">Get Quote</button>
-  </section>
+      <div class="mb-6">
+        <div class="flex space-x-2 justify-center mb-2">
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">C</div>
+          <!-- Present (O) yellow -->
+          <div class="wordle-cell present" style="background-color:#c9b458;color:white;border:none;">O</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">D</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">E</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">D</div>
+        </div>
+        <p class="text-center">The letter <strong>O</strong> is in the word but in the wrong spot.</p>
+      </div>
+
+      <div class="mb-6">
+        <div class="flex space-x-2 justify-center mb-2">
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">G</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">A</div>
+          <!-- Absent (M) gray -->
+          <div class="wordle-cell absent" style="background-color:#787c7e;color:white;border:none;">M</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">E</div>
+          <div class="wordle-cell" style="background-color:#add8e6;border:none;">S</div>
+        </div>
+        <p class="text-center">The letter <strong>M</strong> is not in the word in any spot.</p>
+      </div>
+
+      <button id="closeRulesButton" class="mt-4 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition transform hover:scale-105 shadow">
+        Got It!
+      </button>
+    </div>
+  </div>
+
+  <!-- Rock Paper Scissors Modal -->
+  <div id="rpsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
+      <h2 class="text-3xl fun-font my-4 text-center">Rock Paper Scissors</h2>
+      <div id="rpsOutput" class="text-center text-xl mt-4"></div>
+      <div class="text-center mt-4">
+        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeRpsModal()">Close</button>
+      </div>
+    </div>
+  </div>
 
   <section id="zork" class="hidden">
     <h2 class="text-3xl fun-font my-4">Zork Adventure</h2>
     <div id="output" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-scroll" style="max-height: 300px;"></div>
-    <!-- Removed onkeydown attribute here to avoid double triggers -->
     <input id="input" type="text" class="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg" placeholder="Type your command here...">
     <p class="text-sm text-gray-400 mt-2">Type commands like "go north", "take sword", or "attack goblin".</p>
   </section>
@@ -123,13 +444,24 @@
     <button class="mt-4 game-button" onclick="playNumberGuess()">Play Number Guess</button>
   </section>
 
+  <section id="writings" class="hidden">
+    <h2 class="text-3xl fun-font my-4">My Writings</h2>
+    <div id="writings-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    <div class="text-center mt-4">
+      <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500" onclick="loadWritings()">Load Writings</button>
+    </div>
+  </section>
+
+  <!-- Scripts -->
   <script src="js/flappybird.js"></script>
   <script src="js/tictactoe.js"></script>
   <script src="js/rockpaperscissors.js"></script>
   <script src="js/quotes.js"></script>
-  <script src="js/spaceinvaders.js"></script>
   <script src="js/zork.js"></script>
   <script src="js/numberguess.js"></script>
+  <script src="js/writings.js"></script>
+  <script src="js/yetanotherwordlegame.js"></script>
+
   <script>
     function showGame(gameId) {
       document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
@@ -148,18 +480,52 @@
 
     function openTicTacToeModal() {
       document.getElementById("ticTacToeModal").classList.remove("hidden");
-      // Initialize game as soon as modal opens, ensuring element is there
       initializeTicTacToe();
     }
     function closeTicTacToeModal() {
       document.getElementById("ticTacToeModal").classList.add("hidden");
     }
 
-    function openSpaceInvadersModal() {
-      document.getElementById("spaceInvadersModal").classList.remove("hidden");
+    function openWordleModal() {
+      document.getElementById("wordleModal").classList.remove("hidden");
+      document.body.classList.add('modal-open');
+      openRulesModal();
     }
-    function closeSpaceInvadersModal() {
-      document.getElementById("spaceInvadersModal").classList.add("hidden");
+    function closeWordleModal() {
+      document.getElementById("wordleModal").classList.add("hidden");
+      document.body.classList.remove('modal-open');
+    }
+
+    function openWritings() {
+      document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
+      document.getElementById("writings").classList.remove("hidden");
+    }
+
+    // RULES MODAL
+    const rulesModal = document.getElementById('rulesModal');
+    const closeRulesButton = document.getElementById('closeRulesButton');
+    const modalClose = rulesModal.querySelector('.modal-close');
+
+    function openRulesModal() {
+      rulesModal.classList.remove('hidden');
+      rulesModal.classList.add('active');
+      rulesModal.style.zIndex = '100';
+    }
+
+    function closeRulesModal() {
+      rulesModal.classList.remove('active');
+      rulesModal.classList.add('hidden');
+    }
+
+    modalClose.addEventListener('click', closeRulesModal);
+    closeRulesButton.addEventListener('click', closeRulesModal);
+
+    function openRpsModal() {
+      document.getElementById("rpsModal").classList.remove("hidden");
+      playRockPaperScissors();
+    }
+    function closeRpsModal() {
+      document.getElementById("rpsModal").classList.add("hidden");
     }
   </script>
 </body>

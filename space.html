@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Space Invaders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at center, #000000 0%, #1a1a1a 100%);
+      font-family: 'Poppins', sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: center;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    header, main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .game-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+    .canvas-wrapper {
+      width: 100%;
+      position: relative;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 20px auto;
+      background: #000;
+      border: 2px solid #fff;
+    }
+    .game-button {
+      display: inline-block;
+      text-align: center;
+      background-color: #4a5568;
+      color: #f7fafc;
+      padding: 10px 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .game-button:hover {
+      background-color: #2d3748;
+      transform: scale(1.05);
+    }
+    .game-button:active {
+      transform: scale(0.95);
+    }
+
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle 2s infinite ease-in-out alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.1; }
+      to { opacity: 1; }
+    }
+
+    .controls-container {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px 0;
+    }
+    .control-button {
+      background-color: #4a5568;
+      color: #fff;
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .control-button:hover {
+      background-color: #2d3748;
+      transform: scale(1.05);
+    }
+    .control-button:active {
+      transform: scale(0.95);
+    }
+
+    #nextLevelButton {
+      display: none;
+    }
+
+    @media (max-width: 400px) {
+      .control-button {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="p-4 w-full flex justify-center">
+    <a href="index.html" class="game-button">Back to Home</a>
+  </header>
+
+  <main class="game-container">
+    <h1 class="text-3xl font-bold mb-4 mt-4 text-center">Space Invaders</h1>
+    <div class="canvas-wrapper">
+      <canvas id="spaceGameCanvas"></canvas>
+    </div>
+    <button id="startSpaceGame" class="game-button">Start Game</button>
+    <button id="nextLevelButton" class="game-button">Next Level</button>
+
+    <!-- On-screen controls: Left, Shoot (middle), Right -->
+    <div class="controls-container">
+      <div class="control-button" id="leftButton">←</div>
+      <div class="control-button" id="shootButton">★</div>
+      <div class="control-button" id="rightButton">→</div>
+    </div>
+  </main>
+
+  <div class="starfield" id="starfield"></div>
+
+  <script src="js/spaceinvaders.js"></script>
+  <script>
+    const starfield = document.getElementById('starfield');
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 3;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.left = Math.random() * 100 + '%';
+      starfield.appendChild(star);
+    }
+  </script>
+</body>
+</html>
