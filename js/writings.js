@@ -1,19 +1,45 @@
-// Load and display writings
+// writings.js
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('./writings.json')
-    .then(response => response.json())
-    .then(data => {
-      const writingsContainer = document.getElementById('writings-container');
-      data.forEach(writing => {
-        const writingElement = `
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-2xl font-bold">${writing.title}</h3>
-            <p class="mt-2 text-gray-400">${writing.description}</p>
-            <button class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg text-white hover:bg-indigo-500" onclick="alert('${writing.content}')">Read More</button>
-          </div>
-        `;
-        writingsContainer.innerHTML += writingElement;
+  const writingsContainer = document.getElementById('writings-container');
+
+  window.loadWritings = function() {
+    // Reverting to ./writings.json so it matches the original structure
+    fetch('./writings.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!data.writings || !Array.isArray(data.writings)) {
+          throw new Error('Invalid writings format');
+        }
+        writingsContainer.innerHTML = ''; // Clear previous writings
+        data.writings.forEach(writing => {
+          const writingCard = document.createElement('div');
+          writingCard.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md');
+
+          const title = document.createElement('h3');
+          title.classList.add('text-2xl', 'font-bold', 'mb-2');
+          title.textContent = writing.title;
+
+          const description = document.createElement('p');
+          description.classList.add('text-gray-400', 'mb-2');
+          description.textContent = writing.description;
+
+          const content = document.createElement('p');
+          content.classList.add('text-gray-300');
+          content.textContent = writing.content;
+
+          writingCard.appendChild(title);
+          writingCard.appendChild(description);
+          writingCard.appendChild(content);
+          writingsContainer.appendChild(writingCard);
+        });
+      })
+      .catch(error => {
+        writingsContainer.innerHTML = `<p class="text-red-500">Failed to load writings: ${error.message}</p>`;
       });
-    })
-    .catch(err => console.error('Error loading writings:', err));
+  }
 });
