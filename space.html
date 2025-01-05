@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -120,7 +120,7 @@
       display: none;
     }
 
-    /* New Reset Button (same style) */
+    /* Reset Button was moved below the control buttons, as requested */
     #resetGameButton {
       display: none;
     }
@@ -146,8 +146,6 @@
     </div>
     <button id="startSpaceGame" class="game-button">Start Game</button>
     <button id="nextLevelButton" class="game-button">Next Level</button>
-    <!-- New Reset button -->
-    <button id="resetGameButton" class="game-button">Reset Game</button>
 
     <!-- On-screen controls: Left, Shoot (middle), Right -->
     <div class="controls-container">
@@ -155,6 +153,9 @@
       <div class="control-button" id="shootButton">★</div>
       <div class="control-button" id="rightButton">→</div>
     </div>
+
+    <!-- Moved Reset button below the control buttons -->
+    <button id="resetGameButton" class="game-button">Reset Game</button>
   </main>
 
   <div class="starfield" id="starfield"></div>
