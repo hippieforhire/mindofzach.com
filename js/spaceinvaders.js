@@ -3,6 +3,7 @@
 // Shoot button center, left/right on sides
 // More variety: first 2 levels normal enemies, 3rd level a boss with more health and power-ups.
 // Now includes additional levels, better power-ups, player can actually die, improved graphics.
+// Bosses can now shoot at the player to increase difficulty.
 
 (function() {
     const canvas = document.getElementById('spaceGameCanvas');
@@ -20,6 +21,10 @@
     // Track whether left/right buttons are being pressed (mobile).
     let moveLeftActive = false;
     let moveRightActive = false;
+
+    // Store any bullets fired by enemies/boss.
+    let enemyBullets = [];
+    let bossShootTimer = 0; // Tracks time since last boss shot
 
     function init(levelNum = 1) {
         canvas.width = 800;
@@ -40,26 +45,52 @@
         bullets = [];
         enemies = [];
         powerUps = [];
+        enemyBullets = [];
         keys = {};
         gameOver = false;
         score = 0;
         level = levelNum;
         enemyDirection = 1;
+        bossShootTimer = 0;
 
         // Spawn enemies/boss depending on level
-        if (level === 1) {
-            spawnEnemies(2, 8);
-        } else if (level === 2) {
-            spawnEnemies(3, 8);
-        } else if (level === 3) {
-            spawnBoss(50);
-        } else if (level === 4) {
-            spawnEnemies(4, 10);
-        } else if (level === 5) {
-            spawnBoss(100);
-        } else {
-            // If you want more levels, you can extend the logic here
-            spawnEnemies(3, 8);
+        switch (level) {
+            case 1:
+                // small wave
+                spawnEnemies(2, 8);
+                break;
+            case 2:
+                // medium wave
+                spawnEnemies(3, 8);
+                break;
+            case 3:
+                // boss with 50 HP
+                spawnBoss(50);
+                break;
+            case 4:
+                // bigger wave
+                spawnEnemies(4, 10);
+                break;
+            case 5:
+                // boss with 100 HP
+                spawnBoss(100);
+                break;
+            case 6:
+                // even larger wave
+                spawnEnemies(5, 10);
+                break;
+            case 7:
+                // bigger boss
+                spawnBoss(150);
+                break;
+            case 8:
+                // a big final wave
+                spawnEnemies(6, 12);
+                break;
+            default:
+                // after level 8, just keep repeating or create your own pattern
+                spawnEnemies(4, 10);
+                break;
         }
     }
 
@@ -72,6 +103,8 @@
         const offsetLeft = 50;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
+                // Slight random variation in health for more difficulty
+                const randomExtraHealth = Math.random() < 0.3 ? 2 : 1;
                 enemies.push({
                     x: offsetLeft + c * (enemyWidth + padding),
                     y: offsetTop + r * (enemyHeight + padding),
@@ -79,7 +112,7 @@
                     height: enemyHeight,
                     alive: true,
                     boss: false,
-                    health: 1
+                    health: randomExtraHealth
                 });
             }
         }
@@ -153,7 +186,7 @@
                 if (e.boss) {
                     enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
                     enemyGrad.addColorStop(0, '#ff69b4'); // Boss: hot pink
-                    enemyGrad.addColorStop(1, '#ff1493'); 
+                    enemyGrad.addColorStop(1, '#ff1493');
                 } else {
                     enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
                     enemyGrad.addColorStop(0, 'white');
@@ -178,7 +211,7 @@
         });
         if (hitEdge) {
             enemies.forEach(e => {
-                if (e.alive) e.y += 10;
+                if (e.alive) e.y += 10; 
             });
             enemyDirection *= -1;
         }
@@ -189,11 +222,11 @@
         powerUps.forEach(p => {
             // Radial gradient for power-up
             const puGrad = ctx.createRadialGradient(
-                p.x + p.size / 2, 
-                p.y + p.size / 2, 
+                p.x + p.size / 2,
+                p.y + p.size / 2,
                 p.size / 8,
-                p.x + p.size / 2, 
-                p.y + p.size / 2, 
+                p.x + p.size / 2,
+                p.y + p.size / 2,
                 p.size / 2
             );
             puGrad.addColorStop(0, 'yellow');
@@ -222,6 +255,52 @@
                 powerUps.splice(i, 1);
             } else if (powerUps[i].y > canvas.height) {
                 powerUps.splice(i, 1);
+            }
+        }
+    }
+
+    // Allow bosses (or possibly enemies) to shoot
+    function spawnEnemyBullet(shooter) {
+        // Shooter is an enemy or boss object
+        enemyBullets.push({
+            x: shooter.x + shooter.width / 2 - 2,
+            y: shooter.y + shooter.height,
+            width: 4,
+            height: 10,
+            speed: 4, // speed of downward bullet
+        });
+    }
+
+    function drawEnemyBullets() {
+        enemyBullets.forEach(b => {
+            const bulletGrad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.height);
+            bulletGrad.addColorStop(0, 'cyan');
+            bulletGrad.addColorStop(1, 'blue');
+            ctx.fillStyle = bulletGrad;
+            ctx.fillRect(b.x, b.y, b.width, b.height);
+        });
+    }
+
+    function moveEnemyBullets() {
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+            enemyBullets[i].y += enemyBullets[i].speed;
+            // Remove if off screen
+            if (enemyBullets[i].y > canvas.height) {
+                enemyBullets.splice(i, 1);
+                continue;
+            }
+            // Check collision with player
+            if (
+                enemyBullets[i].y + enemyBullets[i].height >= player.y &&
+                enemyBullets[i].x < player.x + player.width &&
+                enemyBullets[i].x + enemyBullets[i].width > player.x
+            ) {
+                // Player takes damage
+                player.health--;
+                enemyBullets.splice(i, 1);
+                if (player.health <= 0) {
+                    gameOver = true;
+                }
             }
         }
     }
@@ -281,13 +360,13 @@
         enemies.forEach(e => {
             if (e.alive) {
                 // If enemy's bottom is at or below player's top
-                if (e.y + e.height >= player.y && 
+                if (e.y + e.height >= player.y &&
                     e.x < player.x + player.width &&
                     e.x + e.width > player.x
                 ) {
                     // Player takes damage
                     player.health--;
-                    e.alive = false; 
+                    e.alive = false;
                     // End game if out of health
                     if (player.health <= 0) {
                         gameOver = true;
@@ -329,6 +408,25 @@
         movePowerUps();
         drawPowerUps();
 
+        // Boss shooting logic (only if there's a boss alive)
+        let bossExists = enemies.some(e => e.boss && e.alive);
+        if (bossExists) {
+            bossShootTimer++;
+            // For example: boss fires every ~60 frames
+            if (bossShootTimer > 60) {
+                // Fire bullet(s) from the boss
+                let bossEnemy = enemies.find(e => e.boss && e.alive);
+                if (bossEnemy) {
+                    spawnEnemyBullet(bossEnemy);
+                }
+                bossShootTimer = 0;
+            }
+        }
+
+        // Enemy bullets
+        moveEnemyBullets();
+        drawEnemyBullets();
+
         checkCollisions();
         drawScore();
 
@@ -336,7 +434,8 @@
         if (enemies.every(e => !e.alive)) {
             ctx.fillStyle = 'white';
             ctx.font = '30px sans-serif';
-            if (level < 5) {
+            // If we're below level 8, show next level button
+            if (level < 8) {
                 ctx.fillText("Level Complete!", canvas.width / 2 - 100, canvas.height / 2);
                 nextLevelButton.style.display = 'inline-block';
             } else {
