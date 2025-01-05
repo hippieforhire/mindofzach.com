@@ -1,13 +1,16 @@
 // spaceinvaders.js with multiple levels, bosses
 // One-hit kill: If the player is hit, it's game over
-// All enemies shoot, with frequency increasing each level, bosses shoot even more
-// Power-ups removed
-// Improved graphics for more appealing visuals
+// All enemies shoot, but only a few at once, with frequency increasing each level
+// Bosses shoot fewer bullets at a time
+// Added "Reset Game" button
+// Enhanced fluid feel (wave animation for enemies, smoother difficulty curve, etc.)
+// Preserves your layout, text, and margins
 
 (function() {
     const canvas = document.getElementById('spaceGameCanvas');
     const startButton = document.getElementById('startSpaceGame');
     const nextLevelButton = document.getElementById('nextLevelButton');
+    const resetGameButton = document.getElementById('resetGameButton');
     const leftButton = document.getElementById('leftButton');
     const rightButton = document.getElementById('rightButton');
     const shootButton = document.getElementById('shootButton');
@@ -16,8 +19,7 @@
     let gameStarted = false;
     let animationId;
 
-    // We now have only one-hit kill. 
-    // So no need for 'health' or complicated collision checks on player health.
+    // One-hit kill logic
     let player, bullets, enemies, keys, gameOver, score, level, enemyDirection;
     
     // Mobile left/right movement flags
@@ -27,25 +29,28 @@
     // Enemy / Boss bullet data
     let enemyBullets = [];
 
-    // Timers to handle shooting intervals
+    // Timers / intervals
     let enemyShootTimer = 0;
     let bossShootTimer = 0;
 
-    // Frequency / difficulty scales each level
-    // Lower intervals = more frequent shots
-    // e.g. level 1: enemies shoot every 120 frames, boss shoots every 80 frames, etc.
+    // Basic wave amplitude for a fluid, slight vertical motion
+    const waveAmplitude = 2;  
+
+    // Each level: enemies shoot with some interval, boss has its own
+    // The user wants level 1 to be relatively easy, and the game to scale up.
     function getEnemyShootInterval() {
-      // Enemies get faster shooting each level
-      // We'll do a base of 120 frames - (level * 5) with a minimum
-      let interval = 120 - (level * 5);
-      return Math.max(interval, 50); // never go below 50 frames
+      // Start fairly high at level 1, then ramp down, never below 60
+      const base = 200; // frames
+      const dec = (level - 1) * 15; 
+      return Math.max(base - dec, 60);
     }
 
     function getBossShootInterval() {
-      // Bosses shoot more than normal enemies
-      // We'll do 80 frames - (level * 5) with a minimum
-      let interval = 80 - (level * 5);
-      return Math.max(interval, 30); 
+      // Boss shoots more often, but not too many bullets.
+      // Start a bit faster, also never below 40
+      const base = 150;
+      const dec = (level - 1) * 10;
+      return Math.max(base - dec, 40);
     }
 
     function init(levelNum = 1) {
@@ -73,40 +78,48 @@
         enemyShootTimer = 0;
         bossShootTimer = 0;
 
-        // Spawn enemies/boss depending on level
-        switch (level) {
+        // Hide the Reset and Next Level buttons at the start
+        resetGameButton.style.display = 'none';
+        nextLevelButton.style.display = 'none';
+
+        spawnWave(level);
+    }
+
+    // Helper to spawn enemies/boss based on level
+    function spawnWave(lvl) {
+        switch (lvl) {
             case 1:
-                spawnEnemies(2, 8);
+                spawnEnemies(2, 6);
                 break;
             case 2:
                 spawnEnemies(3, 8);
                 break;
             case 3:
-                spawnBoss(50);
+                spawnBoss(60);
                 break;
             case 4:
-                spawnEnemies(4, 10);
+                spawnEnemies(4, 9);
                 break;
             case 5:
-                spawnBoss(100);
+                spawnBoss(80);
                 break;
             case 6:
                 spawnEnemies(5, 10);
                 break;
             case 7:
-                spawnBoss(150);
+                spawnBoss(120);
                 break;
             case 8:
                 spawnEnemies(6, 12);
                 break;
             default:
-                // after 8, keep going if you like
-                spawnEnemies(4, 10);
+                // after 8, keep scaling
+                spawnEnemies(4 + (lvl % 3), 8 + (lvl % 5));
                 break;
         }
     }
 
-    // Create normal enemies in a grid
+    // Create normal enemies in a grid, each storing initialY for wave motion
     function spawnEnemies(rows, cols) {
         const enemyWidth = 30;
         const enemyHeight = 20;
@@ -116,29 +129,28 @@
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                // Slight random variation in health, though it doesn't matter for you killing them in one shot
-                // but let's keep them at 1 for simplicity or optionally do random
-                const randomHealth = 1;
                 enemies.push({
                     x: offsetLeft + c * (enemyWidth + padding),
                     y: offsetTop + r * (enemyHeight + padding),
+                    initialY: offsetTop + r * (enemyHeight + padding),
+                    offset: Math.random() * 10000, // random offset for wave
                     width: enemyWidth,
                     height: enemyHeight,
                     alive: true,
                     boss: false,
-                    health: randomHealth
+                    health: 1 // one shot kill for them
                 });
             }
         }
     }
 
     // Create a boss enemy with a given health
-    // Even though "health" isn't a big factor for one-hit kills to the player,
-    // We'll keep it for enemy/boss logic (boss might still need multiple shots to kill).
     function spawnBoss(bossHealth) {
         enemies.push({
             x: canvas.width / 2 - 40,
             y: 50,
+            initialY: 50,
+            offset: Math.random() * 10000,
             width: 80,
             height: 40,
             alive: true,
@@ -148,10 +160,7 @@
     }
 
     function drawBackground() {
-        // Add a subtle starry background with a random color overlay
-        // We'll do a slight gradient overlay for extra flair
         const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        // Purple to black for a cosmic vibe
         bgGradient.addColorStop(0, '#0c0c3c');
         bgGradient.addColorStop(1, '#000');
         ctx.fillStyle = bgGradient;
@@ -200,47 +209,54 @@
     // Draw enemies with random color variation for extra style
     function drawEnemies() {
         enemies.forEach(e => {
-            if (e.alive) {
-                let enemyGrad;
-                if (e.boss) {
-                    // Boss: vibrant purple gradient
-                    enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
-                    enemyGrad.addColorStop(0, '#bb00ff');
-                    enemyGrad.addColorStop(1, '#7a00ff');
-                } else {
-                    // Random-ish color for each enemy
-                    enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
-                    enemyGrad.addColorStop(0, randomColorStop());
-                    enemyGrad.addColorStop(1, randomColorStop());
-                }
-                ctx.fillStyle = enemyGrad;
-                ctx.fillRect(e.x, e.y, e.width, e.height);
+            if (!e.alive) return;
+
+            let enemyGrad;
+            if (e.boss) {
+                enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
+                enemyGrad.addColorStop(0, '#bb00ff');
+                enemyGrad.addColorStop(1, '#7a00ff');
+            } else {
+                enemyGrad = ctx.createLinearGradient(e.x, e.y, e.x + e.width, e.y + e.height);
+                enemyGrad.addColorStop(0, randomColorStop());
+                enemyGrad.addColorStop(1, randomColorStop());
             }
+            ctx.fillStyle = enemyGrad;
+            ctx.fillRect(e.x, e.y, e.width, e.height);
         });
     }
 
-    // Helper to generate random color stops
+    // Helper to generate random pastel-ish color stops
     function randomColorStop() {
-      // random pastel color
-      const r = 100 + Math.floor(Math.random() * 156);
-      const g = 100 + Math.floor(Math.random() * 156);
-      const b = 100 + Math.floor(Math.random() * 156);
-      return `rgb(${r}, ${g}, ${b})`;
+        const r = 100 + Math.floor(Math.random() * 156);
+        const g = 100 + Math.floor(Math.random() * 156);
+        const b = 100 + Math.floor(Math.random() * 156);
+        return `rgb(${r}, ${g}, ${b})`;
     }
 
+    // Move enemies sideways, plus a small wave effect
     function moveEnemies() {
         let hitEdge = false;
         enemies.forEach(e => {
-            if (e.alive) {
-                e.x += enemyDirection;
-                if (e.x + e.width > canvas.width || e.x < 0) {
-                    hitEdge = true;
-                }
+            if (!e.alive) return;
+
+            // Standard horizontal movement
+            e.x += enemyDirection;
+
+            // Wave effect for vertical position
+            e.y = e.initialY + waveAmplitude * Math.sin((Date.now() + e.offset) / 300);
+
+            if (e.x + e.width > canvas.width || e.x < 0) {
+                hitEdge = true;
             }
         });
         if (hitEdge) {
             enemies.forEach(e => {
-                if (e.alive) e.y += 10; 
+                if (e.alive) {
+                    e.x = e.x; // keep x
+                    // Move them down a bit
+                    e.initialY += 10;
+                }
             });
             enemyDirection *= -1;
         }
@@ -277,30 +293,36 @@
         }
     }
 
-    // Let all enemies shoot, plus boss shoot more
+    // Let enemies shoot, but only a random subset, boss shoots fewer bullets
     function handleEnemyShooting() {
         enemyShootTimer++;
         bossShootTimer++;
 
-        // Normal enemy shoot
+        // Normal enemies shoot
         if (enemyShootTimer > getEnemyShootInterval()) {
+            enemyShootTimer = 0;
+            // Randomly pick a few enemies to shoot
             enemies.forEach(e => {
                 if (!e.boss && e.alive) {
-                    spawnEnemyBullet(e);
+                    // 20% chance each living normal enemy will shoot
+                    if (Math.random() < 0.2) {
+                        spawnEnemyBullet(e);
+                    }
                 }
             });
-            enemyShootTimer = 0;
         }
 
         // Boss shoot
         if (bossShootTimer > getBossShootInterval()) {
+            bossShootTimer = 0;
             let bossEnemy = enemies.find(e => e.boss && e.alive);
             if (bossEnemy) {
-                // Boss can shoot multiple bullets at once for extra challenge
-                spawnEnemyBullet(bossEnemy);
-                spawnEnemyBullet(bossEnemy);
+                // Boss fires fewer bullets: 1 bullet if level < 4, else 2 bullets
+                let bulletsToFire = (level < 4) ? 1 : 2;
+                for (let i = 0; i < bulletsToFire; i++) {
+                    spawnEnemyBullet(bossEnemy);
+                }
             }
-            bossShootTimer = 0;
         }
     }
 
@@ -311,7 +333,7 @@
             y: shooter.y + shooter.height,
             width: 4,
             height: 10,
-            speed: 4
+            speed: 3 // a bit slower for more fluid dodge
         });
     }
 
@@ -375,6 +397,8 @@
             ctx.fillStyle = 'white';
             ctx.font = '30px sans-serif';
             ctx.fillText("Game Over!", canvas.width / 2 - 70, canvas.height / 2);
+            // Show reset button
+            resetGameButton.style.display = 'inline-block';
             cancelAnimationFrame(animationId);
             return;
         }
@@ -389,9 +413,7 @@
         moveEnemies();
         drawEnemies();
 
-        // All enemies & bosses shoot
         handleEnemyShooting();
-
         moveEnemyBullets();
         drawEnemyBullets();
 
@@ -402,12 +424,13 @@
         if (enemies.every(e => !e.alive)) {
             ctx.fillStyle = 'white';
             ctx.font = '30px sans-serif';
-            // If we're below level 8, show next level button
             if (level < 8) {
                 ctx.fillText("Level Complete!", canvas.width / 2 - 100, canvas.height / 2);
                 nextLevelButton.style.display = 'inline-block';
             } else {
                 ctx.fillText("You Win the Game!", canvas.width / 2 - 120, canvas.height / 2);
+                // Show reset button
+                resetGameButton.style.display = 'inline-block';
             }
             cancelAnimationFrame(animationId);
             return;
@@ -422,21 +445,30 @@
         ctx = canvas.getContext('2d');
         init(1);
         startButton.style.display = 'none';
-        nextLevelButton.style.display = 'none';
         update();
+    }
+
+    function resetGame() {
+        // Return to initial state
+        cancelAnimationFrame(animationId);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        gameStarted = false;
+        startButton.style.display = 'inline-block';
+        nextLevelButton.style.display = 'none';
+        resetGameButton.style.display = 'none';
     }
 
     nextLevelButton.addEventListener('click', () => {
         level++;
         init(level);
-        nextLevelButton.style.display = 'none';
         update();
     });
+
+    resetGameButton.addEventListener('click', resetGame);
 
     // Keyboard events
     document.addEventListener('keydown', (e) => {
         keys[e.key] = true;
-        // Shoot with Space
         if (e.key === ' ') {
             shoot();
         }
