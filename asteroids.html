@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asteroids Game</title>
     <style>
+        body {
+            background: linear-gradient(to bottom, #000, #222);
+            margin: 0;
+            overflow: hidden;
+        }
         canvas {
             border: 2px solid white;
-            background-color: black;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         #gameOverScreen {
             position: absolute;
@@ -35,6 +45,25 @@
         button:hover {
             background-color: #45a049;
         }
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        #controls div {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +76,12 @@
         <p>Score: <span id="scoreDisplay">0</span></p>
         <p>Lives: <span id="livesDisplay">3</span></p>
         <p>Level: <span id="levelDisplay">1</span></p>
+    </div>
+    <div id="controls">
+        <div id="leftBtn">Left</div>
+        <div id="rightBtn">Right</div>
+        <div id="thrustBtn">Thrust</div>
+        <div id="shootBtn">Shoot</div>
     </div>
 
     <script>
@@ -207,12 +242,29 @@
                 this.player = new Player();
                 this.asteroids = [];
                 this.bullets = [];
+                this.stars = [];
                 this.score = 0;
                 this.lives = 3;
                 this.currentLevel = 1;
                 this.gameOver = false;
                 this.setupInput();
                 this.startNewLevel();
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                for (let i = 0; i < 100; i++) {
+                    this.stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 0.5 + 0.1
+                    });
+                }
+            }
+
+            resizeCanvas() {
+                const scale = Math.min(window.innerWidth / canvas.width, window.innerHeight / canvas.height);
+                canvas.style.width = (canvas.width * scale) + 'px';
+                canvas.style.height = (canvas.height * scale) + 'px';
             }
 
             setupInput() {
@@ -229,11 +281,6 @@
                             break;
                         case ' ':
                             this.player.shooting = true;
-                            const now = Date.now();
-                            if (now - this.player.lastShotTime > 500) {
-                                this.shootBullet();
-                                this.player.lastShotTime = now;
-                            }
                             break;
                     }
                 });
@@ -253,6 +300,47 @@
                             this.player.shooting = false;
                             break;
                     }
+                });
+
+                const leftBtn = document.getElementById('leftBtn');
+                const rightBtn = document.getElementById('rightBtn');
+                const thrustBtn = document.getElementById('thrustBtn');
+                const shootBtn = document.getElementById('shootBtn');
+
+                leftBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.player.turningLeft = true;
+                });
+                leftBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.player.turningLeft = false;
+                });
+
+                rightBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.player.turningRight = true;
+                });
+                rightBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.player.turningRight = false;
+                });
+
+                thrustBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.player.thrust = true;
+                });
+                thrustBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.player.thrust = false;
+                });
+
+                shootBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.player.shooting = true;
+                });
+                shootBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.player.shooting = false;
                 });
 
                 restartButton.addEventListener('click', () => {
@@ -310,10 +398,20 @@
 
                 this.player.update();
 
+                if (this.player.shooting && Date.now() - this.player.lastShotTime > 500) {
+                    this.shootBullet();
+                    this.player.lastShotTime = Date.now();
+                }
+
                 this.bullets = this.bullets.filter(bullet => !bullet.isExpired());
                 this.bullets.forEach(bullet => bullet.update());
 
                 this.asteroids.forEach(asteroid => asteroid.update());
+
+                this.stars.forEach(star => {
+                    star.x -= star.speed;
+                    if (star.x < 0) star.x = canvas.width;
+                });
 
                 // Check bullet-asteroid collisions
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
@@ -392,6 +490,14 @@
             render() {
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw stars
+                ctx.fillStyle = 'white';
+                this.stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
 
                 this.player.draw();
 
