@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mind of Zach</title>
   
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
@@ -349,10 +348,26 @@
         max-width: 90%;
       }
     }
+    
+    /* Specific styles for Tetris canvas */
+    #tetrisCanvas {
+        border: 2px solid #ccc;
+        background-color: #000; /* Ensure black background for Tetris game area */
+        /* Explicitly define dimensions that will be adjusted by JS */
+        width: 240px; 
+        height: 400px;
+        max-width: 100%; /* Ensure it doesn't overflow on small screens */
+        max-height: 80vh; /* Limit height to viewport height for smaller screens */
+    }
+
+    /* Prevent scrolling on touch for game canvases */
+    #tetrisCanvas, #gameCanvas, #snakeCanvas, #pongCanvas, #hangmanCanvas {
+        -ms-touch-action: none;
+        touch-action: none;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center">
-  <!-- Animated Background Container -->
   <div class="content content--canvas"></div>
 
   <header class="py-10 text-center">
@@ -360,7 +375,6 @@
     <p class="text-lg text-gray-300">Hello! I’m Zach Rogers, welcome to my page. Click a button!</p>
   </header>
 
-  <!-- Quotes Section -->
   <section id="quotes" class="hidden">
     <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
     <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
@@ -383,7 +397,6 @@
     <button class="px-6 py-3 bg-rose-600 rounded-lg hover:bg-rose-500" onclick="openHangmanModal()">Hangman</button>
   </main>
 
-  <!-- Flappy Bird Modal -->
   <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
       <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
@@ -397,7 +410,6 @@
     </div>
   </div>
 
-  <!-- Tic Tac Toe Modal -->
   <div id="ticTacToeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Tic Tac Toe</h2>
@@ -411,7 +423,6 @@
     </div>
   </div>
 
-  <!-- Zachdle Modal -->
   <div id="wordleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl mx-4 relative modal-content">
       <div id="roundIndicator"></div>
@@ -440,7 +451,6 @@
     </div>
   </div>
 
-  <!-- Rules Modal for Zachdle -->
   <div id="rulesModal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
     <div class="relative bg-white rounded-lg p-6 w-full max-w-md shadow-lg modal-content">
       <span class="modal-close">&times;</span>
@@ -460,7 +470,7 @@
 
       <div class="mb-6">
         <div class="flex space-x-2 justify-center mb-2">
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">C</div>
+          <div class="wordle-cell" style="background-color:#add7e6;border:none;">C</div>
           <div class="wordle-cell present" style="background-color:#c9b458;color:white;border:none;">O</div>
           <div class="wordle-cell" style="background-color:#add8e6;border:none;">D</div>
           <div class="wordle-cell" style="background-color:#add8e6;border:none;">E</div>
@@ -486,7 +496,6 @@
     </div>
   </div>
 
-  <!-- Rock Paper Scissors Modal -->
   <div id="rpsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Rock Paper Scissors</h2>
@@ -497,7 +506,6 @@
     </div>
   </div>
 
-  <!-- Zork Adventure Section -->
   <section id="zork" class="hidden">
     <h2 class="text-3xl fun-font my-4">Zork Adventure</h2>
     <div id="output" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-scroll" style="max-height: 300px;"></div>
@@ -505,14 +513,12 @@
     <p class="text-sm text-gray-400 mt-2">Type commands like "go north", "take sword", or "attack goblin".</p>
   </section>
 
-  <!-- Number Guess Game Section -->
   <section id="numberguess" class="hidden">
     <h2 class="text-3xl fun-font my-4">Number Guess Game</h2>
     <p id="guessOutput" class="text-xl text-center italic"></p>
     <button class="mt-4 game-button" onclick="playNumberGuess()">Play Number Guess</button>
   </section>
 
-  <!-- Writings Section -->
   <section id="writings" class="hidden">
     <h2 class="text-3xl fun-font my-4">My Writings</h2>
     <div id="writings-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
@@ -521,11 +527,9 @@
     </div>
   </section>
 
-  <!-- Tetris Modal -->
   <div id="tetrisModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
-      <h2 class="text-3xl fun-font my-4 text-center">Tetris</h2>
-      <canvas id="tetrisCanvas" class="bg-gray-200"></canvas>
+    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl max-h-screen overflow-y-auto"> <h2 class="text-3xl fun-font my-4 text-center">Tetris</h2>
+      <canvas id="tetrisCanvas"></canvas>
       <p id="tetrisScore" class="text-center text-lg mt-4">Score: 0</p>
       <div class="text-center mt-4 space-x-4">
         <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startTetrisButton">Start</button>
@@ -540,7 +544,6 @@
     </div>
   </div>
 
-  <!-- Snake Modal -->
   <div id="snakeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Snake</h2>
@@ -561,7 +564,6 @@
     </div>
   </div>
 
-  <!-- Pong Modal -->
   <div id="pongModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Pong</h2>
@@ -578,7 +580,6 @@
     </div>
   </div>
 
-  <!-- Hangman Modal -->
   <div id="hangmanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
       <h2 class="text-3xl fun-font my-4 text-center">Hangman</h2>
@@ -593,7 +594,6 @@
     </div>
   </div>
 
-  <!-- External Scripts -->
   <script src="js/flappybird.js"></script>
   <script src="js/tictactoe.js"></script>
   <script src="js/rockpaperscissors.js"></script>
@@ -607,10 +607,8 @@
   <script src="js/pong.js"></script>
   <script src="js/hangman.js"></script>
 
-  <!-- Simplex Noise CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
 
-  <!-- Inline util.js -->
   <script>
     // util.js
 
@@ -636,7 +634,6 @@
     }
   </script>
 
-  <!-- Inline coalesce.js -->
   <script>
     // coalesce.js
     (function() {
@@ -840,7 +837,6 @@
     })();
   </script>
 
-  <!-- Modal and Game Scripts -->
   <script>
     function showGame(gameId) {
       document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
@@ -912,9 +908,16 @@
 
     function openTetrisModal() {
       document.getElementById("tetrisModal").classList.remove("hidden");
+      // Call a function to initialize or reset Tetris when the modal opens
+      if (typeof initializeTetris === 'function') {
+          initializeTetris(); // Initialize Tetris game state
+      }
     }
     function closeTetrisModal() {
       document.getElementById("tetrisModal").classList.add("hidden");
+      if (typeof stopTetrisGame === 'function') {
+          stopTetrisGame(); // Stop the Tetris game loop when the modal closes
+      }
     }
 
     function openSnakeModal() {
