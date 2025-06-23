@@ -4,6 +4,7 @@
   const scoreElement = document.getElementById('tetrisScore');
   const startButton = document.getElementById('startTetrisButton');
 
+  // Get Tetris control buttons
   const leftBtn = document.getElementById('tetrisLeft');
   const rightBtn = document.getElementById('tetrisRight');
   const rotateBtn = document.getElementById('tetrisRotate');
@@ -391,26 +392,34 @@
     }
   });
 
-  // Touch controls - use 'touchstart' for immediate response
-  // Prevent default to stop scrolling/zooming
-  leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(-1); }, { passive: false });
-  rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(1); }, { passive: false });
-  rotateBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerRotate(1); }, { passive: false });
-  downBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerDrop(); }, { passive: false });
-
-  // Use 'click' for desktop users or as fallback, but 'touchstart' is primary for mobile
-  leftBtn.addEventListener('click', () => playerMove(-1));
-  rightBtn.addEventListener('click', () => playerMove(1));
-  rotateBtn.addEventListener('click', () => playerRotate(1));
-  downBtn.addEventListener('click', () => playerDrop());
+  // Touch/Click controls for on-screen buttons
+  // Using both 'touchstart' for immediate mobile response and 'click' for broader compatibility
+  if (leftBtn) {
+    leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(-1); }, { passive: false });
+    leftBtn.addEventListener('click', () => playerMove(-1));
+  }
+  if (rightBtn) {
+    rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(1); }, { passive: false });
+    rightBtn.addEventListener('click', () => playerMove(1));
+  }
+  if (rotateBtn) {
+    rotateBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerRotate(1); }, { passive: false });
+    rotateBtn.addEventListener('click', () => playerRotate(1));
+  }
+  if (downBtn) {
+    downBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerDrop(); }, { passive: false });
+    downBtn.addEventListener('click', () => playerDrop());
+  }
 
   // Start button event listener
-  startButton.addEventListener('click', () => {
-    initializeTetris(); // Call the initialization function to start a new game
-  });
+  if (startButton) {
+    startButton.addEventListener('click', () => {
+      initializeTetris(); // Call the initialization function to start a new game
+    });
+  }
 
   // Initial setup when the script loads (before any modals are opened)
   // This ensures the canvas dimensions are set correctly even before the modal is first opened.
-  resetGame();
-  updateScore(); // Display initial score
+  // No need to call resetGame() or update() here as they are called by initializeTetris()
+  // which will be triggered when the modal is opened via openTetrisModal().
 })();
