@@ -3,662 +3,768 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mind of Zach</title>
-  
+  <title>Mind of Zach — Neon Arcade</title>
+  <meta name="description" content="The personal arcade of Zach Rogers: neon remakes of classic games, writings, and quotes.">
   <script src="https://cdn.tailwindcss.com"></script>
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap');
-    *, *::before, *::after {
-      box-sizing: border-box;
+    :root {
+      --bg: #05060f;
+      --panel: rgba(10, 14, 30, 0.88);
+      --neon-cyan: #00f0ff;
+      --neon-magenta: #ff2fd6;
+      --neon-lime: #a6ff00;
+      --neon-amber: #ffb300;
+      --neon-violet: #8b5cf6;
+      --text: #e8ecff;
+      --muted: #8b93b8;
     }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Poppins', sans-serif;
-      background: transparent;
-      color: #fff;
-      position: relative;
-      overflow-x: hidden; 
-      margin: 0; 
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
     }
-    .fun-font {
-      font-family: 'Pacifico', cursive;
+    .content--canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; opacity: 0.85;
     }
-    .hidden { display: none; }
-    .game-button {
-      display: inline-block;
-      text-align: center;
-      background-color: #4a5568;
-      color: #f7fafc;
-      padding: 10px 20px;
-      margin: 10px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      width: 100%; 
+    .content--canvas canvas { position: fixed; top: 0; left: 0; }
+    .page { position: relative; z-index: 1; }
+
+    .font-display { font-family: 'Orbitron', sans-serif; }
+    .font-fun { font-family: 'Pacifico', cursive; }
+
+    /* ---------- header ---------- */
+    .site-header { text-align: center; padding: 3.5rem 1rem 1.5rem; animation: dropIn 1s ease both; }
+    @keyframes dropIn { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: none; } }
+    .logo {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(2.2rem, 7vw, 4.2rem); letter-spacing: 0.08em; margin: 0;
+      background: linear-gradient(100deg, var(--neon-cyan), var(--neon-magenta), var(--neon-amber));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.45));
     }
-    .game-button:hover {
-      background-color: #2d3748;
-      transform: scale(1.05);
+    .tagline { color: var(--muted); font-size: 1.15rem; margin-top: 0.6rem; letter-spacing: 0.04em; }
+    .tagline b { color: var(--neon-cyan); font-weight: 600; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;
+      padding: 0.6rem; background: rgba(5, 6, 15, 0.72); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.15);
     }
-    .game-button:active {
-      transform: scale(0.95);
+    .nav-link {
+      font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 0.14em;
+      color: var(--muted); text-decoration: none; padding: 0.5rem 0.9rem;
+      border: 1px solid transparent; border-radius: 999px; transition: all 0.2s;
     }
-    canvas {
-      display: block;
-      margin: 0 auto;
-      width: 100%;
-      height: auto;
-      max-width: 100%; 
+    .nav-link:hover { color: var(--neon-cyan); border-color: rgba(0,240,255,0.4); text-shadow: 0 0 10px rgba(0,240,255,0.8); }
+    .mute-btn {
+      background: none; border: 1px solid rgba(139,147,184,0.4); color: var(--muted);
+      border-radius: 999px; padding: 0.5rem 0.9rem; cursor: pointer;
+      font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 0.14em;
     }
-    .text-center { text-align: center; }
-    header {
-      animation: fadeInDown 1.5s ease forwards;
-      opacity: 0;
+    .mute-btn:hover { color: var(--neon-amber); border-color: var(--neon-amber); }
+
+    /* ---------- section titles ---------- */
+    .section-title {
+      font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 0.12em;
+      font-size: clamp(1.1rem, 3vw, 1.6rem); text-align: center; margin: 0 0 0.4rem;
+      color: #fff; text-shadow: 0 0 14px rgba(0,240,255,0.6);
     }
-    @keyframes fadeInDown {
-      from { opacity:0; transform: translateY(-20px); }
-      to { opacity:1; transform: translateY(0); }
+    .section-sub { text-align: center; color: var(--muted); margin: 0 0 1.6rem; }
+
+    /* ---------- game cards ---------- */
+    .lobby { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+    .card-grid {
+      display: grid; gap: 1.1rem;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
-    main button {
-      transition: transform 0.2s, box-shadow 0.2s;
+    .game-card {
+      position: relative; cursor: pointer; overflow: hidden;
+      background: linear-gradient(160deg, rgba(16,22,48,0.92), rgba(8,10,24,0.94));
+      border: 1px solid rgba(0,240,255,0.18); border-radius: 16px;
+      padding: 1.3rem 1.2rem 1.1rem; text-align: left;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      animation: cardIn 0.6s ease both;
     }
-    main button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+    .game-card:nth-child(2) { animation-delay: 0.05s; } .game-card:nth-child(3) { animation-delay: 0.1s; }
+    .game-card:nth-child(4) { animation-delay: 0.15s; } .game-card:nth-child(5) { animation-delay: 0.2s; }
+    .game-card:nth-child(6) { animation-delay: 0.25s; } .game-card:nth-child(7) { animation-delay: 0.3s; }
+    .game-card:nth-child(8) { animation-delay: 0.35s; } .game-card:nth-child(9) { animation-delay: 0.4s; }
+    .game-card:nth-child(10) { animation-delay: 0.45s; } .game-card:nth-child(11) { animation-delay: 0.5s; }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .game-card:hover {
+      transform: translateY(-5px) scale(1.015);
+      border-color: var(--card-accent, var(--neon-cyan));
+      box-shadow: 0 0 0 1px var(--card-accent, var(--neon-cyan)),
+                  0 0 26px -4px var(--card-accent, var(--neon-cyan)),
+                  0 18px 40px -18px rgba(0,0,0,0.9);
     }
-    section {
-      animation: fadeIn 1s ease forwards;
-      opacity:0;
+    .game-card .icon {
+      width: 46px; height: 46px; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center; margin-bottom: 0.8rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid color-mix(in srgb, var(--card-accent, var(--neon-cyan)) 55%, transparent);
+      box-shadow: 0 0 16px -4px var(--card-accent, var(--neon-cyan));
     }
-    @keyframes fadeIn {
-      to { opacity:1; }
+    .game-card .icon svg { width: 26px; height: 26px; stroke: var(--card-accent, var(--neon-cyan)); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .game-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.02rem; margin: 0 0 0.35rem; letter-spacing: 0.06em; color: #fff; }
+    .game-card p { color: var(--muted); font-size: 0.95rem; margin: 0 0 0.8rem; line-height: 1.35; min-height: 2.6em; }
+    .card-foot { display: flex; justify-content: space-between; align-items: center; }
+    .hi-chip {
+      font-family: 'Orbitron', sans-serif; font-size: 0.68rem; letter-spacing: 0.1em;
+      color: var(--neon-amber); border: 1px solid rgba(255,179,0,0.35);
+      padding: 0.28rem 0.6rem; border-radius: 999px; background: rgba(255,179,0,0.06);
+      text-shadow: 0 0 8px rgba(255,179,0,0.6); white-space: nowrap;
     }
-    #wordleBoard {
-      display: grid;
-      gap: 5px;
-      justify-items: center;
-      margin-bottom: 20px;
-      perspective: 1000px;
+    .play-hint {
+      font-family: 'Orbitron', sans-serif; font-size: 0.68rem; letter-spacing: 0.14em;
+      color: var(--card-accent, var(--neon-cyan)); opacity: 0.9;
     }
-    .wordle-row {
-      display: grid;
-      gap: 5px;
+    .game-card:hover .play-hint { text-shadow: 0 0 10px var(--card-accent, var(--neon-cyan)); }
+
+    /* ---------- content sections ---------- */
+    .content-section { max-width: 860px; margin: 0 auto; padding: 2.5rem 1rem; }
+    .hidden { display: none !important; }
+
+    /* quotes */
+    .quote-card {
+      background: linear-gradient(160deg, rgba(20,16,44,0.92), rgba(8,10,24,0.94));
+      border: 1px solid rgba(255,47,214,0.3); border-radius: 20px;
+      padding: 2.4rem 2rem; text-align: center; position: relative; overflow: hidden;
+      box-shadow: 0 0 40px -12px rgba(255,47,214,0.5);
     }
+    .quote-card::before {
+      content: '\201C'; position: absolute; top: -0.6rem; left: 1rem;
+      font-family: Georgia, serif; font-size: 6rem; color: rgba(255,47,214,0.16);
+    }
+    #quoteText {
+      font-size: clamp(1.25rem, 3.4vw, 1.8rem); font-style: italic; line-height: 1.5;
+      color: #fff; margin: 0 0 1.6rem; min-height: 4.5em; display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #quoteText.swap { opacity: 0; transform: translateY(8px); }
+    .btn-neon {
+      font-family: 'Orbitron', sans-serif; font-size: 0.78rem; letter-spacing: 0.14em;
+      background: transparent; color: var(--neon-magenta); cursor: pointer;
+      border: 1px solid var(--neon-magenta); border-radius: 999px; padding: 0.7rem 1.6rem;
+      transition: all 0.2s; text-transform: uppercase;
+    }
+    .btn-neon:hover { background: rgba(255,47,214,0.12); box-shadow: 0 0 18px rgba(255,47,214,0.55); text-shadow: 0 0 8px var(--neon-magenta); }
+    .btn-neon.cyan { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+    .btn-neon.cyan:hover { background: rgba(0,240,255,0.1); box-shadow: 0 0 18px rgba(0,240,255,0.55); text-shadow: 0 0 8px var(--neon-cyan); }
+
+    /* writings */
+    .writing-card {
+      background: linear-gradient(160deg, rgba(16,22,48,0.92), rgba(8,10,24,0.94));
+      border: 1px solid rgba(0,240,255,0.2); border-radius: 14px; padding: 1.4rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .writing-card:hover { border-color: rgba(0,240,255,0.55); box-shadow: 0 0 24px -8px rgba(0,240,255,0.6); }
+    .writing-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: var(--neon-cyan); margin: 0 0 0.4rem; letter-spacing: 0.05em; }
+    .writing-card .wdesc { color: var(--neon-amber); font-size: 0.95rem; margin: 0 0 0.6rem; font-weight: 600; }
+    .writing-card .wbody { color: #c9d2f2; line-height: 1.55; margin: 0; white-space: pre-wrap; }
+
+    /* zork terminal */
+    .terminal {
+      background: rgba(2, 8, 6, 0.94); border: 1px solid rgba(166,255,0,0.35);
+      border-radius: 14px; box-shadow: 0 0 34px -10px rgba(166,255,0,0.5), inset 0 0 60px rgba(166,255,0,0.04);
+      overflow: hidden;
+    }
+    .terminal-bar { display: flex; gap: 0.5rem; padding: 0.7rem 1rem; border-bottom: 1px solid rgba(166,255,0,0.2); align-items: center; }
+    .terminal-bar .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .terminal-bar .t { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--neon-lime); margin-left: 0.4rem; }
+    #zorkOutput {
+      height: 320px; overflow-y: auto; padding: 1rem 1.2rem; color: #c8ffa0;
+      font-family: 'Courier New', monospace; font-size: 0.95rem; line-height: 1.55;
+      text-shadow: 0 0 6px rgba(166,255,0,0.5);
+    }
+    #zorkOutput .echo { color: #fff; }
+    #zorkInput {
+      width: 100%; background: rgba(166,255,0,0.05); border: none; border-top: 1px solid rgba(166,255,0,0.2);
+      color: #eaffd0; font-family: 'Courier New', monospace; font-size: 1rem; padding: 0.9rem 1.2rem; outline: none;
+    }
+    #zorkInput::placeholder { color: rgba(200,255,160,0.35); }
+
+    footer { text-align: center; padding: 2.5rem 1rem 3rem; color: var(--muted); position: relative; z-index: 1; }
+    footer .sig { font-family: 'Pacifico', cursive; color: var(--neon-magenta); font-size: 1.3rem; text-shadow: 0 0 12px rgba(255,47,214,0.6); }
+
+    /* ---------- game modals ---------- */
+    .game-modal {
+      position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center;
+      background: rgba(2, 3, 10, 0.78); backdrop-filter: blur(6px); padding: 1rem;
+      animation: modalIn 0.25s ease both; overflow-y: auto;
+    }
+    @keyframes modalIn { from { opacity: 0; } to { opacity: 1; } }
+    .game-panel {
+      background: var(--panel); border: 1px solid rgba(0,240,255,0.3); border-radius: 18px;
+      padding: 1.2rem; width: 100%; max-width: 560px; max-height: 94vh; overflow-y: auto;
+      box-shadow: 0 0 60px -12px rgba(0,240,255,0.45), 0 30px 60px -20px rgba(0,0,0,0.9);
+      animation: panelIn 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+    }
+    .game-panel.wide { max-width: 720px; }
+    @keyframes panelIn { from { opacity: 0; transform: scale(0.94) translateY(12px); } to { opacity: 1; transform: none; } }
+    .game-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+    .game-panel-head h2 { font-family: 'Orbitron', sans-serif; font-size: 1.25rem; letter-spacing: 0.1em; margin: 0; color: #fff; text-shadow: 0 0 12px rgba(0,240,255,0.7); }
+    .game-panel-meta { display: flex; gap: 0.5rem; align-items: center; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(139,147,184,0.4);
+      background: rgba(255,255,255,0.04); color: var(--text); cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.4); }
+    .game-canvas-wrap { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,240,255,0.25); background: #02030a; }
+    .game-canvas-wrap canvas { display: block; width: 100%; height: auto; touch-action: none; }
+    /* subtle CRT scanlines */
+    .game-canvas-wrap::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.10) 0 1px, transparent 1px 3px);
+    }
+    .game-hud {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em;
+      color: var(--neon-cyan); margin: 0.8rem 0.1rem 0; text-shadow: 0 0 8px rgba(0,240,255,0.5);
+    }
+    .game-hud .newbest { color: var(--neon-amber); text-shadow: 0 0 10px rgba(255,179,0,0.8); animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { opacity: 0.55; } }
+    .game-start-overlay, .game-over-overlay {
+      position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.7rem; text-align: center;
+      background: rgba(2, 4, 12, 0.82); backdrop-filter: blur(2px); cursor: pointer; padding: 1rem;
+    }
+    .game-over-overlay { cursor: default; }
+    .go-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(1.6rem, 6vw, 2.6rem); letter-spacing: 0.1em; color: #fff; text-shadow: 0 0 20px var(--neon-cyan), 0 0 60px var(--neon-magenta); }
+    .go-title.lost { text-shadow: 0 0 20px #ff3355, 0 0 60px #ff3355; }
+    .go-sub { color: var(--muted); letter-spacing: 0.2em; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; }
+    .go-score { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-amber); letter-spacing: 0.1em; }
+    .go-best { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--neon-lime); letter-spacing: 0.12em; }
+    .go-btn {
+      font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 0.16em;
+      background: linear-gradient(100deg, rgba(0,240,255,0.18), rgba(255,47,214,0.18));
+      border: 1px solid var(--neon-cyan); color: #fff; border-radius: 999px;
+      padding: 0.75rem 2rem; cursor: pointer; margin-top: 0.5rem; transition: all 0.2s;
+    }
+    .go-btn:hover { box-shadow: 0 0 22px rgba(0,240,255,0.6); transform: scale(1.05); }
+
+    .touch-controls { display: flex; justify-content: center; gap: 0.7rem; margin-top: 0.9rem; flex-wrap: wrap; }
+    .tbtn {
+      width: 58px; height: 58px; border-radius: 14px; border: 1px solid rgba(0,240,255,0.4);
+      background: rgba(0,240,255,0.06); color: var(--neon-cyan); font-size: 1.4rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none;
+      touch-action: none; transition: all 0.12s;
+    }
+    .tbtn:active { background: rgba(0,240,255,0.25); transform: scale(0.93); box-shadow: 0 0 16px rgba(0,240,255,0.6); }
+    .tbtn.wide-btn { width: auto; padding: 0 1.2rem; font-size: 1rem; font-family: 'Orbitron', sans-serif; letter-spacing: 0.1em; height: 52px; }
+
+    /* tic tac toe */
+    #ticTacToeBoard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 340px; margin: 0 auto; }
+    .ttt-cell {
+      aspect-ratio: 1; border-radius: 12px; border: 1px solid rgba(0,240,255,0.35);
+      background: rgba(0,240,255,0.04); display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif; font-size: 2.6rem; font-weight: 900; cursor: pointer;
+      transition: all 0.15s; color: #fff; user-select: none;
+    }
+    .ttt-cell:hover:empty { background: rgba(0,240,255,0.12); }
+    .ttt-cell.x { color: var(--neon-cyan); text-shadow: 0 0 14px var(--neon-cyan); }
+    .ttt-cell.o { color: var(--neon-magenta); text-shadow: 0 0 14px var(--neon-magenta); }
+    .ttt-cell.win { background: rgba(166,255,0,0.14); border-color: var(--neon-lime); animation: pulse 0.7s infinite; }
+    .ttt-score { display: flex; justify-content: center; gap: 1.4rem; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; margin-top: 0.9rem; color: var(--muted); }
+    .diff-row { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.9rem; flex-wrap: wrap; }
+    .diff-btn {
+      font-family: 'Orbitron', sans-serif; font-size: 0.68rem; letter-spacing: 0.12em;
+      border: 1px solid rgba(139,147,184,0.4); background: transparent; color: var(--muted);
+      border-radius: 999px; padding: 0.45rem 1rem; cursor: pointer; transition: all 0.15s;
+    }
+    .diff-btn.active { color: var(--neon-lime); border-color: var(--neon-lime); box-shadow: 0 0 12px rgba(166,255,0,0.4); }
+
+    /* rps + number guess */
+    .choice-row { display: flex; justify-content: center; gap: 1rem; margin: 1.2rem 0; }
+    .choice-btn {
+      width: 84px; height: 84px; border-radius: 18px; border: 1px solid rgba(255,47,214,0.4);
+      background: rgba(255,47,214,0.05); cursor: pointer; font-size: 2.4rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+    }
+    .choice-btn:hover { transform: translateY(-4px) scale(1.06); box-shadow: 0 0 20px rgba(255,47,214,0.5); background: rgba(255,47,214,0.14); }
+    .choice-btn:active { transform: scale(0.94); }
+    .rps-arena { display: flex; justify-content: center; gap: 2.5rem; margin: 1rem 0; font-size: 3rem; }
+    .rps-arena .vs { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--muted); align-self: center; }
+    .shake-anim { animation: rpsShake 0.5s ease; }
+    @keyframes rpsShake { 0%,100% { transform: translateY(0); } 25% { transform: translateY(-14px) rotate(-8deg); } 75% { transform: translateY(-14px) rotate(8deg); } }
+    .ng-input {
+      width: 120px; text-align: center; font-family: 'Orbitron', sans-serif; font-size: 1.6rem;
+      background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.4); color: #fff;
+      border-radius: 12px; padding: 0.6rem; outline: none;
+    }
+    .ng-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 14px rgba(0,240,255,0.4); }
+    .ng-history { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 0.8rem; min-height: 2rem; }
+    .ng-chip { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(139,147,184,0.3); color: var(--muted); }
+    .ng-chip.hot { color: #ff6b6b; border-color: #ff6b6b; }
+    .ng-chip.warm { color: var(--neon-amber); border-color: var(--neon-amber); }
+    .ng-chip.cold { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+    /* hangman */
+    #hangmanCanvas { background: rgba(2,4,12,0.6); border-radius: 8px; }
+    #hangmanWord { font-family: 'Orbitron', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 0.35em; text-align: center; color: #fff; text-shadow: 0 0 12px rgba(0,240,255,0.7); margin: 0.6rem 0; min-height: 2.6rem; }
+    #hangmanMessage { text-align: center; min-height: 1.8rem; font-size: 1.05rem; font-weight: 600; }
+    #hangmanKeyboard { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 0.8rem; }
+    .kb-key {
+      width: 38px; height: 44px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.35);
+      background: rgba(0,240,255,0.05); color: var(--text); font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.12s;
+    }
+    .kb-key:hover:not(:disabled) { background: rgba(0,240,255,0.18); box-shadow: 0 0 10px rgba(0,240,255,0.4); }
+    .kb-key:disabled { opacity: 0.28; cursor: default; }
+    .kb-key.right { border-color: var(--neon-lime); color: var(--neon-lime); opacity: 1; }
+    .kb-key.wrong { border-color: #ff3355; color: #ff3355; opacity: 1; }
+
+    /* wordle (dark reskin, classes driven by yetanotherwordlegame.js) */
+    #wordleBoard { display: grid; gap: 6px; justify-items: center; margin: 1rem 0; }
+    .wordle-row { display: grid; gap: 6px; }
     .wordle-cell {
-      width: 50px;
-      height: 50px;
-      background-color: #add8e6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: bold;
-      text-transform: uppercase;
-      color: black;
-      border-radius: 5px;
-      border: 2px solid #d3d6da;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-      backface-visibility: hidden;
-      transform: rotateY(0deg);
-      transform-style: preserve-3d;
+      width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 700; text-transform: uppercase; color: #fff;
+      border-radius: 8px; border: 2px solid rgba(139,147,184,0.4); background: rgba(255,255,255,0.04);
+      transition: all 0.25s ease; font-family: 'Orbitron', sans-serif;
     }
-    .wordle-cell.correct {
-      background-color: #6aaa64;
-      color: white;
-      border-color: #6aaa64;
-    }
-    .wordle-cell.present {
-      background-color: #c9b458;
-      color: white;
-      border-color: #c9b458;
-    }
-    .wordle-cell.absent {
-      background-color: #787c7e;
-      color: white;
-      border-color: #787c7e;
-    }
-    #wordleKeyboard {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-    }
+    .wordle-cell.pop { animation: cellPop 0.18s ease; }
+    @keyframes cellPop { 50% { transform: scale(1.12); } }
+    .wordle-cell.flip { animation: cellFlip 0.5s ease; }
+    @keyframes cellFlip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+    .wordle-cell.correct { background: #16a34a; border-color: #16a34a; box-shadow: 0 0 14px rgba(22,163,74,0.7); }
+    .wordle-cell.present { background: #b8860b; border-color: #b8860b; box-shadow: 0 0 14px rgba(184,134,11,0.7); }
+    .wordle-cell.absent { background: #2a2f45; border-color: #2a2f45; color: #6b7394; }
+    #wordleKeyboard { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 0.6rem; }
     .wordle-key {
-      width: 35px;
-      height: 48px;
-      background-color: #d3d6da;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 5px;
-      cursor: pointer;
-      user-select: none;
-      font-weight: bold;
-      text-transform: uppercase;
-      transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
-      backface-visibility: hidden;
-      transform: scale(1);
-      margin: 3px;
-      font-size: 0.85rem;
+      min-width: 34px; height: 50px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(139,147,184,0.35);
+      background: rgba(255,255,255,0.06); color: var(--text); display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; cursor: pointer; user-select: none; font-size: 0.85rem; margin: 0 2px; transition: all 0.12s;
     }
-    .wordle-key.correct {
-      background-color: #6aaa64;
-      color: white;
+    .wordle-key:hover { background: rgba(0,240,255,0.15); }
+    .wordle-key.correct { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .wordle-key.present { background: #b8860b; border-color: #b8860b; color: #fff; }
+    .wordle-key.absent { background: #1c2033; color: #4a5170; }
+    .wordle-key.wide { min-width: 58px; font-size: 0.7rem; }
+    #wordleInput { position: absolute; opacity: 0; pointer-events: none; }
+    #wordleMessage { text-align: center; min-height: 1.6rem; color: var(--neon-amber); font-weight: 600; }
+    #wordleTheme { text-align: center; color: var(--muted); margin-bottom: 0.4rem; }
+    #wordleTheme span { color: var(--neon-magenta); font-weight: 700; }
+    #progressBarContainer { height: 8px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; margin-bottom: 0.8rem; }
+    #progressBar { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); transition: width 0.4s ease; box-shadow: 0 0 10px rgba(0,240,255,0.7); }
+    #roundIndicator, #correctGuessMessage {
+      position: absolute; left: 50%; transform: translateX(-50%); z-index: 6;
+      font-family: 'Orbitron', sans-serif; font-weight: 700; padding: 0.6rem 1.4rem; border-radius: 12px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
-    .wordle-key.present {
-      background-color: #c9b458;
-      color: white;
-    }
-    .wordle-key.absent {
-      background-color: #787c7e;
-      color: white;
-    }
-    .wordle-key:hover {
-      background-color: #b0bec5;
-      transform: scale(1.05);
-    }
-    .wordle-key:active {
-      transform: scale(0.95);
-    }
-    #roundIndicator {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(255, 255, 255, 0.8);
-      color: #333;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      opacity: 0;
-      pointer-events: none;
-    }
-    #correctGuessMessage {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(106, 170, 100, 0.9);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-    #confetti {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 1000;
-    }
-    .confetti-piece {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
-      opacity: 0;
-      animation: confetti-fall 3s forwards;
-    }
-    @keyframes confetti-fall {
-      0% {
-        transform: translateY(-10px) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-      }
-    }
-    #progressBarContainer {
-      width: 100%;
-      background-color: #e0e0e0;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    #progressBar {
-      width: 0%;
-      height: 10px;
-      background-color: #4caf50;
-      transition: width 0.3s ease;
-    }
-    .modal-content {
-      background: linear-gradient(135deg, #ffffff, #f0f0f0);
-      border-radius: 15px;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    .modal-open .modal-content {
-      transform: scale(1);
-      opacity: 1;
-    }
-    .modal {
-      transition: opacity 0.5s ease;
-      z-index: 50;
-    }
-    .active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-header {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      text-align: center;
-      color: #1f2937;
-    }
-    .modal-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #6b7280;
-      transition: color 0.3s;
-    }
-    .modal-close:hover {
-      color: #374151;
-    }
-    #quotes {
-      background: rgba(0,0,0,0.3);
-      padding: 20px;
-      border-radius: 10px;
-    }
-    #quote {
-      color: #fff;
-    }
-    .control-buttons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .control-button {
-      background-color: #4a5568;
-      color: #f7fafc;
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-    .control-button:hover {
-      background-color: #2d3748;
-      transform: scale(1.05);
-    }
-    .control-button:active {
-      transform: scale(0.95);
-    }
-    .content.content--canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1; 
-    }
-    @media (max-width: 768px) {
-      .modal-content {
-        max-width: 90%;
-      }
-      .control-buttons {
-        flex-direction: column; /* Stack controls vertically on small screens */
-        align-items: center;
-      }
-      .control-button {
-        width: 60px; /* Slightly larger buttons for touch */
-        height: 60px;
-      }
-      .tetris-control-row {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-      }
+    #roundIndicator { top: 12px; background: rgba(0,240,255,0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); }
+    #correctGuessMessage { top: 64px; background: rgba(22,163,74,0.2); border: 1px solid #16a34a; color: #4ade80; }
+    .animate-fade-in { animation: fadeInX 0.4s ease both; }
+    .animate-fade-out { animation: fadeOutX 0.4s ease both; }
+    @keyframes fadeInX { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeOutX { from { opacity: 1; } to { opacity: 0; } }
+    #confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 7; }
+    .confetti-piece { position: absolute; width: 9px; height: 9px; opacity: 0; animation: confetti-fall 2.6s forwards; }
+    @keyframes confetti-fall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(60vh) rotate(720deg); opacity: 0; } }
+
+    body.arcade-modal-open { overflow: hidden; }
+    @media (max-width: 560px) {
+      .game-panel { padding: 0.9rem; }
+      .tbtn { width: 52px; height: 52px; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center">
-  <div class="content content--canvas"></div>
-  <header class="py-10 text-center">
-    <h1 class="text-5xl fun-font mb-4">Welcome to the Mind of Zach!</h1>
-    <p class="text-lg text-gray-300">Hello! I’m Zach Rogers, welcome to my page. Click a button!</p>
-  </header>
-  <section id="quotes" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Inspirational Quotes</h2>
-    <p id="quote" class="text-xl text-center italic">Click below for a random quote!</p>
-    <button class="mt-4 game-button" onclick="displayRandomQuote()">Get Quote</button>
-  </section>
-  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-screen-lg w-full px-4 mt-10">
-    <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" onclick="openFlappyModal()">Flappy Bird</button>
-    <button class="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-500" onclick="openTicTacToeModal()">Tic Tac Toe</button>
-    <button class="px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-500" onclick="openRpsModal()">Rock Paper Scissors</button>
-    <button class="px-6 py-3 bg-yellow-600 rounded-lg hover:bg-yellow-500" onclick="showGame('quotes')">Quotes</button>
-    <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="window.location.href='space.html'">Space Invaders</button>
-    <button class="px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-500" onclick="showGame('zork')">Zork Adventure</button>
-    <button class="px-6 py-3 bg-teal-600 rounded-lg hover:bg-teal-500" onclick="showGame('numberguess')">Number Guess</button>
-    <button class="px-6 py-3 bg-pink-600 rounded-lg hover:bg-pink-500" onclick="openWordleModal()">Zachdle</button>
-    <button class="px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-500" onclick="openWritings()">Writings</button>
-    <button class="px-6 py-3 bg-orange-600 rounded-lg hover:bg-orange-500" onclick="openTetrisModal()">Tetris</button>
-    <button class="px-6 py-3 bg-lime-600 rounded-lg hover:bg-lime-500" onclick="window.location.href='snake.html'">Snake</button>
-    <button class="px-6 py-3 bg-amber-600 rounded-lg hover:bg-amber-500" onclick="openPongModal()">Pong</button>
-    <button class="px-6 py-3 bg-rose-600 rounded-lg hover:bg-rose-500" onclick="openHangmanModal()">Hangman</button>
-  </main>
+<body>
+  <div class="content--canvas"></div>
 
-  <div id="flappyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl">
-      <h2 class="text-3xl fun-font my-4 text-center">Flappy Bird</h2>
-      <canvas id="gameCanvas" class="bg-gray-200"></canvas>
-      <p id="score" class="text-center text-lg mt-4">Score: 0</p>
-      <div class="text-center mt-4 space-x-4">
-        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startGameButton">Start</button>
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeFlappyModal()">Close</button>
-        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500 hidden" id="restartButton">Restart</button>
+  <div class="page">
+    <nav class="topbar">
+      <a class="nav-link" href="#games">ARCADE</a>
+      <a class="nav-link" href="#quotes">QUOTES</a>
+      <a class="nav-link" href="#writings">WRITINGS</a>
+      <a class="nav-link" href="#zork">ZORK</a>
+      <button class="mute-btn" id="muteBtn" title="Toggle sound">SOUND: ON</button>
+    </nav>
+
+    <header class="site-header">
+      <h1 class="logo">MIND OF ZACH</h1>
+      <p class="tagline">A personal neon arcade. <b>11 games</b>, zero quarters required.</p>
+    </header>
+
+    <main class="lobby" id="games">
+      <h2 class="section-title">CHOOSE YOUR GAME</h2>
+      <p class="section-sub">High scores are saved on this device. Click any cabinet to play.</p>
+      <div class="card-grid" id="cardGrid"></div>
+    </main>
+
+    <section class="content-section hidden" id="quotes">
+      <h2 class="section-title">QUOTES</h2>
+      <p class="section-sub">Words worth keeping. Hit the button for another.</p>
+      <div class="quote-card">
+        <p id="quoteText">Click below for a random quote.</p>
+        <button class="btn-neon" id="quoteBtn">New quote</button>
+      </div>
+    </section>
+
+    <section class="content-section hidden" id="writings">
+      <h2 class="section-title">WRITINGS</h2>
+      <p class="section-sub">Short pieces from the mind behind the arcade.</p>
+      <div id="writings-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <section class="content-section hidden" id="zork">
+      <h2 class="section-title">ZORK ADVENTURE</h2>
+      <p class="section-sub">A tiny text adventure starring Addy. Type <b>help</b> if you're lost.</p>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot" style="background:#ff5f57"></span>
+          <span class="dot" style="background:#febc2e"></span>
+          <span class="dot" style="background:#28c840"></span>
+          <span class="t">ADDY'S QUEST — v1.0</span>
+        </div>
+        <div id="zorkOutput"></div>
+        <input id="zorkInput" type="text" placeholder="> type your command..." autocomplete="off" spellcheck="false">
+      </div>
+    </section>
+
+    <footer>
+      <div class="sig">Zach Rogers</div>
+      <p style="margin:0.4rem 0 0; font-size:0.9rem;">Built by hand. Powered by neon.</p>
+    </footer>
+  </div>
+
+  <!-- ============ MODALS ============ -->
+
+  <div id="snakeModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>SNAKE</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="snakeHi">0</span></span>
+          <button class="icon-btn" id="snakePause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('snakeModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="snakeCanvas"></canvas></div>
+      <div class="game-hud"><span id="snakeScore">SCORE 0</span><span id="snakeBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="touch-controls">
+        <button class="tbtn" id="snakeUp">▲</button>
+        <div style="display:flex;gap:0.7rem;">
+          <button class="tbtn" id="snakeLeft">◀</button>
+          <button class="tbtn" id="snakeDown">▼</button>
+          <button class="tbtn" id="snakeRight">▶</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="ticTacToeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
-      <h2 class="text-3xl fun-font my-4 text-center">Tic Tac Toe</h2>
-      <div id="ticTacToeBoard" class="grid grid-cols-3 gap-2 mx-auto"></div>
-      <div class="text-center mt-4">
-        <button class="mt-4 game-button" onclick="initializeTicTacToe()">Start Game</button>
+  <div id="tetrisModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>TETRIS</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="tetrisHi">0</span></span>
+          <button class="icon-btn" id="tetrisPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('tetrisModal')" title="Close">✕</button>
+        </div>
       </div>
-      <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeTicTacToeModal()">Close</button>
+      <div class="game-canvas-wrap"><canvas id="tetrisCanvas"></canvas></div>
+      <div class="game-hud"><span id="tetrisScore">SCORE 0</span><span id="tetrisBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="touch-controls">
+        <button class="tbtn" id="tetrisLeft">◀</button>
+        <button class="tbtn" id="tetrisRotate">⟳</button>
+        <button class="tbtn" id="tetrisDown">▼</button>
+        <button class="tbtn" id="tetrisRight">▶</button>
+        <button class="tbtn" id="tetrisDrop">⤓</button>
+        <button class="tbtn" id="tetrisHold">HOLD</button>
       </div>
     </div>
   </div>
 
-  <div id="wordleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-2xl mx-4 relative modal-content">
+  <div id="pongModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>PONG</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="pongHi">0</span></span>
+          <button class="icon-btn" id="pongPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('pongModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="pongCanvas"></canvas></div>
+      <div class="game-hud"><span id="pongScore">YOU 0 : 0 CPU</span><span style="color:var(--muted)">FIRST TO 7</span></div>
+      <div class="touch-controls">
+        <button class="tbtn" id="pongUp">▲</button>
+        <button class="tbtn" id="pongDown">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="flappyModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>FLAPPY</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="flappyHi">0</span></span>
+          <button class="icon-btn" id="flappyPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('flappyModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="gameCanvas"></canvas></div>
+      <div class="game-hud"><span id="score">SCORE 0</span><span style="color:var(--muted)">CLICK / TAP / SPACE</span></div>
+    </div>
+  </div>
+
+  <div id="hangmanModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>HANGMAN</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" onclick="Arcade.closeModal('hangmanModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="hangmanCanvas"></canvas></div>
+      <div id="hangmanWord"></div>
+      <div id="hangmanMessage"></div>
+      <div id="hangmanKeyboard"></div>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" id="startHangmanButton">NEW WORD</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ticTacToeModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>TIC TAC TOE</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" onclick="Arcade.closeModal('ticTacToeModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="diff-row" id="tttDiff">
+        <button class="diff-btn" data-d="easy">CHILL</button>
+        <button class="diff-btn active" data-d="hard">SMART</button>
+        <button class="diff-btn" data-d="2p">2 PLAYERS</button>
+      </div>
+      <div id="ticTacToeBoard"></div>
+      <div class="ttt-score"><span style="color:var(--neon-cyan)">X · <span id="tttX">0</span></span><span>DRAW · <span id="tttD">0</span></span><span style="color:var(--neon-magenta)">O · <span id="tttO">0</span></span></div>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" id="tttReset">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rpsModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>ROCK PAPER SCISSORS</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" onclick="Arcade.closeModal('rpsModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="rps-arena">
+        <span id="rpsYou">❔</span><span class="vs">VS</span><span id="rpsCpu">❔</span>
+      </div>
+      <p id="rpsMsg" style="text-align:center;min-height:2rem;font-size:1.1rem;font-weight:600;">Pick your weapon.</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-rps="rock" title="Rock">🪨</button>
+        <button class="choice-btn" data-rps="paper" title="Paper">📄</button>
+        <button class="choice-btn" data-rps="scissors" title="Scissors">✂️</button>
+      </div>
+      <div class="ttt-score"><span style="color:var(--neon-lime)">YOU · <span id="rpsYouScore">0</span></span><span style="color:#ff6b6b">CPU · <span id="rpsCpuScore">0</span></span></div>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" id="rpsReset">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ngModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>NUMBER GUESS</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" onclick="Arcade.closeModal('ngModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <p style="text-align:center;color:var(--muted);margin:0.2rem 0 1rem;">I'm thinking of a number from <b style="color:#fff">1 to 100</b>.<br>You get <b style="color:#fff">7 tries</b>.</p>
+      <p id="ngMsg" style="text-align:center;min-height:2rem;font-size:1.15rem;font-weight:600;color:var(--neon-cyan);">Make your first guess.</p>
+      <div style="display:flex;gap:0.7rem;justify-content:center;align-items:center;margin:0.6rem 0;">
+        <input class="ng-input" id="ngInput" type="number" min="1" max="100" placeholder="?">
+        <button class="tbtn wide-btn" id="ngGo">GUESS</button>
+      </div>
+      <div class="ng-history" id="ngHistory"></div>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" id="ngNew">NEW GAME</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="wordleModal" class="game-modal hidden">
+    <div class="game-panel wide" style="position:relative;">
+      <div class="game-panel-head">
+        <h2>ZACHDLE</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" id="rulesButton" title="Rules">?</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('wordleModal')" title="Close">✕</button>
+        </div>
+      </div>
       <div id="roundIndicator"></div>
       <div id="correctGuessMessage"></div>
       <div id="confetti"></div>
-      <div id="progressBarContainer">
-        <div id="progressBar"></div>
-      </div>
-      <h2 class="text-3xl fun-font my-4 text-center">Zachdle</h2>
-      <p id="wordleTheme" class="text-center text-lg mb-4">Theme: <span id="currentTheme">Loading...</span></p>
-
-      <div class="mt-6 flex flex-wrap justify-center gap-4">
-        <button id="startWordleButton" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition transform hover:scale-105 shadow">Start Game</button>
-        <button id="rulesButton" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition transform hover:scale-105 shadow">Rules</button>
-        <button id="resetButton" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition transform hover:scale-105 shadow">Reset</button>
-        <button id="powerUpButton" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition transform hover:scale-105 shadow">Use Power-Up</button>
-      </div>
-
-      <div id="wordleBoard" class="mt-4"></div>
-      <div id="wordleKeyboard" class="mt-4"></div>
-      <input id="wordleInput" type="text" class="invisible-input" autofocus>
-      <p id="wordleMessage" class="text-center text-gray-800 mt-4"></p>
-      <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-500" onclick="closeWordleModal()">Close</button>
+      <div id="progressBarContainer"><div id="progressBar"></div></div>
+      <p id="wordleTheme">Theme: <span id="currentTheme">…</span></p>
+      <div id="wordleBoard"></div>
+      <div id="wordleKeyboard"></div>
+      <input id="wordleInput" type="text" autocomplete="off">
+      <p id="wordleMessage"></p>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" id="startWordleButton">START</button>
+        <button class="tbtn wide-btn" id="powerUpButton">POWER-UP</button>
+        <button class="tbtn wide-btn" id="resetButton">RESET</button>
       </div>
     </div>
   </div>
 
-  <div id="rulesModal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-    <div class="relative bg-white rounded-lg p-6 w-full max-w-md shadow-lg modal-content">
-      <span class="modal-close">&times;</span>
-      <h2 class="modal-header mb-4 text-2xl font-bold">How to Play</h2>
-      <p class="mb-6 text-center">Guess the secret word, based on the theme, within six tries each round. There are a total of 3 rounds.</p>
-
-      <div class="mb-6">
-        <div class="flex space-x-2 justify-center mb-2">
-          <div class="wordle-cell correct" style="background-color:#6aaa64;color:white;border:none;">Z</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">A</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">C</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">H</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">S</div>
-        </div>
-        <p class="text-center">The letter <strong>Z</strong> is in the word and in the correct spot.</p>
-      </div>
-
-      <div class="mb-6">
-        <div class="flex space-x-2 justify-center mb-2">
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">C</div>
-          <div class="wordle-cell present" style="background-color:#c9b458;color:white;border:none;">O</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">D</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">E</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">D</div>
-        </div>
-        <p class="text-center">The letter <strong>O</strong> is in the word but in the wrong spot.</p>
-      </div>
-
-      <div class="mb-6">
-        <div class="flex space-x-2 justify-center mb-2">
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">G</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">A</div>
-          <div class="wordle-cell absent" style="background-color:#787c7e;color:white;border:none;">M</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">E</div>
-          <div class="wordle-cell" style="background-color:#add8e6;border:none;">S</div>
-        </div>
-        <p class="text-center">The letter <strong>M</strong> is not in the word in any spot.</p>
-      </div>
-
-      <button id="closeRulesButton" class="mt-4 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition transform hover:scale-105 shadow">
-        Got It!
-      </button>
-    </div>
-  </div>
-
-  <div id="rpsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
-      <h2 class="text-3xl fun-font my-4 text-center">Rock Paper Scissors</h2>
-      <div id="rpsOutput" class="text-center text-xl mt-4"></div>
-      <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeRpsModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <section id="zork" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Zork Adventure</h2>
-    <div id="output" class="bg-gray-800 text-white p-4 rounded-lg overflow-y-scroll" style="max-height: 300px;"></div>
-    <input id="input" type="text" class="w-full mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg" placeholder="Type your command here...">
-    <p class="text-sm text-gray-400 mt-2">Type commands like "go north", "take sword", or "attack goblin".</p>
-  </section>
-
-  <section id="numberguess" class="hidden">
-    <h2 class="text-3xl fun-font my-4">Number Guess Game</h2>
-    <p id="guessOutput" class="text-xl text-center italic"></p>
-    <button class="mt-4 game-button" onclick="playNumberGuess()">Play Number Guess</button>
-  </section>
-
-  <section id="writings" class="hidden">
-    <h2 class="text-3xl fun-font my-4">My Writings</h2>
-    <div id="writings-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-    <div class="text-center mt-4">
-      <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500" onclick="loadWritings()">Load Writings</button>
-    </div>
-  </section>
-
-  <div id="pongModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
-      <h2 class="text-3xl fun-font my-4 text-center">Pong</h2>
-      <canvas id="pongCanvas" class="bg-gray-200"></canvas>
-      <p id="pongScore" class="text-center text-lg mt-4">Score: Player 0 : 0 CPU</p>
-      <div class="text-center mt-4 space-x-4">
-        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startPongButton">Start</button>
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closePongModal()">Close</button>
-      </div>
-      <div class="control-buttons mt-4" style="display:flex;flex-direction:column;align-items:center;">
-        <div class="control-button" id="pongUp">▲</div>
-        <div style="height:10px;"></div>
-        <div class="control-button" id="pongDown">▼</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tetrisModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
-      <h2 class="text-3xl fun-font my-4 text-center">Tetris</h2>
-      <canvas id="tetrisCanvas" class="bg-gray-200"></canvas>
-      <p id="tetrisScore" class="text-center text-lg mt-4">Score: 0 | Level: 1 | Lines: 0</p>
-      <div class="text-center mt-4 space-x-4">
-        <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500" id="startTetrisButton">Start</button>
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeTetrisModal()">Close</button>
-      </div>
-      <div class="control-buttons mt-4">
-        <div class="tetris-control-row">
-          <div class="control-button" id="tetrisLeft">◀</div>
-          <div class="control-button" id="tetrisRotate">▲</div>
-          <div class="control-button" id="tetrisRight">▶</div>
-        </div>
-        <div class="tetris-control-row mt-2">
-          <div class="control-button" id="tetrisDown">▼</div>
+  <div id="rulesModal" class="game-modal hidden">
+    <div class="game-panel" style="max-width:440px;">
+      <div class="game-panel-head">
+        <h2>HOW TO PLAY</h2>
+        <div class="game-panel-meta">
+          <button class="icon-btn" onclick="Arcade.closeModal('rulesModal')" title="Close">✕</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div id="hangmanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 text-black w-full max-w-md">
-      <h2 class="text-3xl fun-font my-4 text-center">Hangman</h2>
-      <div class="text-center mt-4">
-        <button class="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-500" onclick="closeHangmanModal()">Close</button>
+      <p style="text-align:center;color:var(--muted)">Guess the secret word from the theme in <b style="color:#fff">6 tries</b>, across <b style="color:#fff">3 rounds</b>.</p>
+      <div style="display:flex;gap:6px;justify-content:center;margin:1rem 0;">
+        <div class="wordle-cell correct">Z</div><div class="wordle-cell">A</div><div class="wordle-cell">C</div><div class="wordle-cell">H</div>
+      </div>
+      <p style="text-align:center">Green = right letter, right spot.</p>
+      <div style="display:flex;gap:6px;justify-content:center;margin:1rem 0;">
+        <div class="wordle-cell">C</div><div class="wordle-cell present">O</div><div class="wordle-cell">D</div><div class="wordle-cell">E</div>
+      </div>
+      <p style="text-align:center">Amber = in the word, wrong spot. Gray = not in the word.</p>
+      <div class="touch-controls">
+        <button class="tbtn wide-btn" onclick="Arcade.closeModal('rulesModal')">GOT IT</button>
       </div>
     </div>
   </div>
 
-
+  <script src="js/arcade.js"></script>
+  <script src="js/coalesce.js"></script>
+  <script src="js/quotes.js"></script>
+  <script src="js/writings.js"></script>
+  <script src="js/snake.js"></script>
+  <script src="js/tetris.js"></script>
+  <script src="js/pong.js"></script>
   <script src="js/flappybird.js"></script>
+  <script src="js/hangman.js"></script>
   <script src="js/tictactoe.js"></script>
   <script src="js/rockpaperscissors.js"></script>
-  <script src="js/quotes.js"></script>
-  <script src="js/zork.js"></script>
   <script src="js/numberguess.js"></script>
-  <script src="js/writings.js"></script>
   <script src="js/yetanotherwordlegame.js"></script>
-  <script src="js/pong.js"></script>
-  <script src="js/tetris.js"></script> <script src="js/hangman.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
-
+  <script src="js/zork.js"></script>
   <script>
-    function rand(max) {
-      return Math.random() * max;
-    }
-    function angle(x1, y1, x2, y2) {
-      return Math.atan2(y2 - y1, x2 - x1);
-    }
-    function lerp(start, end, amt) {
-      return (1 - amt) * start + amt * end;
-    }
-    function fadeInOut(life, ttl) {
-      const halfTTL = ttl / 2;
-      if (life < halfTTL) {
-        return life / halfTTL;
-      } else {
-        return (ttl - life) / halfTTL;
+    /* ---------- lobby cards ---------- */
+    const GAMES = [
+      { id: 'snake', title: 'Snake', hi: 'snake', accent: '#a6ff00', modal: 'snakeModal',
+        desc: 'The timeless classic, remixed in neon. Eat, grow, don\'t bite yourself.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M4 18c3 0 3-4 6-4s3 4 6 4 2-3 4-3"/><circle cx="19" cy="15" r="1.4"/></svg>' },
+      { id: 'tetris', title: 'Tetris', hi: 'tetris', accent: '#00f0ff', modal: 'tetrisModal',
+        desc: 'Stack, spin, clear lines. Ghost piece, hold queue, and combos.',
+        icon: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="10" y="3" width="7" height="7"/><rect x="3" y="10" width="7" height="7"/><rect x="10" y="10" width="7" height="7"/></svg>' },
+      { id: 'invaders', title: 'Space Invaders', accent: '#ff2fd6', page: 'space.html',
+        desc: 'Defend Earth wave after wave. Bosses included. No mercy given.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M7 4h10v4H7zM5 8h14v3H5zM8 11h8v3H8zM6 14h3v4H6zM15 14h3v4h-3zM10 18h4v3h-4z"/></svg>' },
+      { id: 'asteroids', title: 'Asteroids', accent: '#ffb300', page: 'asteroids.html',
+        desc: 'Pilot the vector ship. Blast rocks, dodge debris, survive.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M12 3l8 18-8-4-8 4z"/><circle cx="18" cy="6" r="1.6"/></svg>' },
+      { id: 'pong', title: 'Pong', hi: 'pong', accent: '#00f0ff', modal: 'pongModal',
+        desc: 'The original esport. First to 7 takes the crown.',
+        icon: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="2.6" height="10"/><rect x="18.4" y="7" width="2.6" height="10"/><circle cx="12" cy="12" r="1.6"/></svg>' },
+      { id: 'flappy', title: 'Flappy', hi: 'flappy', accent: '#a6ff00', modal: 'flappyModal',
+        desc: 'One button. Infinite pipes. Zero mercy.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M4 14c4-1 6-6 12-7-1 3-2 4-2 4s3 0 4 2c-3 1-4 0-4 0s-1 4-5 4c-3 0-4-2-5-3z"/><circle cx="15" cy="9" r="1"/></svg>' },
+      { id: 'hangman', title: 'Hangman', accent: '#ff2fd6', modal: 'hangmanModal',
+        desc: 'Guess the word before the noose tightens. Themed word packs.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M6 21V4h11v5M17 4c0 3-2 3-2 5M8 21h8"/></svg>' },
+      { id: 'tictactoe', title: 'Tic Tac Toe', accent: '#00f0ff', modal: 'ticTacToeModal',
+        desc: 'Face an unbeatable AI, a chill one, or a friend.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M8 3v18M16 3v18M3 8h18M3 16h18"/></svg>' },
+      { id: 'zachdle', title: 'Zachdle', accent: '#8b5cf6', modal: 'wordleModal',
+        desc: 'Themed word puzzles. Three rounds, six tries each.',
+        icon: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="4.6" height="4.6"/><rect x="9.7" y="4" width="4.6" height="4.6"/><rect x="15.4" y="4" width="4.6" height="4.6"/><rect x="4" y="9.7" width="4.6" height="4.6"/><rect x="9.7" y="9.7" width="4.6" height="4.6"/><rect x="4" y="15.4" width="4.6" height="4.6"/></svg>' },
+      { id: 'rps', title: 'Rock Paper Scissors', accent: '#ff2fd6', modal: 'rpsModal',
+        desc: 'Best of five against the machine. It holds grudges.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M7 11V6a1.6 1.6 0 013 0v4M10 10V4.5a1.6 1.6 0 013 0V10M13 10V6a1.6 1.6 0 013 0v7c0 4-2.5 7-6 7-2.5 0-4-1-5.5-3.5L3 13c-.8-1 .2-2.4 1.4-1.7L7 13"/></svg>' },
+      { id: 'ng', title: 'Number Guess', accent: '#ffb300', modal: 'ngModal',
+        desc: '1 to 100. Hotter or colder. Seven tries. Trust your gut.',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>' },
+    ];
+
+    const grid = document.getElementById('cardGrid');
+    GAMES.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.style.setProperty('--card-accent', g.accent);
+      const hiHtml = g.hi ? `<span class="hi-chip">BEST ${Arcade.getHi(g.hi)}</span>` : `<span class="hi-chip" style="visibility:hidden">BEST 0</span>`;
+      card.innerHTML = `<div class="icon">${g.icon}</div><h3>${g.title}</h3><p>${g.desc}</p>
+        <div class="card-foot">${hiHtml}<span class="play-hint">PLAY ▸</span></div>`;
+      card.addEventListener('click', () => {
+        Arcade.sfx.click();
+        if (g.modal) Arcade.openModal(g.modal);
+        else if (g.page) window.location.href = g.page;
+      });
+      grid.appendChild(card);
+    });
+
+    /* ---------- section navigation ---------- */
+    function showSection(id) {
+      document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        if (id === 'writings' && window.loadWritings) loadWritings();
+        if (id === 'zork' && window.startZorkGame) startZorkGame();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      if (id === 'games') window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  </script>
-  <script>
-    function showGame(gameId) {
-      document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
-      document.getElementById(gameId).classList.remove("hidden");
-      if (gameId === 'zork') {
-        startZorkGame();
-      }
-    }
-    function openFlappyModal() {
-      document.getElementById("flappyModal").classList.remove("hidden");
-    }
-    function closeFlappyModal() {
-      document.getElementById("flappyModal").classList.add("hidden");
-    }
-    function openTicTacToeModal() {
-      document.getElementById("ticTacToeModal").classList.remove("hidden");
-      initializeTicTacToe();
-    }
-    function closeTicTacToeModal() {
-      document.getElementById("ticTacToeModal").classList.add("hidden");
-    }
-    function openWordleModal() {
-      document.getElementById("wordleModal").classList.remove("hidden");
-      document.body.classList.add('modal-open');
-      openRulesModal();
-    }
-    function closeWordleModal() {
-      document.getElementById("wordleModal").classList.add("hidden");
-      document.body.classList.remove('modal-open');
-    }
-    function openWritings() {
-      document.querySelectorAll("section").forEach(section => section.classList.add("hidden"));
-      document.getElementById("writings").classList.remove("hidden");
-    }
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const href = a.getAttribute('href');
+        if (href === '#games') { e.preventDefault(); showSection('games'); }
+        else { e.preventDefault(); showSection(href.slice(1)); }
+      });
+    });
 
-    const rulesModal = document.getElementById('rulesModal');
-    const closeRulesButton = document.getElementById('closeRulesButton');
-    const modalClose = rulesModal.querySelector('.modal-close');
+    /* ---------- sound toggle ---------- */
+    const muteBtn = document.getElementById('muteBtn');
+    function paintMute() { muteBtn.textContent = 'SOUND: ' + (Arcade.sfx.isMuted() ? 'OFF' : 'ON'); }
+    muteBtn.addEventListener('click', () => { Arcade.sfx.toggleMute(); paintMute(); Arcade.sfx.click(); });
+    paintMute();
 
-    function openRulesModal() {
-      rulesModal.classList.remove('hidden');
-      rulesModal.classList.add('active');
-      rulesModal.style.zIndex = '100';
-    }
-    function closeRulesModal() {
-      rulesModal.classList.remove('active');
-      rulesModal.classList.add('hidden');
-    }
-    if (modalClose) {
-      modalClose.addEventListener('click', closeRulesModal);
-    }
-    if (closeRulesButton) {
-      closeRulesButton.addEventListener('click', closeRulesModal);
-    }
+    /* ---------- quotes (display only; quote list lives in js/quotes.js) ---------- */
+    const quoteText = document.getElementById('quoteText');
+    document.getElementById('quoteBtn').addEventListener('click', () => {
+      quoteText.classList.add('swap');
+      setTimeout(() => { displayRandomQuote(); quoteText.classList.remove('swap'); }, 240);
+    });
 
-    function openRpsModal() {
-      document.getElementById("rpsModal").classList.remove("hidden");
-      playRockPaperScissors();
-    }
-    function closeRpsModal() {
-      document.getElementById("rpsModal").classList.add("hidden");
-    }
-
-    function openPongModal() {
-      document.getElementById("pongModal").classList.remove("hidden");
-    }
-    function closePongModal() {
-      document.getElementById("pongModal").classList.add("hidden");
-      stopPongGame(); // Stop pong game when modal closes
-    }
-
-    function openHangmanModal() {
-      document.getElementById("hangmanModal").classList.remove("hidden");
-    }
-    function closeHangmanModal() {
-      document.getElementById("hangmanModal").classList.add("hidden");
-    }
-
-    // Tetris modal functions
-    function openTetrisModal() {
-      document.getElementById("tetrisModal").classList.remove("hidden");
-    }
-    function closeTetrisModal() {
-      document.getElementById("tetrisModal").classList.add("hidden");
-      stopTetrisGame(); // Stop Tetris game when modal closes
-    }
+    /* ---------- refresh high-score chips when returning to the lobby ---------- */
+    window.addEventListener('focus', () => {
+      document.querySelectorAll('#cardGrid .game-card').forEach((card, i) => {
+        const g = GAMES[i];
+        if (g && g.hi) {
+          const chip = card.querySelector('.hi-chip');
+          if (chip) chip.textContent = 'BEST ' + Arcade.getHi(g.hi);
+        }
+      });
+    });
   </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Space Invaders</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       background: radial-gradient(circle at center, #000000 0%, #1a1a1a 100%);
@@ -125,6 +126,25 @@
       display: none;
     }
 
+    .game-start-overlay {
+      position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.7rem; text-align: center;
+      background: rgba(2, 4, 12, 0.82); cursor: pointer; padding: 1rem; border-radius: 8px;
+    }
+    .game-start-overlay.hidden { display: none; }
+    .go-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(1.6rem, 6vw, 2.6rem); letter-spacing: 0.1em; color: #fff; text-shadow: 0 0 20px #00f0ff, 0 0 60px #ff2fd6; }
+    .go-title.lost { text-shadow: 0 0 20px #ff3355, 0 0 60px #ff3355; }
+    .go-sub { color: #8b93b8; letter-spacing: 0.2em; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; }
+    .go-score { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #ffb300; letter-spacing: 0.1em; }
+    .go-best { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: #a6ff00; letter-spacing: 0.12em; }
+    .go-btn {
+      font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 0.16em;
+      background: linear-gradient(100deg, rgba(0,240,255,0.18), rgba(255,47,214,0.18));
+      border: 1px solid #00f0ff; color: #fff; border-radius: 999px;
+      padding: 0.75rem 2rem; cursor: pointer; margin-top: 0.5rem;
+    }
+    .go-btn:hover { box-shadow: 0 0 22px rgba(0,240,255,0.6); }
+
     @media (max-width: 400px) {
       .control-button {
         width: 50px;
@@ -160,6 +180,7 @@
 
   <div class="starfield" id="starfield"></div>
 
+  <script src="js/arcade.js"></script>
   <script src="js/spaceinvaders.js"></script>
   <script>
     const starfield = document.getElementById('starfield');
