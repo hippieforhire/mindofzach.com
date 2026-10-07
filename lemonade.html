@@ -403,7 +403,7 @@ function patience(){return 14+(S.upgrades.chairs?15:0)+S.staff.length*6;}
 function spawnCust(){
  const fromLeft=Math.random()<.5;
  const c={e:pick(PEOPLE),x:fromLeft?-30:670,y:SIDE_Y+rnd(-6,6),state:'arrive',mood:null,moodT:0,
-  qT:0,serveT:0,coin:0,coinT:0,walkSpd:rnd(55,95)};
+  qT:0,serveT:0,coin:0,coinT:0,walkSpd:rnd(55,95),faceLeft:!fromLeft};
  c.slot=queue.length;queue.push(c);custs.push(c);}
 function slotX(i){return STAND_X-56-60*i;}
 function updateDay(dt){
@@ -416,6 +416,7 @@ function updateDay(dt){
  for(let i=custs.length-1;i>=0;i--){const c=custs[i];
   if(c.state==='arrive'){
    const tx=slotX(c.slot),dx=tx-c.x,step=c.walkSpd*dt;
+   c.faceLeft=dx<0;
    if(Math.abs(dx)<=Math.max(4,step)){c.x=tx;c.state='queued';}
    else c.x+=Math.sign(dx)*step;
   }else if(c.state==='queued'){
@@ -435,6 +436,7 @@ function updateDay(dt){
     c.state=c.mood==='😠'||c.mood==='😞'?'leaveAngry':'leave';
     if(c.coin)c.coinT=1.1;}
   }else if(c.state==='leave'||c.state==='leaveAngry'){
+   c.faceLeft=(c.state==='leaveAngry');
    c.x+=(c.state==='leave'?1:-1)*c.walkSpd*1.4*dt;
    if(c.moodT>0)c.moodT-=dt;
    if(c.coinT>0)c.coinT-=dt;
@@ -443,6 +445,7 @@ function updateDay(dt){
  if(D.toSpawn===0&&custs.length===0)finishDay();}
 function moveCusts(dt){ // after sold out: everyone drifts off
  for(let i=custs.length-1;i>=0;i--){const c=custs[i];
+  c.faceLeft=c.x<320;
   c.x+=(c.x<320?-1:1)*c.walkSpd*dt;
   if(c.moodT>0)c.moodT-=dt;
   if(c.x>680||c.x<-40)custs.splice(i,1);}}
@@ -546,12 +549,15 @@ function drawDay(){
  // customers
  ctx.textAlign='center';
  custs.forEach(c=>{
-  ctx.font='56px serif';ctx.fillText(c.e,c.x,c.y);
+  const fl=c.faceLeft?-1:1,bx=c.x+(c.faceLeft?-24:24);
+  ctx.save();ctx.translate(c.x,c.y);ctx.scale(fl,1);
+  ctx.font='56px serif';ctx.textAlign='center';ctx.fillText(c.e,0,0);
+  ctx.restore();
   if(c.mood&&c.moodT>0){ctx.font='22px serif';
    ctx.fillStyle='rgba(255,251,232,.95)';
-   ctx.beginPath();ctx.arc(c.x+24,c.y-70,17,0,7);ctx.fill();
-   ctx.fillText(c.mood,c.x+24,c.y-62);}
-  if(c.coinT>0){ctx.font='bold 15px Fredoka,sans-serif';ctx.fillStyle='#ffdf3f';
+   ctx.beginPath();ctx.arc(bx,c.y-70,17,0,7);ctx.fill();
+   ctx.textAlign='center';ctx.fillText(c.mood,bx,c.y-62);}
+  if(c.coinT>0){ctx.font='bold 15px Fredoka,sans-serif';ctx.fillStyle='#ffdf3f';ctx.textAlign='center';
    ctx.fillText('+'+fmt(S.price),c.x,c.y-88-(1.1-c.coinT)*30);}});
  // staffers behind counter
  ctx.font='36px serif';
