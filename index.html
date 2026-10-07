@@ -247,6 +247,9 @@
     /* tetris: panel sits high, controls are a directional D-pad (up=rotate, like the arrow keys) */
     #tetrisModal { align-items: flex-start; }
     #tetrisModal .game-panel { margin-top: 0.2rem; }
+    /* dkong/joust/sinistar: same treatment — panel sits high so the playfield stays visible */
+    #dkongModal, #joustModal, #siniModal { align-items: flex-start; }
+    #dkongModal .game-panel, #joustModal .game-panel, #siniModal .game-panel { margin-top: 0.2rem; }
     .tetris-controls { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-top: 0.9rem; }
     .dpad { display: grid; grid-template-columns: repeat(3, 58px); grid-auto-rows: 58px; gap: 0.45rem; }
     .tetris-actions { display: flex; flex-direction: column; gap: 0.45rem; }
@@ -862,7 +865,15 @@
       </div>
       <div class="game-canvas-wrap"><canvas id="dkongCanvas"></canvas></div>
       <div class="game-hud"><span id="dkongScore">0</span><span id="dkongBest" class="newbest hidden">NEW BEST!</span></div>
-      <div id="dkongTouch" class="zoo-tools"></div>
+      <div class="dpad-row">
+        <div class="dpad">
+          <span></span><button class="tbtn" id="dkongUp" title="Climb up">▲</button><span></span>
+          <button class="tbtn" id="dkongLeft" title="Move left">◀</button><button class="tbtn" id="dkongDown" title="Climb down">▼</button><button class="tbtn" id="dkongRight" title="Move right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="dkongJump" title="Jump">JUMP</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -878,7 +889,15 @@
       </div>
       <div class="game-canvas-wrap"><canvas id="joustCanvas"></canvas></div>
       <div class="game-hud"><span id="joustScore">0</span><span id="joustBest" class="newbest hidden">NEW BEST!</span></div>
-      <div id="joustTouch" class="zoo-tools"></div>
+      <div class="dpad-row">
+        <div style="display:flex;gap:0.45rem;">
+          <button class="tbtn" id="joustLeft" title="Move left">◀</button>
+          <button class="tbtn" id="joustRight" title="Move right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="joustFlap" title="Flap wings">FLAP</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -894,6 +913,17 @@
       </div>
       <div class="game-canvas-wrap"><canvas id="siniCanvas"></canvas></div>
       <div class="game-hud"><span id="siniScore">0</span><span id="siniBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row">
+        <div style="display:flex;gap:0.45rem;">
+          <button class="tbtn" id="siniRotL" title="Rotate left">⟲</button>
+          <button class="tbtn" id="siniRotR" title="Rotate right">⟳</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="siniThrust" title="Hold to thrust">THRUST</button>
+          <button class="tbtn" id="siniFire" title="Hold to fire">FIRE</button>
+          <button class="tbtn" id="siniBomb" title="Fire sinibomb">BOMB</button>
+        </div>
+      </div>
     </div>
   </div>
 
