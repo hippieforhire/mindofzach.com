@@ -9,7 +9,6 @@ const scoreEl = document.getElementById('dkongScore');
 const hiEl = document.getElementById('dkongHi');
 const bestEl = document.getElementById('dkongBest');
 const pauseBtn = document.getElementById('dkongPause');
-const touchEl = document.getElementById('dkongTouch');
 
 const W = 480, H = 640;
 A.fitCanvas(canvas, W, H);
@@ -469,21 +468,12 @@ function togglePause() {
 pauseBtn.addEventListener('click', togglePause);
 
 function buildTouch() {
-  touchEl.innerHTML = '';
-  touchEl.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;margin-top:.6rem';
-  const mk = (label, w) => {
-    const b = document.createElement('button');
-    b.textContent = label;
-    b.style.cssText = 'font:700 18px Rajdhani,sans-serif;width:' + (w || 62) + 'px;height:56px;margin:3px;border-radius:12px;border:1px solid rgba(0,240,255,.4);background:rgba(0,240,255,.08);color:#e8ecff;touch-action:none;user-select:none;-webkit-user-select:none';
-    touchEl.appendChild(b);
-    return b;
-  };
-  const bl = mk('◀'), bu = mk('▲'), bd = mk('▼'), br = mk('▶'), bj = mk('JUMP', 92);
-  A.bindHold(bl, () => { keys.left = true; }, () => { keys.left = false; });
-  A.bindHold(br, () => { keys.right = true; }, () => { keys.right = false; });
-  A.bindHold(bu, () => { keys.up = true; }, () => { keys.up = false; });
-  A.bindHold(bd, () => { keys.down = true; }, () => { keys.down = false; });
-  A.bindTap(bj, jump);
+  const B = id => document.getElementById(id);
+  A.bindHold(B('dkongLeft'), () => { keys.left = true; }, () => { keys.left = false; });
+  A.bindHold(B('dkongRight'), () => { keys.right = true; }, () => { keys.right = false; });
+  A.bindHold(B('dkongUp'), () => { keys.up = true; }, () => { keys.up = false; });
+  A.bindHold(B('dkongDown'), () => { keys.down = true; }, () => { keys.down = false; });
+  A.bindTap(B('dkongJump'), jump);
 }
 
 A.registerModalGame('dkongModal', {

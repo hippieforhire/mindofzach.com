@@ -527,6 +527,13 @@ function togglePause() {
 }
 pauseBtn.addEventListener('click', togglePause);
 
+// touch buttons (also work with mouse)
+A.bindHold(document.getElementById('siniRotL'), () => keys['arrowleft'] = true, () => keys['arrowleft'] = false);
+A.bindHold(document.getElementById('siniRotR'), () => keys['arrowright'] = true, () => keys['arrowright'] = false);
+A.bindHold(document.getElementById('siniThrust'), () => keys['arrowup'] = true, () => keys['arrowup'] = false);
+A.bindHold(document.getElementById('siniFire'), () => keys['z'] = true, () => keys['z'] = false);
+document.getElementById('siniBomb').addEventListener('click', () => { if (state === 'playing') fireBomb(); });
+
 A.registerModalGame('siniModal', {
   onOpen() { reset(); overOverlay.hide();
     startOverlay.show('<div class="go-title">SINISTAR</div>' +

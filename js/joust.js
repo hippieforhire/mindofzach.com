@@ -10,7 +10,6 @@ const scoreEl = document.getElementById('joustScore');
 const hiEl = document.getElementById('joustHi');
 const bestEl = document.getElementById('joustBest');
 const pauseBtn = document.getElementById('joustPause');
-const touchEl = document.getElementById('joustTouch');
 
 const W = 640, H = 480, GRAV = 1500, FLAP_V = -470, LAVA_Y = 452;
 A.fitCanvas(canvas, W, H);
@@ -369,18 +368,10 @@ const loop = A.createLoop(update, render);
 
 /* ---------- touch buttons ---------- */
 (function buildTouch() {
-  touchEl.innerHTML = '';
-  const mk = (label, on, off) => {
-    const b = document.createElement('button');
-    b.textContent = label;
-    b.style.cssText = 'font:700 15px Orbitron,sans-serif;margin:3px;padding:14px 22px;border-radius:12px;border:1px solid rgba(0,240,255,.4);background:rgba(0,240,255,.08);color:#e8ecff;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none';
-    A.bindHold(b, on, off);
-    touchEl.appendChild(b);
-    return b;
-  };
-  mk('◀', () => { input.left = true; }, () => { input.left = false; });
-  mk('FLAP', () => { input.flap = true; }, () => { input.flap = false; });
-  mk('▶', () => { input.right = true; }, () => { input.right = false; });
+  const B = id => document.getElementById(id);
+  A.bindHold(B('joustLeft'), () => { input.left = true; }, () => { input.left = false; });
+  A.bindHold(B('joustRight'), () => { input.right = true; }, () => { input.right = false; });
+  A.bindHold(B('joustFlap'), () => { input.flap = true; }, () => { input.flap = false; });
 })();
 
 /* ---------- input ---------- */
