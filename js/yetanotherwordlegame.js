@@ -1,10 +1,16 @@
-// yetanotherwordlegame.js
+// Zach's Wordle Game — themed daily wordle with real Wordle rules:
+// guesses must fill every box and must be real words (or theme titles).
 document.addEventListener('DOMContentLoaded', () => {
+  'use strict';
+  const A = window.Arcade;
   const wordleBoard = document.getElementById('wordleBoard');
   const wordleInput = document.getElementById('wordleInput');
   const wordleMessage = document.getElementById('wordleMessage');
   const startWordleButton = document.getElementById('startWordleButton');
   const powerUpButton = document.getElementById('powerUpButton');
+  const powerUpChooser = document.getElementById('powerUpChooser');
+  const puRevealBtn = document.getElementById('puReveal');
+  const puGuessBtn = document.getElementById('puGuess');
   const wordleKeyboard = document.getElementById('wordleKeyboard');
   const currentThemeSpan = document.getElementById('currentTheme');
   const roundIndicator = document.getElementById('roundIndicator');
@@ -14,101 +20,73 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetButton = document.getElementById('resetButton');
   const rulesButton = document.getElementById('rulesButton');
 
-  const dailyGames = {
-    "2024-12-09": {
-      theme: "Famous Movies",
-      words: ["alien", "psycho", "titanic"],
-      anagram: "cinema"
-    },
-    "2024-12-10": {
-      theme: "Famous Bands",
-      words: ["queen", "weezer", "nirvana"],
-      anagram: "winter"
-    },
-    "2024-12-11": {
-      theme: "Country or State Capitals",
-      words: ["texas", "berlin", "jakarta"],
-      anagram: "county"
-    },
-    "2024-12-12": {
-      theme: "Common Cat Names",
-      words: ["salem", "oliver", "smokey"],
-      anagram: "cocoa"
-    },
-    "2024-12-13": {
-      theme: "Car Types/Models",
-      words: ["civic", "accord", "mustang"],
-      anagram: "civic"
-    },
-    "2024-12-14": {
-      theme: "Common Dog Names",
-      words: ["buddy", "bailey", "charlie"],
-      anagram: "buddy"
-    },
-    "2024-12-15": {
-      theme: "American Cuisine",
-      words: ["cajun", "burger", "hotdogs"],
-      anagram: "bunch"
-    }
-  };
+  const THEMES = [
+    { theme: "Famous Movies", words: ["alien", "psycho", "titanic"], anagram: "cinema" },
+    { theme: "Famous Bands", words: ["queen", "weezer", "nirvana"], anagram: "winter" },
+    { theme: "Country or State Capitals", words: ["texas", "berlin", "jakarta"], anagram: "county" },
+    { theme: "Common Cat Names", words: ["salem", "oliver", "smokey"], anagram: "cocoa" },
+    { theme: "Car Types/Models", words: ["civic", "accord", "mustang"], anagram: "civic" },
+    { theme: "Common Dog Names", words: ["buddy", "bailey", "charlie"], anagram: "buddy" },
+    { theme: "American Cuisine", words: ["cajun", "burger", "hotdogs"], anagram: "bunch" }
+  ];
 
-  function getCurrentDate() {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const centralTime = new Date(utc - (3600000 * 6));
-    const year = centralTime.getFullYear();
-    let month = centralTime.getMonth() + 1;
-    let day = centralTime.getDate();
-    month = month < 10 ? '0' + month : month;
-    day = day < 10 ? '0' + day : day;
-    return `${year}-${month}-${day}`;
+  // Real daily rotation: theme changes every UTC day.
+  function utcDayString() {
+    const d = new Date();
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
   }
+  const dayIndex = Math.floor(Date.now() / 86400000) % THEMES.length;
+  const gameData = THEMES[dayIndex];
+  const theme = gameData.theme;
+  const words = gameData.words;
+  const anagram = gameData.anagram;
 
-  let currentDate = getCurrentDate();
-  let gameData = dailyGames[currentDate];
-
-  if (!gameData) {
-    const dates = Object.keys(dailyGames);
-    const firstDate = dates[0];
-    gameData = dailyGames[firstDate];
-    currentDate = firstDate;
-  }
-
-  let { theme, words, anagram } = gameData;
   let currentRound = 0;
-  const totalRounds = words.length; 
+  const totalRounds = words.length;
   let usedPowerUp = false;
   let secretWord = words[currentRound].toLowerCase();
   let wordLength = secretWord.length;
   let maxGuesses = 6;
   let guesses = [];
-  let currentGuess = '';
+  let typed = '';          // letters typed into non-revealed slots
+  let revealed = {};       // pos -> letter, locked in by the reveal power-up
   let gameOver = false;
   let anagramGuess = '';
   let anagramFound = false;
 
+  function freeSlots() {
+    let n = 0;
+    for (let i = 0; i < wordLength; i++) if (!(i in revealed)) n++;
+    return n;
+  }
+
   function initializeWordleGame() {
     currentRound = 0;
+    startRound();
+    wordleMessage.textContent = 'Theme: ' + theme;
+    displayClickableTheme();
+    showRoundIndicator();
+  }
+
+  function startRound() {
     usedPowerUp = false;
     anagramFound = false;
     secretWord = words[currentRound].toLowerCase();
     wordLength = secretWord.length;
     maxGuesses = 6;
     guesses = [];
-    currentGuess = '';
+    typed = '';
+    revealed = {};
     anagramGuess = '';
     gameOver = false;
-    wordleMessage.textContent = `Theme: ${theme}`;
-    displayClickableTheme();
     createBoard();
     createKeyboard();
+    renderCurrentRow();
     wordleInput.disabled = false;
     wordleInput.value = '';
-    wordleInput.focus();
+    if (powerUpChooser) powerUpChooser.classList.add('hidden');
     powerUpButton.disabled = false;
-    powerUpButton.textContent = "Use Power-Up";
-    updateKeyboard();
-    showRoundIndicator();
+    powerUpButton.textContent = 'POWER-UP';
     updateProgressBar();
   }
 
@@ -117,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < maxGuesses; i++) {
       const row = document.createElement('div');
       row.classList.add('wordle-row');
-      row.style.gridTemplateColumns = `repeat(${wordLength}, 50px)`;
+      row.style.gridTemplateColumns = 'repeat(' + wordLength + ', 1fr)';
       for (let j = 0; j < wordLength; j++) {
         const cell = document.createElement('div');
         cell.classList.add('wordle-cell');
@@ -127,70 +105,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function addExtraRow() {
+    const row = document.createElement('div');
+    row.classList.add('wordle-row');
+    row.style.gridTemplateColumns = 'repeat(' + wordLength + ', 1fr)';
+    for (let j = 0; j < wordLength; j++) {
+      const cell = document.createElement('div');
+      cell.classList.add('wordle-cell');
+      row.appendChild(cell);
+    }
+    wordleBoard.appendChild(row);
+  }
+
   function createKeyboard() {
-    const keys = 'QWERTYUIOPASDFGHJKLEntZXCVBNMBCK'.split('');
     wordleKeyboard.innerHTML = '';
-
-    const firstRowKeys = keys.slice(0,10);
-    const secondRowKeys = keys.slice(10,19);
-    const thirdRowKeys = keys.slice(19);
-
-    const firstRow = document.createElement('div');
-    firstRow.classList.add('flex', 'justify-center', 'mb-2');
-    firstRowKeys.forEach(key => {
-      const btn = createKeyButton(key);
-      firstRow.appendChild(btn);
+    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    rows.forEach((keys, ri) => {
+      const row = document.createElement('div');
+      row.className = 'wrow';
+      if (ri === 2) {
+        const ent = document.createElement('button');
+        ent.className = 'wordle-key wide'; ent.textContent = 'ENTER';
+        ent.addEventListener('click', () => handleKeyPress('Ent'));
+        row.appendChild(ent);
+      }
+      keys.split('').forEach(k => row.appendChild(createKeyButton(k)));
+      if (ri === 2) {
+        const bck = document.createElement('button');
+        bck.className = 'wordle-key wide'; bck.textContent = '←';
+        bck.addEventListener('click', () => handleKeyPress('BCK'));
+        row.appendChild(bck);
+      }
+      wordleKeyboard.appendChild(row);
     });
-    wordleKeyboard.appendChild(firstRow);
-
-    const secondRow = document.createElement('div');
-    secondRow.classList.add('flex', 'justify-center', 'mb-2');
-    secondRowKeys.forEach(key => {
-      const btn = createKeyButton(key);
-      secondRow.appendChild(btn);
-    });
-    wordleKeyboard.appendChild(secondRow);
-
-    const thirdRow = document.createElement('div');
-    thirdRow.classList.add('flex', 'justify-center');
-    thirdRowKeys.forEach(key => {
-      const btn = createKeyButton(key);
-      thirdRow.appendChild(btn);
-    });
-    wordleKeyboard.appendChild(thirdRow);
   }
 
   function createKeyButton(key) {
-    const keyButton = document.createElement('div');
-    keyButton.classList.add('wordle-key');
-    keyButton.textContent = key === 'Ent' ? 'Ent' : (key === 'BCK' ? '←' : key);
-    keyButton.addEventListener('click', () => handleKeyPress(key));
-    return keyButton;
+    const b = document.createElement('button');
+    b.className = 'wordle-key';
+    b.textContent = key;
+    b.dataset.key = key;
+    b.addEventListener('click', () => handleKeyPress(key));
+    return b;
+  }
+
+  function keyButtonFor(letter) {
+    return wordleKeyboard.querySelector('.wordle-key[data-key="' + letter.toUpperCase() + '"]');
   }
 
   function updateKeyboard() {
     guesses.forEach(guessObj => {
-      const { guess, feedback } = guessObj;
+      const guess = guessObj.guess, feedback = guessObj.feedback;
       guess.split('').forEach((letter, index) => {
-        const key = letter.toUpperCase();
-        const keyButton = Array.from(wordleKeyboard.querySelectorAll('.wordle-key')).find(btn => btn.textContent === key || (btn.textContent === '←' && key==='BCK'));
-        if (keyButton) {
-          if (feedback[index] === 'correct') {
-            keyButton.classList.remove('present', 'absent');
-            keyButton.classList.add('correct', 'animate-press');
-            setTimeout(() => keyButton.classList.remove('animate-press'), 600);
-          } else if (feedback[index] === 'present') {
-            if (!keyButton.classList.contains('correct')) {
-              keyButton.classList.remove('absent');
-              keyButton.classList.add('present', 'animate-press');
-              setTimeout(() => keyButton.classList.remove('animate-press'), 600);
-            }
-          } else {
-            if (!keyButton.classList.contains('correct') && !keyButton.classList.contains('present')) {
-              keyButton.classList.add('absent', 'animate-press');
-              setTimeout(() => keyButton.classList.remove('animate-press'), 600);
-            }
-          }
+        const kb = keyButtonFor(letter);
+        if (!kb) return;
+        if (feedback[index] === 'correct') {
+          kb.classList.remove('present', 'absent');
+          kb.classList.add('correct');
+        } else if (feedback[index] === 'present') {
+          if (!kb.classList.contains('correct')) { kb.classList.remove('absent'); kb.classList.add('present'); }
+        } else {
+          if (!kb.classList.contains('correct') && !kb.classList.contains('present')) kb.classList.add('absent');
         }
       });
     });
@@ -198,71 +173,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
   wordleInput.addEventListener('keydown', (e) => {
     if (gameOver) return;
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submitGuess();
-    } else if (e.key === 'Backspace') {
-      currentGuess = currentGuess.slice(0, -1);
-      updateBoardUI();
-    } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < wordLength) {
-      currentGuess += e.key.toUpperCase();
-      updateBoardUI();
+    if (e.key === 'Enter') { e.preventDefault(); submitGuess(); }
+    else if (e.key === 'Backspace') { typed = typed.slice(0, -1); renderCurrentRow(); }
+    else if (/^[a-zA-Z]$/.test(e.key) && typed.length < freeSlots()) {
+      typed += e.key.toUpperCase();
+      renderCurrentRow();
+      if (A) A.sfx.tick();
     }
   });
 
   function handleKeyPress(key) {
     if (gameOver) return;
-    if (key === 'Ent') {
-      submitGuess();
-    } else if (key === 'BCK') {
-      currentGuess = currentGuess.slice(0, -1);
-      updateBoardUI();
-    } else if (/^[A-Z]$/.test(key) && currentGuess.length < wordLength) {
-      currentGuess += key;
-      updateBoardUI();
+    if (key === 'Ent') submitGuess();
+    else if (key === 'BCK') { typed = typed.slice(0, -1); renderCurrentRow(); }
+    else if (/^[A-Z]$/.test(key) && typed.length < freeSlots()) {
+      typed += key;
+      renderCurrentRow();
+      if (A) A.sfx.tick();
     }
   }
 
-  function updateBoardUI() {
-    const currentRow = wordleBoard.children[guesses.length];
-    Array.from(currentRow.children).forEach((cell, i) => {
-      cell.textContent = currentGuess[i] || '';
+  // Paint the active row: revealed (locked) letters + typed letters.
+  function renderCurrentRow() {
+    const row = wordleBoard.children[guesses.length];
+    if (!row) return;
+    let ti = 0;
+    Array.from(row.children).forEach((cell, i) => {
+      cell.classList.remove('hint', 'pop');
+      if (i in revealed) {
+        cell.textContent = revealed[i].toUpperCase();
+        cell.classList.add('hint');
+      } else {
+        cell.textContent = typed[ti] || '';
+        if (typed[ti]) { cell.classList.add('pop'); setTimeout(() => cell.classList.remove('pop'), 180); }
+        ti++;
+      }
     });
+  }
+
+  // Compose the full guess from revealed + typed letters, in position order.
+  function buildGuess() {
+    let ti = 0, out = '';
+    for (let i = 0; i < wordLength; i++) {
+      if (i in revealed) out += revealed[i];
+      else out += (typed[ti++] || '').toLowerCase();
+    }
+    return out;
+  }
+
+  function shakeRow() {
+    const row = wordleBoard.children[guesses.length];
+    if (!row) return;
+    row.classList.remove('row-shake');
+    void row.offsetWidth;
+    row.classList.add('row-shake');
+    setTimeout(() => row.classList.remove('row-shake'), 500);
+    if (A) A.sfx.bad();
   }
 
   function submitGuess() {
     if (gameOver) return;
-    if (currentGuess.length !== wordLength) {
-      wordleMessage.textContent = `Please enter a ${wordLength}-letter word.`;
+    const guess = buildGuess();
+
+    if (guess.length !== wordLength) {
+      wordleMessage.textContent = 'Not enough letters — fill every box.';
+      shakeRow();
+      return;
+    }
+    if (!window.Wordlist || !window.Wordlist.isWord(guess, theme)) {
+      wordleMessage.textContent = '"' + guess.toUpperCase() + '" is not in the word list.';
+      shakeRow();
       return;
     }
 
-    const feedback = getFeedback(currentGuess.toLowerCase());
-    guesses.push({ guess: currentGuess.toLowerCase(), feedback });
+    const feedback = getFeedback(guess);
+    guesses.push({ guess, feedback });
     updateBoardColors(feedback);
     updateKeyboard();
-    currentGuess = '';
-    updateBoardUI();
+    typed = '';
+    renderCurrentRow();
     wordleMessage.textContent = '';
-
     updateProgressBar();
+    if (A) A.sfx.pop();
 
-    if (guesses[guesses.length - 1].guess === secretWord) {
-      wordleMessage.textContent = "Congratulations! You've guessed the word!";
+    if (guess === secretWord) {
+      wordleMessage.textContent = "Correct! Nice work.";
       wordleInput.disabled = true;
       powerUpButton.disabled = true;
+      if (powerUpChooser) powerUpChooser.classList.add('hidden');
       displayCorrectGuess();
       triggerConfetti();
-      proceedToNextRound(true);
+      if (A) A.sfx.win();
+      setTimeout(() => proceedToNextRound(true), 1600);
       saveGameState(true);
       return;
     }
 
-    if (guesses.length === maxGuesses) {
-      wordleMessage.textContent = `Out of guesses! The word was "${secretWord.toUpperCase()}".`;
+    if (guesses.length >= maxGuesses) {
+      wordleMessage.textContent = 'Out of guesses! The word was "' + secretWord.toUpperCase() + '".';
       wordleInput.disabled = true;
       powerUpButton.disabled = true;
-      proceedToNextRound(false);
+      if (powerUpChooser) powerUpChooser.classList.add('hidden');
+      if (A) A.sfx.lose();
+      setTimeout(() => proceedToNextRound(false), 1800);
       saveGameState(false);
       return;
     }
@@ -271,162 +284,118 @@ document.addEventListener('DOMContentLoaded', () => {
   function getFeedback(guess) {
     const feedback = Array(wordLength).fill('absent');
     const secretArr = secretWord.split('');
-
     for (let i = 0; i < wordLength; i++) {
-      if (guess[i] === secretArr[i]) {
-        feedback[i] = 'correct';
-        secretArr[i] = null;
-      }
+      if (guess[i] === secretArr[i]) { feedback[i] = 'correct'; secretArr[i] = null; }
     }
-
     for (let i = 0; i < wordLength; i++) {
       if (feedback[i] === 'correct') continue;
-      const index = secretArr.indexOf(guess[i]);
-      if (index !== -1) {
-        feedback[i] = 'present';
-        secretArr[index] = null;
-      }
+      const idx = secretArr.indexOf(guess[i]);
+      if (idx !== -1) { feedback[i] = 'present'; secretArr[idx] = null; }
     }
-
     return feedback;
   }
 
   function updateBoardColors(feedback) {
-    const currentRow = wordleBoard.children[guesses.length - 1];
-    Array.from(currentRow.children).forEach((cell, i) => {
-      cell.classList.remove('animate-flip', 'bounce');
+    const row = wordleBoard.children[guesses.length - 1];
+    Array.from(row.children).forEach((cell, i) => {
+      cell.classList.remove('hint');
       void cell.offsetWidth;
-      cell.classList.add(feedback[i], 'animate-flip', 'bounce');
-      setTimeout(() => {
-        cell.classList.remove('animate-flip', 'bounce');
-      }, 1000);
+      cell.classList.add(feedback[i], 'flip');
+      setTimeout(() => cell.classList.remove('flip'), 650);
     });
   }
 
+  /* ---------- power-ups (no prompt dialogs) ---------- */
   powerUpButton.addEventListener('click', () => {
-    if (usedPowerUp) {
-      wordleMessage.textContent = "Power-Up already used.";
-      return;
-    }
-    const powerUpChoice = prompt("Choose a Power-Up:\n1. Reveal a Letter\n2. Get an Extra Guess");
-    if (powerUpChoice === '1') {
-      revealLetterFunction();
-      usedPowerUp = true;
-    } else if (powerUpChoice === '2') {
-      getExtraGuessFunction();
-      usedPowerUp = true;
-    } else {
-      wordleMessage.textContent = "Invalid Power-Up choice.";
-    }
+    if (gameOver || powerUpButton.disabled) return;
+    if (usedPowerUp) { wordleMessage.textContent = 'Power-up already used this round.'; return; }
+    powerUpChooser.classList.toggle('hidden');
+    if (A) A.sfx.click();
   });
 
-  function revealLetterFunction() {
-    for (let i = 0; i < wordLength; i++) {
-      const cell = wordleBoard.children[guesses.length].children[i];
-      if (cell.textContent === '') {
-        cell.classList.remove('correct','present','absent','animate-flip','bounce');
-        void cell.offsetWidth;
-        cell.textContent = secretWord[i].toUpperCase();
-        cell.classList.add('correct','animate-flip','bounce');
-        setTimeout(() => cell.classList.remove('animate-flip','bounce'), 1000);
+  puRevealBtn.addEventListener('click', () => {
+    powerUpChooser.classList.add('hidden');
+    if (usedPowerUp || gameOver) return;
+    const options = [];
+    for (let i = 0; i < wordLength; i++) if (!(i in revealed)) options.push(i);
+    if (!options.length) return;
+    const pos = options[Math.floor(Math.random() * options.length)];
+    revealed[pos] = secretWord[pos];
+    usedPowerUp = true;
+    powerUpButton.disabled = true;
+    const kb = keyButtonFor(secretWord[pos]);
+    if (kb) { kb.classList.remove('present', 'absent'); kb.classList.add('correct'); }
+    wordleMessage.textContent = 'Revealed: "' + secretWord[pos].toUpperCase() + '" is locked in.';
+    renderCurrentRow();
+    if (A) A.sfx.power();
+  });
 
-        const key = secretWord[i].toUpperCase();
-        const keyButton = Array.from(wordleKeyboard.querySelectorAll('.wordle-key')).find(btn => btn.textContent === key);
-        if (keyButton) {
-          keyButton.classList.remove('present','absent','animate-press');
-          void keyButton.offsetWidth;
-          keyButton.classList.add('correct','animate-press');
-          setTimeout(() => keyButton.classList.remove('animate-press'), 600);
-        }
-        break;
-      }
-    }
-  }
-
-  function getExtraGuessFunction() {
+  puGuessBtn.addEventListener('click', () => {
+    powerUpChooser.classList.add('hidden');
+    if (usedPowerUp || gameOver) return;
+    usedPowerUp = true;
+    powerUpButton.disabled = true;
     maxGuesses += 1;
-    const row = document.createElement('div');
-    row.classList.add('wordle-row');
-    row.style.gridTemplateColumns = `repeat(${wordLength}, 50px)`;
-    for (let j = 0; j < wordLength; j++) {
-      const cell = document.createElement('div');
-      cell.classList.add('wordle-cell');
-      row.appendChild(cell);
-    }
-    wordleBoard.appendChild(row);
-    wordleMessage.textContent = "An extra guess added!";
+    addExtraRow();
+    wordleMessage.textContent = 'Extra guess added!';
     updateProgressBar();
-  }
+    if (A) A.sfx.power();
+  });
 
   function proceedToNextRound(won) {
     if (won && currentRound < totalRounds - 1) {
       currentRound++;
-      secretWord = words[currentRound].toLowerCase();
-      wordLength = secretWord.length;
-      maxGuesses = 6;
-      guesses = [];
-      currentGuess = '';
-      anagramGuess = '';
-      gameOver = false;
-      anagramFound = false;
-      wordleMessage.textContent = `Round ${currentRound + 1}: ${theme}`;
-      resetThemeDisplay();
-      adjustBoardForNewRound();
-      createKeyboard();
-      wordleInput.disabled = false;
-      wordleInput.value = '';
-      wordleInput.focus();
-      powerUpButton.disabled = false;
-      powerUpButton.textContent = "Use Power-Up";
-      updateKeyboard();
+      startRound();
+      wordleMessage.textContent = 'Round ' + (currentRound + 1) + ': ' + theme;
+      displayClickableTheme();
       showRoundIndicator();
-      updateProgressBar();
+      wordleInput.focus();
     } else {
-      wordleMessage.textContent += " Game Over.";
+      wordleMessage.textContent += won ? ' You cleared every round!' : ' Game over.';
       gameOver = true;
     }
   }
 
   function saveGameState(won) {
-    const today = getCurrentDate();
-    localStorage.setItem('wordle_last_played', today);
-    localStorage.setItem('wordle_won', won);
+    try {
+      localStorage.setItem('wordle_last_played', utcDayString());
+      localStorage.setItem('wordle_won', won ? '1' : '0');
+    } catch (e) {}
   }
 
   function hasPlayedToday() {
-    const lastPlayed = localStorage.getItem('wordle_last_played');
-    const today = getCurrentDate();
-    return lastPlayed === today;
+    try { return localStorage.getItem('wordle_last_played') === utcDayString(); }
+    catch (e) { return false; }
   }
 
   startWordleButton.addEventListener('click', () => {
     if (hasPlayedToday()) {
-      wordleMessage.textContent = "Already played today's game.";
+      wordleMessage.textContent = "Already played today's game — come back tomorrow.";
       wordleInput.disabled = true;
       powerUpButton.disabled = true;
       return;
     }
+    if (A) A.sfx.click();
     initializeWordleGame();
+    wordleInput.focus();
   });
 
   rulesButton.addEventListener('click', () => {
     const rulesModal = document.getElementById('rulesModal');
     rulesModal.classList.remove('hidden');
-    rulesModal.classList.add('active');
-    rulesModal.style.zIndex = '100';
   });
 
   resetButton.addEventListener('click', () => {
+    try { localStorage.removeItem('wordle_last_played'); } catch (e) {}
     initializeWordleGame();
-    wordleMessage.textContent = "Game has been reset.";
+    wordleMessage.textContent = 'Fresh game — daily lock cleared.';
+    wordleInput.focus();
   });
 
   function showRoundIndicator() {
-    const roundText = `Round ${currentRound + 1}`;
-    roundIndicator.textContent = roundText;
+    roundIndicator.textContent = 'Round ' + (currentRound + 1) + ' of ' + totalRounds;
     roundIndicator.classList.remove('animate-fade-out');
     roundIndicator.classList.add('animate-fade-in');
-
     setTimeout(() => {
       roundIndicator.classList.remove('animate-fade-in');
       roundIndicator.classList.add('animate-fade-out');
@@ -434,11 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function displayCorrectGuess() {
-    correctGuessMessage.textContent = "Correct Guess!";
+    correctGuessMessage.textContent = 'Correct!';
     correctGuessMessage.style.display = 'flex';
     correctGuessMessage.classList.remove('hidden');
     correctGuessMessage.classList.add('animate-fade-in');
-
     setTimeout(() => {
       correctGuessMessage.classList.remove('animate-fade-in');
       correctGuessMessage.classList.add('animate-fade-out');
@@ -446,39 +414,32 @@ document.addEventListener('DOMContentLoaded', () => {
         correctGuessMessage.classList.add('hidden');
         correctGuessMessage.classList.remove('animate-fade-out');
         correctGuessMessage.textContent = '';
-      }, 1000);
-    }, 3000);
+      }, 900);
+    }, 2200);
   }
 
   function triggerConfetti() {
-    const confettiCount = 100;
-    const colors = ['#FFC700', '#FF0000', '#2E3192', '#41BBC7'];
-    for (let i = 0; i < confettiCount; i++) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.left = `${Math.random() * 100}%`;
-      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      confetti.style.animationDelay = `${Math.random() * 5}s`;
-      confettiContainer.appendChild(confetti);
-
-      confetti.addEventListener('animationend', () => {
-        confetti.remove();
-      });
+    const colors = ['#FFC700', '#00f0ff', '#ff2fd6', '#a6ff00'];
+    for (let i = 0; i < 90; i++) {
+      const c = document.createElement('div');
+      c.classList.add('confetti-piece');
+      c.style.left = (Math.random() * 100) + '%';
+      c.style.backgroundColor = colors[(Math.random() * colors.length) | 0];
+      c.style.animationDelay = (Math.random() * 1.2) + 's';
+      confettiContainer.appendChild(c);
+      c.addEventListener('animationend', () => c.remove());
     }
   }
 
   function updateProgressBar() {
-    const progress = (guesses.length / maxGuesses) * 100;
-    progressBar.style.width = `${progress}%`;
+    progressBar.style.width = ((guesses.length / maxGuesses) * 100) + '%';
   }
 
   function displayClickableTheme() {
     currentThemeSpan.innerHTML = '';
-    const themeText = theme;
-    const letters = themeText.split('');
-    letters.forEach(letter => {
+    theme.split('').forEach(ch => {
       const span = document.createElement('span');
-      span.textContent = letter;
+      span.textContent = ch;
       span.classList.add('theme-letter');
       span.addEventListener('click', handleThemeLetterClick);
       currentThemeSpan.appendChild(span);
@@ -489,7 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameOver || anagramFound) return;
     const cell = e.target;
     const letter = cell.textContent.toLowerCase();
-
     if (cell.classList.contains('selected')) {
       cell.classList.remove('selected');
       anagramGuess = anagramGuess.slice(0, -1);
@@ -497,19 +457,18 @@ document.addEventListener('DOMContentLoaded', () => {
       cell.classList.add('selected');
       anagramGuess += letter;
     }
-
     if (anagramGuess.length === anagram.length) {
       if (anagramGuess === anagram.toLowerCase()) {
-        wordleMessage.textContent = "Anagram Correct! Extra Power-Up!";
-        triggerAnagramSuccessAnimation();
-        awardExtraPowerUp();
+        wordleMessage.textContent = 'Anagram solved! Bonus power-up earned.';
         anagramFound = true;
+        awardExtraPowerUp();
+        if (A) A.sfx.win();
       } else {
-        wordleMessage.textContent = "Incorrect Anagram. Try again!";
+        wordleMessage.textContent = 'Not quite — try another arrangement.';
+        if (A) A.sfx.tick();
       }
       anagramGuess = '';
-      const allLetters = document.querySelectorAll('.theme-letter');
-      allLetters.forEach(l => l.classList.remove('selected'));
+      currentThemeSpan.querySelectorAll('.theme-letter').forEach(l => l.classList.remove('selected'));
     }
   }
 
@@ -517,49 +476,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (usedPowerUp) {
       usedPowerUp = false;
       powerUpButton.disabled = false;
-      powerUpButton.textContent = "Use Power-Up";
-      wordleMessage.textContent += " Another Power-Up available.";
+      powerUpButton.textContent = 'POWER-UP';
+      wordleMessage.textContent += ' Power-up recharged!';
     }
   }
 
-  function resetThemeDisplay() {
-    displayClickableTheme();
-  }
-
-  function adjustBoardForNewRound() {
-    wordleBoard.innerHTML = '';
-    for (let i = 0; i < maxGuesses; i++) {
-      const row = document.createElement('div');
-      row.classList.add('wordle-row');
-      row.style.gridTemplateColumns = `repeat(${wordLength}, 50px)`;
-      for (let j = 0; j < wordLength; j++) {
-        const cell = document.createElement('div');
-        cell.classList.add('wordle-cell');
-        row.appendChild(cell);
-      }
-      wordleBoard.appendChild(row);
-    }
-  }
-
-  function triggerAnagramSuccessAnimation() {
-    const allLetters = document.querySelectorAll('.theme-letter');
-    allLetters.forEach(letterSpan => {
-      const random = Math.random();
-      if (random < 0.3) {
-        letterSpan.style.transition = 'background-color 0.5s';
-        letterSpan.style.backgroundColor = '#9ca3af';
-        setTimeout(() => {
-          letterSpan.style.backgroundColor = '';
-        }, 1000);
-      }
-    });
-  }
-
+  // init state (before first game)
+  displayClickableTheme();
+  updateProgressBar();
   if (hasPlayedToday()) {
-    wordleMessage.textContent = "You have already played today's game.";
+    wordleMessage.textContent = "You've already played today's game — come back tomorrow.";
     wordleInput.disabled = true;
     powerUpButton.disabled = true;
-    displayClickableTheme();
-    updateProgressBar();
+  } else {
+    wordleMessage.textContent = 'Press START to play today\'s theme: ' + theme;
   }
 });
