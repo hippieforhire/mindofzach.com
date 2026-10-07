@@ -254,6 +254,8 @@
     .dpad-row { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-top: 0.9rem; }
     .dpad-actions { display: flex; flex-direction: column; gap: 0.45rem; }
     .dpad-actions .tbtn { width: 112px; height: 58px; font-size: 1rem; letter-spacing: 0.06em; }
+    .zoo-tools { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 0.7rem; max-height: 128px; overflow-y: auto; justify-content: center; }
+    .zoo-speed { width: auto; padding: 0 0.9rem; height: 34px; font-size: 0.85rem; }
     .tbtn {
       width: 58px; height: 58px; border-radius: 14px; border: 1px solid rgba(0,240,255,0.4);
       background: rgba(0,240,255,0.06); color: var(--neon-cyan); font-size: 1.4rem; cursor: pointer;
@@ -832,6 +834,22 @@
     </div>
   </div>
 
+  <div id="zooModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>ZOO TYCOON</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="zooHi">0</span></span>
+          <button class="icon-btn" id="zooPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('zooModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="zooCanvas"></canvas></div>
+      <div class="game-hud"><span id="zooScore">$20,000</span><span id="zooBest" class="newbest hidden">NEW BEST!</span><button class="tbtn zoo-speed" id="zooSpeed" title="Game speed">1×</button></div>
+      <div id="zooTools" class="zoo-tools"></div>
+    </div>
+  </div>
+
   <script src="js/arcade.js"></script>
   <script src="js/coalesce.js"></script>
   <script src="js/wordlist.js"></script>
@@ -853,6 +871,7 @@
   <script src="js/galaga.js"></script>
   <script src="js/bubble.js"></script>
   <script src="js/doom.js"></script>
+  <script src="js/zoo.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -901,6 +920,9 @@
       { id: 'lemonade', title: 'Lemonade Tycoon', accent: '#ffe14d', page: 'lemonade.html',
         desc: 'Buy low, mix it right, watch the weather. Turn $20 into an empire.',
         icon: '<svg viewBox="0 0 24 24"><path d="M7 8h10l-1.5 12h-7z"/><path d="M12 8V3M12 3l3 2M12 3L9 5"/><circle cx="12" cy="13" r="2.5"/></svg>' },
+      { id: 'zoo', title: 'Zoo Tycoon', hi: 'zoo', accent: '#a6ff00', modal: 'zooModal',
+        desc: 'Build exhibits, keep animals happy, rake in admissions. Earn your stars.',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="7" cy="8" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="8" r="2"/><path d="M12 11c-3.5 0-6 2.5-6 5.5 0 1.8 1.4 3 3.2 3 1.2 0 1.9-.5 2.8-.5s1.6.5 2.8.5c1.8 0 3.2-1.2 3.2-3 0-3-2.5-5.5-6-5.5z"/></svg>' },
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         desc: 'A 90s bubble shooter: match three, drop the orphans, beat the ceiling.',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
