@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mind of Zach — Neon Arcade</title>
-  <meta name="description" content="The personal arcade of Zach Rogers: neon remakes of classic games, writings, and quotes.">
+  <meta name="description" content="The personal arcade of Zach Rogers: neon remakes of classic games and quotes.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,17 +161,6 @@
     .btn-neon:hover { background: rgba(255,47,214,0.12); box-shadow: 0 0 18px rgba(255,47,214,0.55); text-shadow: 0 0 8px var(--neon-magenta); }
     .btn-neon.cyan { color: var(--neon-cyan); border-color: var(--neon-cyan); }
     .btn-neon.cyan:hover { background: rgba(0,240,255,0.1); box-shadow: 0 0 18px rgba(0,240,255,0.55); text-shadow: 0 0 8px var(--neon-cyan); }
-
-    /* writings */
-    .writing-card {
-      background: linear-gradient(160deg, rgba(16,22,48,0.92), rgba(8,10,24,0.94));
-      border: 1px solid rgba(0,240,255,0.2); border-radius: 14px; padding: 1.4rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .writing-card:hover { border-color: rgba(0,240,255,0.55); box-shadow: 0 0 24px -8px rgba(0,240,255,0.6); }
-    .writing-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: var(--neon-cyan); margin: 0 0 0.4rem; letter-spacing: 0.05em; }
-    .writing-card .wdesc { color: var(--neon-amber); font-size: 0.95rem; margin: 0 0 0.6rem; font-weight: 600; }
-    .writing-card .wbody { color: #c9d2f2; line-height: 1.55; margin: 0; white-space: pre-wrap; }
 
     /* zork terminal */
     .terminal {
@@ -407,7 +396,6 @@
     <nav class="topbar">
       <a class="nav-link" href="#games">ARCADE</a>
       <a class="nav-link" href="#quotes">QUOTES</a>
-      <a class="nav-link" href="#writings">WRITINGS</a>
       <a class="nav-link" href="#zork">ZORK</a>
       <button class="mute-btn" id="muteBtn" title="Toggle sound">SOUND: ON</button>
     </nav>
@@ -433,12 +421,6 @@
         <p id="quoteText">Click below for a random quote.</p>
         <button class="btn-neon" id="quoteBtn">New quote</button>
       </div>
-    </section>
-
-    <section class="content-section hidden" id="writings">
-      <h2 class="section-title">WRITINGS</h2>
-      <p class="section-sub">Short pieces from the mind behind the arcade.</p>
-      <div id="writings-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
     <section class="content-section hidden" id="zork">
@@ -692,7 +674,7 @@
   <script src="js/coalesce.js"></script>
   <script src="js/wordlist.js"></script>
   <script src="js/quotes.js"></script>
-  <script src="js/writings.js"></script>
+  <script src="js/zork.js"></script>
   <script src="js/snake.js"></script>
   <script src="js/tetris.js"></script>
   <script src="js/pong.js"></script>
@@ -702,7 +684,6 @@
   <script src="js/rockpaperscissors.js"></script>
   <script src="js/numberguess.js"></script>
   <script src="js/yetanotherwordlegame.js"></script>
-  <script src="js/zork.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -763,7 +744,6 @@
       const el = document.getElementById(id);
       if (el) {
         el.classList.remove('hidden');
-        if (id === 'writings' && window.loadWritings) loadWritings();
         if (id === 'zork' && window.startZorkGame) startZorkGame();
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
