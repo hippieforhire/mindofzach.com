@@ -6,138 +6,146 @@
 <title>Lemonade Tycoon — Zach's Page</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#05060f;--neon-cyan:#00f0ff;--neon-magenta:#ff2fd6;--neon-lime:#a6ff00;--neon-amber:#ffb300;--text:#e8ecff;--muted:#8b93b8;--panel:rgba(10,14,30,.9)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh}
-body{background:radial-gradient(ellipse 90% 40% at 50% -5%,rgba(255,179,0,.06),transparent),var(--bg)}
-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;background:rgba(5,6,15,.85);border-bottom:1px solid rgba(0,240,255,.2);backdrop-filter:blur(8px)}
-.back{font-family:'Orbitron';font-size:.68rem;letter-spacing:.08em;color:var(--neon-cyan);text-decoration:none;border:1px solid rgba(0,240,255,.45);border-radius:8px;padding:.5rem .65rem;text-shadow:0 0 8px rgba(0,240,255,.6);white-space:nowrap}
-h1{font-family:'Orbitron';font-weight:900;font-size:.95rem;margin:0;letter-spacing:.1em;text-shadow:0 0 16px rgba(255,179,0,.55);color:var(--neon-amber)}
-.hud{margin-left:auto;display:flex;gap:.55rem;font-family:'Orbitron';font-size:.72rem}
-.hud span{background:rgba(0,240,255,.07);border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:.35rem .55rem;white-space:nowrap}
-main{max-width:640px;margin:0 auto;padding:1rem .9rem 3rem}
-section{display:none}section.on{display:block;animation:fade .25s}
+html,body{margin:0;padding:0;min-height:100vh}
+body{font-family:'Fredoka',sans-serif;background:linear-gradient(180deg,#8fd16a 0%,#6db84c 60%,#4f9a38 100%);color:#fffbe8;background-attachment:fixed}
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;background:#267326;border-bottom:4px solid #1a5c1a}
+.back{font-weight:700;font-size:.72rem;letter-spacing:.05em;color:#fffbe8;text-decoration:none;background:#2f8f2f;border:3px solid #1a5c1a;border-radius:12px;padding:.5rem .6rem;white-space:nowrap}
+h1{font-weight:700;font-size:1rem;margin:0;letter-spacing:.04em;color:#ffcf3f;text-shadow:2px 2px 0 #1a5c1a;white-space:nowrap}
+#resbar{position:sticky;top:57px;z-index:29;display:flex;gap:.35rem;align-items:center;overflow-x:auto;padding:.45rem .6rem;background:#1a5c1a;border-bottom:4px solid #0f3d0f;font-weight:600;font-size:.82rem;white-space:nowrap}
+#resbar .ri{background:#2f8f2f;border:2px solid #0f3d0f;border-radius:10px;padding:.3rem .5rem}
+#resbar .cash{color:#ffcf3f}
+#wxbar{margin:.6rem .6rem 0;background:#2f8f2f;border:3px solid #1a5c1a;border-radius:14px;padding:.55rem .7rem}
+#wxbar .row1{display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-weight:600}
+#wxbar .tmp{font-size:1.25rem;color:#ffcf3f;text-shadow:1px 1px 0 #1a5c1a}
+.ticker{margin-top:.4rem;background:#1a5c1a;border-radius:8px;overflow:hidden;white-space:nowrap;font-size:.85rem}
+.ticker span{display:inline-block;padding:.3rem 0;animation:tick 22s linear infinite;color:#ffe9a8}
+.ticker b{color:#ffcf3f}
+@keyframes tick{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+main{max-width:680px;margin:0 auto;padding:.6rem .6rem 3rem}
+section{display:none}section.on{display:block;animation:fade .22s}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-h2{font-family:'Orbitron';font-size:1rem;letter-spacing:.1em;margin:.4rem 0 .8rem;color:var(--neon-cyan);text-shadow:0 0 12px rgba(0,240,255,.5)}
-.card{background:var(--panel);border:1px solid rgba(0,240,255,.16);border-radius:14px;padding:1rem;margin-bottom:.9rem}
-.btn{display:block;width:100%;font-family:'Orbitron';font-weight:700;font-size:.95rem;letter-spacing:.1em;color:#04121a;background:linear-gradient(180deg,var(--neon-lime),#7ed321);border:none;border-radius:12px;padding:.95rem;margin:.6rem 0;cursor:pointer;box-shadow:0 0 18px rgba(166,255,0,.35)}
-.btn:active{transform:scale(.97)}
-.btn.ghost{background:rgba(0,240,255,.08);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.4);box-shadow:none}
-.btn.warn{background:linear-gradient(180deg,#ff6b6b,#d63c3c);color:#fff;box-shadow:0 0 18px rgba(255,80,80,.35)}
-.btn:disabled{opacity:.4;filter:grayscale(.6)}
-.tabs{display:flex;gap:.4rem;margin-bottom:.8rem}
-.tab{flex:1;font-family:'Orbitron';font-size:.68rem;letter-spacing:.06em;padding:.7rem .2rem;border-radius:10px;border:1px solid rgba(0,240,255,.3);background:rgba(0,240,255,.05);color:var(--text);cursor:pointer}
-.tab.on{background:rgba(0,240,255,.18);color:var(--neon-cyan);text-shadow:0 0 8px rgba(0,240,255,.7)}
-.wx{display:flex;justify-content:space-between;align-items:center;gap:.6rem}
-.wx .t{font-family:'Orbitron';font-size:1.5rem;color:var(--neon-amber)}
-.wx .c{font-size:2rem}
-.row{display:flex;align-items:center;gap:.5rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.row:last-child{border-bottom:none}
-.row .nm{flex:1}.row .nm b{display:block;font-size:1.02rem}.row .nm small{color:var(--muted)}
-.own{font-family:'Orbitron';font-size:.75rem;color:var(--neon-lime);min-width:3.2rem;text-align:right}
-.pr{font-size:.85rem;color:var(--muted);min-width:4.2rem;text-align:right}
-.step{display:flex;gap:.25rem}
-.step button{width:2.5rem;height:2.5rem;font-size:1rem;font-weight:700;border-radius:9px;border:1px solid rgba(0,240,255,.35);background:rgba(0,240,255,.08);color:var(--neon-cyan);cursor:pointer}
-.step button:active{background:rgba(0,240,255,.25)}
-.step button.sm{width:2.1rem;height:2.1rem;font-size:.75rem}
-.radio{display:flex;align-items:center;gap:.7rem;padding:.65rem .4rem;border:1px solid rgba(255,255,255,.08);border-radius:10px;margin-bottom:.45rem;cursor:pointer}
-.radio.on{border-color:var(--neon-lime);background:rgba(166,255,0,.07)}
-.radio .dot{width:1.1rem;height:1.1rem;border-radius:50%;border:2px solid var(--muted);flex-shrink:0}
-.radio.on .dot{border-color:var(--neon-lime);background:var(--neon-lime);box-shadow:0 0 10px var(--neon-lime)}
-.radio b{display:block}.radio small{color:var(--muted)}
-.radio .cost{margin-left:auto;font-family:'Orbitron';font-size:.75rem;color:var(--neon-amber);white-space:nowrap}
-.val{font-family:'Orbitron';font-size:1.05rem;color:var(--neon-amber);min-width:4.5rem;text-align:center}
-.note{color:var(--muted);font-size:.9rem;text-align:center;margin:.5rem 0}
-#street{position:relative;height:300px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,240,255,.2);margin-bottom:.8rem;background:linear-gradient(#2a4a7f 0%,#3d6ea8 55%,#4a4a52 55%,#33333a 100%)}
-#street.rain{background:linear-gradient(#1c2a44 0%,#2c3e5c 55%,#3a3a42 55%,#2c2c33 100%)}
-#street.cloudy{background:linear-gradient(#3a4a63 0%,#55677f 55%,#44444c 55%,#38383f 100%)}
-#stand{position:absolute;left:58%;bottom:22%;font-size:3.2rem;filter:drop-shadow(0 0 12px rgba(255,179,0,.7))}
-#standSign{position:absolute;left:56%;bottom:calc(22% + 3.4rem);font-family:'Orbitron';font-size:.62rem;background:rgba(5,6,15,.8);border:1px solid var(--neon-amber);color:var(--neon-amber);border-radius:6px;padding:.2rem .45rem;white-space:nowrap}
-.cust{position:absolute;bottom:24%;font-size:2rem;transition:left .5s linear;z-index:2}
-.face{position:absolute;font-size:1.5rem;animation:rise 1.1s forwards;z-index:3;pointer-events:none}
-@keyframes rise{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-46px)}}
-.floater{position:absolute;font-family:'Orbitron';font-size:.85rem;color:var(--neon-lime);text-shadow:0 0 8px var(--neon-lime);animation:rise 1.2s forwards;z-index:4;pointer-events:none}
-.daybar{display:flex;gap:.5rem;align-items:center;margin-bottom:.7rem}
-.daybar .stat{flex:1;text-align:center;background:var(--panel);border:1px solid rgba(0,240,255,.16);border-radius:10px;padding:.5rem .2rem;font-family:'Orbitron';font-size:.78rem}
-.spd{font-family:'Orbitron';font-size:.75rem;border:1px solid rgba(255,47,214,.5);color:var(--neon-magenta);background:rgba(255,47,214,.08);border-radius:10px;padding:.6rem .8rem;cursor:pointer}
-.kv{display:flex;justify-content:space-between;padding:.4rem 0;font-size:1.02rem;border-bottom:1px solid rgba(255,255,255,.05)}
-.kv b{font-family:'Orbitron';font-size:.85rem}
-.pos{color:var(--neon-lime)}.neg{color:#ff6b6b}
-.big{font-family:'Orbitron';font-weight:900;font-size:2rem;text-align:center;margin:.6rem 0;letter-spacing:.06em}
+.card{background:#2f8f2f;border:3px solid #1a5c1a;border-radius:16px;padding:.9rem;margin-bottom:.8rem;box-shadow:0 4px 0 #1a5c1a}
+h2{font-size:1.05rem;letter-spacing:.04em;margin:.2rem 0 .7rem;color:#ffcf3f;text-shadow:2px 2px 0 #1a5c1a}
+.btn{display:block;width:100%;font-family:inherit;font-weight:700;font-size:1rem;letter-spacing:.05em;color:#5a3c00;background:linear-gradient(180deg,#ffe066,#ffcf3f);border:3px solid #8a5a00;border-radius:14px;padding:.9rem;margin:.6rem 0;cursor:pointer;box-shadow:0 4px 0 #8a5a00;min-height:52px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8a5a00}
+.btn.green{color:#fffbe8;background:linear-gradient(180deg,#46b846,#2f8f2f);border-color:#0f3d0f;box-shadow:0 4px 0 #0f3d0f;text-shadow:1px 1px 0 #0f3d0f}
+.btn.red{color:#fff;background:linear-gradient(180deg,#e06666,#c23c3c);border-color:#6e1414;box-shadow:0 4px 0 #6e1414}
+.btn:disabled{opacity:.45;filter:grayscale(.5)}
+.tabbar{display:flex;gap:.3rem;margin:.6rem 0;overflow-x:auto;padding-bottom:.2rem}
+.tab{flex:1;min-width:74px;font-family:inherit;font-weight:700;font-size:.66rem;letter-spacing:.03em;padding:.65rem .25rem;border-radius:12px;border:3px solid #1a5c1a;background:#267326;color:#dff0d0;cursor:pointer;min-height:48px}
+.tab.on{background:#ffcf3f;color:#5a3c00;border-color:#8a5a00}
+.srow{display:flex;align-items:center;gap:.5rem;padding:.55rem 0;border-bottom:2px solid rgba(15,61,15,.35)}
+.srow:last-child{border-bottom:none}
+.srow .ic{font-size:1.7rem}
+.srow .nm{flex:1}.srow .nm b{display:block;font-size:1rem}.srow .nm small{color:#dff0d0;font-size:.78rem}
+.own{font-weight:700;font-size:.85rem;color:#ffcf3f;min-width:3rem;text-align:right}
+.trend{font-size:.8rem;min-width:1.2rem;text-align:center}
+.trend.up{color:#ff8a8a}.trend.dn{color:#b8ff9e}.trend.eq{color:#dff0d0}
+.step{display:flex;gap:.25rem;flex-wrap:wrap;justify-content:flex-end}
+.step button{min-width:2.6rem;min-height:2.6rem;font-family:inherit;font-size:.85rem;font-weight:700;border-radius:10px;border:3px solid #0f3d0f;background:#46b846;color:#fff;cursor:pointer;padding:.2rem .4rem}
+.step button:active{background:#2f8f2f}
+.pick{display:flex;align-items:center;gap:.6rem;padding:.6rem .5rem;border:3px solid #1a5c1a;border-radius:12px;margin-bottom:.45rem;cursor:pointer;background:#267326;min-height:56px}
+.pick.on{border-color:#ffcf3f;background:#2f8f2f;box-shadow:0 0 0 2px #ffcf3f}
+.pick .em{font-size:1.6rem}
+.pick b{display:block;font-size:.95rem}.pick small{color:#dff0d0;font-size:.78rem}
+.pick .cost{margin-left:auto;font-weight:700;font-size:.8rem;color:#ffcf3f;white-space:nowrap}
+.pick.owned .cost{color:#b8ff9e}
+.bar{height:.6rem;background:#0f3d0f;border-radius:6px;overflow:hidden;margin-top:.25rem}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ffe066,#ff9f1c);border-radius:6px}
+.val{font-weight:700;font-size:1.05rem;color:#ffcf3f;min-width:4.2rem;text-align:center;text-shadow:1px 1px 0 #1a5c1a}
+.note{color:#e8f5d8;font-size:.88rem;text-align:center;margin:.5rem 0}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:.42rem 0;font-size:1rem;border-bottom:2px solid rgba(15,61,15,.35)}
+.kv b{font-size:.9rem}
+.pos{color:#c6ff7a}.neg{color:#ff9d9d}
+.big{font-weight:700;font-size:2rem;text-align:center;margin:.6rem 0;text-shadow:2px 2px 0 #1a5c1a}
 .center{text-align:center}
-#mile{position:fixed;top:38%;left:50%;transform:translate(-50%,-50%) scale(.6);z-index:50;font-family:'Orbitron';font-weight:900;font-size:1.3rem;color:var(--neon-amber);text-shadow:0 0 24px var(--neon-amber);background:rgba(5,6,15,.92);border:2px solid var(--neon-amber);border-radius:16px;padding:1.2rem 1.6rem;opacity:0;pointer-events:none;transition:all .3s;text-align:center}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.6rem 0}
+.statbox{background:#267326;border:3px solid #1a5c1a;border-radius:12px;padding:.6rem .4rem;text-align:center}
+.statbox small{display:block;font-size:.72rem;color:#dff0d0;font-weight:600}
+.statbox b{font-size:1.15rem;color:#ffcf3f}
+.daybar{display:flex;gap:.45rem;align-items:stretch;margin-bottom:.6rem}
+.daybar .stat{flex:1;text-align:center;background:#2f8f2f;border:3px solid #1a5c1a;border-radius:12px;padding:.45rem .2rem;font-size:.72rem;font-weight:600}
+.daybar .stat b{display:block;font-size:1rem;color:#ffcf3f}
+.dbtn{font-family:inherit;font-weight:700;font-size:.8rem;border:3px solid #8a5a00;border-radius:12px;background:linear-gradient(180deg,#ffe066,#ffcf3f);color:#5a3c00;padding:.4rem .7rem;cursor:pointer;min-height:52px}
+.dbtn:active{transform:scale(.96)}
+#cvwrap{position:relative;border:4px solid #1a5c1a;border-radius:16px;overflow:hidden;margin-bottom:.6rem;box-shadow:0 4px 0 #1a5c1a}
+#cv{display:block;width:100%;height:auto}
+#mile{position:fixed;top:38%;left:50%;transform:translate(-50%,-50%) scale(.6);z-index:50;font-weight:700;font-size:1.25rem;color:#5a3c00;background:#ffcf3f;border:4px solid #8a5a00;border-radius:18px;padding:1.1rem 1.5rem;opacity:0;pointer-events:none;transition:all .3s;text-align:center}
 #mile.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.stars{color:var(--neon-amber);letter-spacing:.15em}
+.staffrow{display:flex;align-items:center;gap:.6rem}
 </style>
 </head>
 <body>
 <header>
   <a class="back" href="index.html">← ZACH'S PAGE</a>
   <h1>🍋 LEMONADE TYCOON</h1>
-  <div class="hud"><span id="hCash">$20.00</span><span id="hDay">DAY 1</span><span id="hRep">⭐50</span></div>
 </header>
+<div id="resbar"></div>
 <main>
   <section id="scr-title">
     <div class="card center" style="margin-top:2rem">
-      <div style="font-size:4rem">🍋</div>
-      <h2 style="font-size:1.3rem;color:var(--neon-amber)">LEMONADE TYCOON</h2>
-      <p class="note">Buy low, mix it right, watch the weather.<br>Turn $20 into a lemonade empire.</p>
-      <button class="btn" id="btnContinue" style="display:none">CONTINUE DAY <span id="contDay"></span></button>
-      <button class="btn ghost" id="btnNew">NEW GAME</button>
+      <div style="font-size:4.5rem">🍋</div>
+      <h2 style="font-size:1.5rem">LEMONADE TYCOON</h2>
+      <p class="note">Buy low, mix it right, watch the weather.<br>Turn $20 into a lemonade empire!</p>
+      <button class="btn" id="btnContinue" style="display:none">CONTINUE · DAY <span id="contDay"></span></button>
+      <button class="btn green" id="btnNew">NEW GAME</button>
     </div>
   </section>
 
   <section id="scr-morning">
-    <div class="card"><div class="wx">
-      <div><div style="color:var(--muted);font-size:.85rem">TODAY · DAY <span id="mDay"></span></div>
-      <div class="t"><span id="mTemp"></span> <span class="c" id="mCond"></span> <span id="mCondT" style="font-size:1rem"></span></div></div>
-      <div style="text-align:right"><div style="color:var(--muted);font-size:.85rem">TOMORROW'S FORECAST</div>
-      <div style="font-family:'Orbitron';font-size:.95rem;color:var(--neon-cyan)"><span id="fTemp"></span> <span id="fCondT"></span></div></div>
-    </div></div>
-    <div class="tabs">
-      <button class="tab on" data-t="sup">SUPPLIES</button>
-      <button class="tab" data-t="rec">RECIPE &amp; PRICE</button>
-      <button class="tab" data-t="biz">BUSINESS</button>
+    <div id="wxbar">
+      <div class="row1">
+        <div><small style="color:#dff0d0">TODAY · DAY <span id="mDay"></span></small><br><span class="tmp"><span id="mTemp"></span> <span id="mCond"></span></span> <b id="mCondT"></b></div>
+        <div style="text-align:right"><small style="color:#dff0d0">TOMORROW</small><br><b><span id="fTemp"></span> <span id="fCond"></span></b></div>
+      </div>
+      <div class="ticker"><span id="ticker"></span></div>
     </div>
-    <div class="card" id="tab-sup"></div>
+    <div class="tabbar">
+      <button class="tab" data-t="results">RESULTS</button>
+      <button class="tab" data-t="rent">RENT</button>
+      <button class="tab" data-t="upg">UPGRADES</button>
+      <button class="tab" data-t="staff">STAFF</button>
+      <button class="tab" data-t="mkt">MARKETING</button>
+      <button class="tab" data-t="rec">RECIPE</button>
+      <button class="tab on" data-t="sup">SUPPLIES</button>
+    </div>
+    <div class="card" id="tab-results" style="display:none"></div>
+    <div class="card" id="tab-rent" style="display:none"></div>
+    <div class="card" id="tab-upg" style="display:none"></div>
+    <div class="card" id="tab-staff" style="display:none"></div>
+    <div class="card" id="tab-mkt" style="display:none"></div>
     <div class="card" id="tab-rec" style="display:none"></div>
-    <div class="card" id="tab-biz" style="display:none"></div>
+    <div class="card" id="tab-sup"></div>
     <button class="btn" id="btnStart">☀️ START DAY</button>
     <p class="note" id="startWarn"></p>
   </section>
 
   <section id="scr-day">
     <div class="daybar">
-      <div class="stat">SOLD<br><b id="dSold" style="color:var(--neon-lime)">0</b></div>
-      <div class="stat">REVENUE<br><b id="dRev" style="color:var(--neon-amber)">$0.00</b></div>
-      <div class="stat">LEFT<br><b id="dLeft" style="color:var(--neon-cyan)">0</b></div>
-      <button class="spd" id="btnSpd">1×</button>
+      <div class="stat">SOLD<b id="dSold">0</b></div>
+      <div class="stat">REVENUE<b id="dRev">$0.00</b></div>
+      <div class="stat">REMAINING<b id="dLeft">0</b></div>
+      <button class="dbtn" id="btnSpd">1×</button>
+      <button class="dbtn" id="btnSkip">SKIP ⏩</button>
     </div>
-    <div id="street"><div id="standSign"></div><div id="stand">🍋</div></div>
-    <p class="note" id="dayMsg">Customers are on their way…</p>
+    <div id="cvwrap"><canvas id="cv" width="640" height="360"></canvas></div>
+    <p class="note" id="dayMsg"></p>
   </section>
 
   <section id="scr-results">
     <h2>📊 DAY <span id="rDay"></span> RESULTS</h2>
-    <div class="card">
-      <div class="kv"><span>Glasses sold</span><b id="rSold"></b></div>
-      <div class="kv"><span>Revenue</span><b class="pos" id="rRev"></b></div>
-      <div class="kv"><span>Supplies used</span><b class="neg" id="rCost"></b></div>
-      <div class="kv"><span>Rent · <span id="rLoc"></span></span><b class="neg" id="rRent"></b></div>
-      <div class="kv"><span>Advertising</span><b class="neg" id="rAd"></b></div>
-      <div class="kv"><span>Reputation</span><b id="rRep"></b></div>
-      <div class="kv"><span>Weather was</span><b id="rWx"></b></div>
-    </div>
+    <div class="card" id="resCards"></div>
     <div class="big" id="rProf"></div>
-    <button class="btn" id="btnNext">🌙 NEXT DAY</button>
+    <button class="btn green" id="btnNext">🌙 NEXT DAY</button>
   </section>
 
   <section id="scr-over">
     <div class="card center" style="margin-top:2rem">
       <div style="font-size:3.5rem">💸</div>
-      <h2 style="color:#ff6b6b">BANKRUPT!</h2>
+      <h2 style="color:#ff9d9d">BANKRUPT!</h2>
       <p class="note">The lemonade dream ends here.</p>
       <div class="kv"><span>Days survived</span><b id="oDays"></b></div>
       <div class="kv"><span>Peak net worth</span><b id="oPeak"></b></div>
@@ -154,186 +162,462 @@ h2{font-family:'Orbitron';font-size:1rem;letter-spacing:.1em;margin:.4rem 0 .8re
 const A=window.Arcade,$=id=>document.getElementById(id);
 const fmt=n=>'$'+n.toFixed(2),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=(a,b)=>a+Math.random()*(b-a),ri=(a,b)=>Math.floor(rnd(a,b+1));
+const pick=a=>a[ri(0,a.length-1)];
 const CONDEMOJI={Sunny:'☀️',Cloudy:'⛅',Rain:'🌧️'};
-const PEOPLE=['🚶','🚶‍♀️','🚶‍♂️','🧍','🧍‍♀️','🧍‍♂️','🏃','🏃‍♀️'];
-const LOCS=[{n:'Sidewalk',rent:0,traffic:30},{n:'Park',rent:20,traffic:70},{n:'Downtown',rent:50,traffic:120},{n:'Beach',rent:100,traffic:180}];
-const ADS=[{n:'None',cost:0,t:0},{n:'Flyers',cost:10,t:20},{n:'Newspaper',cost:40,t:55},{n:'Radio',cost:100,t:120},{n:'TV Ad',cost:250,t:230}];
-const STANDS=[{n:'Wooden Stand',cost:0,cap:60},{n:'Fancy Stand',cost:150,cap:130},{n:'Lemonade Mansion',cost:400,cap:220}];
-let S=null,speed=1,dayTimer=null;
+const PEOPLE=['🚶','🚶‍♀️','🚶‍♂️','🧍','🧍‍♀️','🧍‍♂️','🏃','🏃‍♀️','🧓','👵','👦','👧'];
+const LOCS=[
+ {n:'Sidewalk',rent:0,traffic:30,em:'🚶',d:'Free, but quiet.'},
+ {n:'Park',rent:20,traffic:70,em:'🌳',d:'Families and joggers.'},
+ {n:'Downtown',rent:50,traffic:120,em:'🏙️',d:'Busy lunch crowds.'},
+ {n:'Beach',rent:100,traffic:180,em:'🏖️',d:'Hot, thirsty tourists.'}];
+const ADS=[
+ {n:'None',cost:0,t:0,em:'🚫'},
+ {n:'Flyers',cost:10,t:20,em:'📄'},
+ {n:'Newspaper',cost:40,t:55,em:'📰'},
+ {n:'Radio',cost:100,t:120,em:'📻'},
+ {n:'TV Ad',cost:250,t:230,em:'📺'}];
+const STANDS=[
+ {n:'Wooden Stand',cost:0,cap:60,em:'🪵'},
+ {n:'Fancy Stand',cost:150,cap:130,em:'🏪'},
+ {n:'Lemonade Mansion',cost:400,cap:220,em:'🏰'}];
+const UPGRADES=[
+ {id:'pitcher',n:'Big Pitcher',cost:120,em:'🏺',d:'+40% daily serving capacity.'},
+ {id:'ice',n:'Ice Machine',cost:200,em:'❄️',d:'Only half your ice melts overnight.'},
+ {id:'chairs',n:'Comfy Chairs',cost:150,em:'🪑',d:'Customers wait much longer (+15 patience).'},
+ {id:'squeezer',n:'Lemon Squeezer',cost:100,em:'🔧',d:'Use 20% fewer lemons per glass.'},
+ {id:'umbrella',n:'Big Umbrella',cost:80,em:'☂️',d:'Rain hurts less (demand floor 0.35).'},
+ {id:'billboard',n:'Billboard',cost:250,em:'🪧',d:'+30 foot traffic at every location.'}];
+const NEWS=[
+ 'Survey: 9 out of 10 kids prefer lemonade to homework!',
+ 'Local man drinks 14 glasses, declares self "Hydration King".',
+ 'Scientists confirm: lemons are, in fact, sour.',
+ 'Heat wave incoming! Stock up on ice, folks!',
+ 'Pigeons spotted unionizing near a downtown stand.',
+ 'Sugar prices doing the cha-cha again this week.',
+ 'Study finds lemonade drinkers 12% more refreshed.',
+ 'Mayor declares Friday "Official Lemonade Day".',
+ 'Squirrel opens rival nut stand. Competition heats up!',
+ 'Weather service apologizes for yesterday. Again.',
+ 'Breaking: ice cubes now 100% colder, experts say.',
+ 'Local grandma\'s recipe still unbeaten after 40 years.'];
+const STAFF_WAGE=15,MAXSTAFF=3;
+const SUPDEF=[
+ {k:'L',em:'🍋',nm:'Lemons',unit:'each'},
+ {k:'S',em:'🧂',nm:'Sugar',unit:'scoop'},
+ {k:'I',em:'🧊',nm:'Ice cubes',unit:'each'},
+ {k:'C',em:'🥤',nm:'Cups',unit:'each'}];
+const KPROP={L:'lemons',S:'sugar',I:'ice',C:'cups'},CAVG={L:'cL',S:'cS',I:'cI',C:'cC'},PRICE={L:'pL',S:'pS',I:'pI',C:'pC'};
 
-function rollPrices(){S.pL=rnd(.35,.75);S.pS=rnd(.30,.70);S.pI=rnd(.03,.10);S.pC=rnd(.08,.20);}
-function rollWx(){const t=ri(60,100),r=Math.random();return{t,c:r<.55?'Sunny':r<.8?'Cloudy':'Rain'};}
-function wMult(w){return w.c==='Sunny'?(.9+(w.t-60)/40*.5):w.c==='Cloudy'?.65:.22;}
-function newGame(){S={cash:20,rep:50,lemons:0,sugar:0,ice:0,cups:0,cL:.5,cS:.45,cI:.05,cC:.12,
-  rl:6,rs:6,ric:2,price:1,loc:0,ad:0,stand:0,owned:[true,false,false],peak:20,tot:0,miles:{},
-  dayN:1,day:null};rollPrices();S.wt=rollWx();S.wf=rollWx();}
-function invVal(){return S.lemons*S.cL+S.sugar*S.cS+S.ice*S.cI+S.cups*S.cC;}
+let S=null;
+
+/* ---------- state / save ---------- */
+function blankSave(){return{v:2,cash:20,rep:50,lemons:0,sugar:0,ice:0,cups:0,cL:.5,cS:.45,cI:.05,cC:.12,
+ prev:null,rl:6,rs:6,ric:2,price:1,loc:0,ad:0,stand:0,owned:[true,false,false],peak:20,tot:0,miles:{},
+ dayN:1,day:null,staff:[],upgrades:{},records:{bestProfit:-1e9,mostCups:0},last:null,wt:null,wf:null,pL:0,pS:0,pI:0,pC:0};}
+function migrate(s){
+ if(s.v!==2){s.staff=s.staff||[];s.upgrades=s.upgrades||{};s.records=s.records||{bestProfit:-1e9,mostCups:0};s.v=2;}
+ return s;}
+function newGame(){S=blankSave();rollPrices();S.wt=rollWx();S.wf=rollWx();save();}
 function save(){A.store.set('lemonade',S);}
-function hud(){$('hCash').textContent=fmt(S.cash);$('hDay').textContent='DAY '+S.dayN;$('hRep').textContent='⭐'+S.rep;}
-function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function loadSv(){const s=A.store.get('lemonade',null);return s&&s.cash!=null?migrate(s):null;}
+function invVal(){return S.lemons*S.cL+S.sugar*S.cS+S.ice*S.cI+S.cups*S.cC;}
 
-/* ---------- morning ---------- */
-function buy(kind,q){const P={L:S.pL,S:S.pS,I:S.pI,C:S.pC}[kind],K={L:'lemons',S:'sugar',I:'ice',C:'cups'}[kind],C={L:'cL',S:'cS',I:'cI',C:'cC'}[kind];
-  if(q<0){const n=Math.min(S[K],-q);if(n<=0){A.sfx.bad();return;}S[K]-=n;S.cash+=S[C]*n;A.sfx.tick();renderMorning();return;}
-  const cost=P*q;if(S.cash<cost){A.sfx.bad();return;}
-  S.cash-=cost;const k=K,n=S[k];S[C]=(S[C]*n+P*q)/(n+q);S[k]=n+q;A.sfx.place();renderMorning();}
-function supRow(em,nm,owned,price,kind){return '<div class="row"><div class="nm"><b>'+em+' '+nm+'</b><small>'+fmt(price)+' each · avg cost '+fmt({L:S.cL,S:S.cS,I:S.cI,C:S.cC}[kind])+'</small></div>'+
-  '<span class="own">'+owned+'</span><span class="pr">'+fmt(price)+'</span><div class="step"><button class="sm" data-b="'+kind+'|-50">−50</button><button class="sm" data-b="'+kind+'|-10">−10</button><button class="sm" data-b="'+kind+'|-1">−1</button><button class="sm" data-b="'+kind+'|1">+1</button><button class="sm" data-b="'+kind+'|10">+10</button><button class="sm" data-b="'+kind+'|50">+50</button></div></div>';}
-function costGlass(){return (S.rl*S.cL+S.rs*S.cS)/8+S.ric*S.cI+S.cC;}
-function recRow(label,val,min,max,step,unit,key){return '<div class="row"><div class="nm"><b>'+label+'</b><small>'+min+'–'+max+' '+unit+'</small></div>'+
-  '<div class="step"><button data-r="'+key+'|-1">−</button></div><span class="val" id="rv-'+key+'">'+val+'</span><div class="step"><button data-r="'+key+'|1">+</button></div></div>';}
-function renderMorning(){
-  hud();$('mDay').textContent=S.dayN;
-  $('mTemp').textContent=S.wt.t+'°F';$('mCond').textContent=CONDEMOJI[S.wt.c];$('mCondT').textContent=S.wt.c;
-  $('fTemp').textContent=S.wf.t+'°F';$('fCondT').textContent=CONDEMOJI[S.wf.c]+' '+S.wf.c;
-  $('tab-sup').innerHTML=supRow('🍋','Lemons',Math.floor(S.lemons),S.pL,'L')+supRow('🧂','Sugar',Math.floor(S.sugar),S.pS,'S')+supRow('🧊','Ice cubes',S.ice,S.pI,'I')+supRow('🥤','Cups',S.cups,S.pC,'C')+
-    '<p class="note">Ice melts overnight — only buy what you\'ll use today.</p>';
-  $('tab-rec').innerHTML=recRow('🍋 Lemons / pitcher',S.rl,1,12,'','', 'rl')+recRow('🧂 Sugar / pitcher',S.rs,1,12,'','','rs')+recRow('🧊 Ice / glass',S.ric,0,4,'','','ric')+recRow('💲 Price / glass',fmt(S.price),'.10','10.00','','','price')+
-    '<div class="kv" style="margin-top:.4rem"><span>Cost per glass</span><b class="neg">'+fmt(costGlass())+'</b></div>'+
-    '<div class="kv"><span>Margin per glass</span><b class="'+(S.price-costGlass()>=0?'pos':'neg')+'">'+fmt(S.price-costGlass())+'</b></div>'+
-    '<p class="note">1 pitcher = 8 glasses. Perfect recipe ≈ 6🍋 6🧂 2🧊.</p>';
-  let biz='<h2 style="font-size:.8rem">📍 LOCATION</h2>';
-  LOCS.forEach((l,i)=>{biz+='<div class="radio'+(S.loc===i?' on':'')+'" data-loc="'+i+'"><div class="dot"></div><div><b>'+l.n+'</b><small>'+l.traffic+' foot traffic</small></div><span class="cost">'+fmt(l.rent)+'/day</span></div>';});
-  biz+='<h2 style="font-size:.8rem;margin-top:.8rem">📣 ADVERTISING (today only)</h2>';
-  ADS.forEach((a,i)=>{biz+='<div class="radio'+(S.ad===i?' on':'')+'" data-ad="'+i+'"><div class="dot"></div><div><b>'+a.n+'</b><small>+'+a.t+' customers</small></div><span class="cost">'+fmt(a.cost)+'</span></div>';});
-  biz+='<h2 style="font-size:.8rem;margin-top:.8rem">🏪 STAND (one-time)</h2>';
-  STANDS.forEach((st,i)=>{const owned=S.owned[i],cur=S.stand===i;
-    biz+='<div class="radio'+(cur?' on':'')+'" data-stand="'+i+'"><div class="dot"></div><div><b>'+st.n+'</b><small>serves '+st.cap+'/day'+(owned?' · owned':'')+'</small></div><span class="cost">'+(owned?(cur?'IN USE':'USE') : fmt(st.cost))+'</span></div>';});
-  $('tab-biz').innerHTML=biz;
-  const ok=S.cups>=1&&S.lemons>0&&S.sugar>0;
-  $('btnStart').disabled=!ok;
-  $('startWarn').textContent=ok?'':'⚠️ You need cups, lemons and sugar to open.';
-  document.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const[k,q]=b.dataset.b.split('|');buy(k,+q);});
-  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.r.split('|');adjRec(k,+d);});
-  document.querySelectorAll('[data-loc]').forEach(r=>r.onclick=()=>{S.loc=+r.dataset.loc;A.sfx.click();renderMorning();});
-  document.querySelectorAll('[data-ad]').forEach(r=>r.onclick=()=>{setAd(+r.dataset.ad);});
-  document.querySelectorAll('[data-stand]').forEach(r=>r.onclick=()=>{setStand(+r.dataset.stand);});
-}
-function adjRec(k,d){if(k==='price'){S.price=clamp(Math.round((S.price+d*.1)*100)/100,.1,10);}
-  else if(k==='rl')S.rl=clamp(S.rl+d,1,12);else if(k==='rs')S.rs=clamp(S.rs+d,1,12);else if(k==='ric')S.ric=clamp(S.ric+d,0,4);
-  A.sfx.tick();renderMorning();}
+/* ---------- sim core (kept from original) ---------- */
+function rollPrices(){S.prev={pL:S.pL,pS:S.pS,pI:S.pI,pC:S.pC};S.pL=rnd(.35,.75);S.pS=rnd(.30,.70);S.pI=rnd(.03,.10);S.pC=rnd(.08,.20);}
+function rollWx(){const t=ri(60,100),r=Math.random();return{t,c:r<.55?'Sunny':r<.8?'Cloudy':'Rain'};}
+function wMult(w){let m=w.c==='Sunny'?(.9+(w.t-60)/40*.5):w.c==='Cloudy'?.65:.22;
+ if(w.c==='Rain'&&S.upgrades.umbrella)m=Math.max(m,.35);return m;}
+function effCap(){let c=STANDS[S.stand].cap;if(S.upgrades.pitcher)c=Math.round(c*1.4);return c;}
+function traffic(){return LOCS[S.loc].traffic+(S.upgrades.billboard?30:0);}
+function lemPerGlass(){return S.rl/8*(S.upgrades.squeezer?0.8:1);}
+function costGlass(){return (lemPerGlass()*S.cL+S.rs/8*S.cS)+S.ric*S.cI+S.cC;}
+function buy(kind,q){
+ const P=S[PRICE[kind]],K=KPROP[kind],C=CAVG[kind];
+ if(q<0){const n=Math.min(Math.floor(S[K]),-q);if(n<=0){A.sfx.bad();return;}S[K]-=n;S.cash+=S[C]*n;A.sfx.tick();renderMorning();return;}
+ const cost=P*q;if(S.cash<cost){A.sfx.bad();return;}
+ S.cash-=cost;const n=S[K];S[C]=(S[C]*n+P*q)/(n+q);S[K]=n+q;A.sfx.place();renderMorning();}
+function adjRec(k,d){
+ if(k==='price')S.price=clamp(Math.round((S.price+d*.1)*100)/100,.1,10);
+ else if(k==='rl')S.rl=clamp(S.rl+d,1,12);
+ else if(k==='rs')S.rs=clamp(S.rs+d,1,12);
+ else if(k==='ric')S.ric=clamp(S.ric+d,0,4);
+ A.sfx.tick();renderMorning();}
 function setAd(i){const c=ADS[i].cost;if(S.cash<c){A.sfx.bad();return;}S.cash-=c;S.ad=i;A.sfx.click();renderMorning();}
-function setStand(i){if(S.owned[i]){S.stand=i;A.sfx.click();}
-  else{const c=STANDS[i].cost;if(S.cash<c){A.sfx.bad();return;}S.cash-=c;S.owned[i]=true;S.stand=i;A.sfx.power();}
-  renderMorning();}
+function setStand(i){
+ if(S.owned[i]){S.stand=i;A.sfx.click();}
+ else{const c=STANDS[i].cost;if(S.cash<c){A.sfx.bad();return;}S.cash-=c;S.owned[i]=true;S.stand=i;A.sfx.power();}
+ renderMorning();}
+function buyUpgrade(id){const u=UPGRADES.find(u=>u.id===id);
+ if(S.upgrades[id]||S.cash<u.cost){A.sfx.bad();return;}
+ S.cash-=u.cost;S.upgrades[id]=1;A.sfx.power();renderMorning();}
+function hireStaff(){
+ if(S.staff.length>=MAXSTAFF){A.sfx.bad();return;}
+ S.staff.push({wage:STAFF_WAGE});A.sfx.power();renderMorning();}
+function fireStaff(i){S.staff.splice(i,1);A.sfx.tick();renderMorning();}
 
-/* ---------- day simulation ---------- */
+/* ---------- HUD / nav ---------- */
+function hud(){
+ $('resbar').innerHTML=
+ '<span class="ri">🍋 '+Math.floor(S.lemons)+'</span><span class="ri">🧂 '+Math.floor(S.sugar)+'</span>'+
+ '<span class="ri">🧊 '+S.ice+'</span><span class="ri">🥤 '+S.cups+'</span>'+
+ '<span class="ri cash">💵 '+fmt(S.cash)+'</span><span class="ri">📅 DAY '+S.dayN+'</span>'+
+ '<span class="ri">⭐ '+S.rep+'</span>';}
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function trend(k){if(!S.prev)return'<span class="trend eq">•</span>';
+ const d=S[PRICE[k]]-S.prev[PRICE[k]];
+ return d>0.005?'<span class="trend up">▲</span>':d<-0.005?'<span class="trend dn">▼</span>':'<span class="trend eq">•</span>';}
+
+/* ---------- morning tabs ---------- */
+const TABS=['results','rent','upg','staff','mkt','rec','sup'];
+function renderMorning(){
+ hud();
+ $('mDay').textContent=S.dayN;
+ $('mTemp').textContent=S.wt.t+'°F';$('mCond').textContent=CONDEMOJI[S.wt.c];$('mCondT').textContent=S.wt.c;
+ $('fTemp').textContent=S.wf.t+'°F';$('fCond').textContent=CONDEMOJI[S.wf.c]+' '+S.wf.c;
+ $('ticker').innerHTML='<b>NEWSFLASH!</b> '+pick(NEWS)+' &nbsp;&nbsp;•&nbsp;&nbsp; <b>NEWSFLASH!</b> '+pick(NEWS);
+ renderTab('sup');
+ const ok=S.cups>=1&&S.lemons>0&&S.sugar>0;
+ $('btnStart').disabled=!ok;
+ $('startWarn').textContent=ok?'':'⚠️ You need cups, lemons and sugar to open for the day.';}
+function renderTab(t){
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+ TABS.forEach(k=>$('tab-'+k).style.display=k===t?'block':'none');
+ ({results:tabResults,rent:tabRent,upg:tabUpg,staff:tabStaff,mkt:tabMkt,rec:tabRec,sup:tabSup})[t]();}
+function supRow(d){
+ const owned=Math.floor(S[KPROP[d.k]]);
+ return '<div class="srow"><div class="ic">'+d.em+'</div><div class="nm"><b>'+d.nm+'</b>'+
+ '<small>'+fmt(S[PRICE[d.k]])+' '+d.unit+' · avg cost '+fmt(S[CAVG[d.k]])+'</small></div>'+
+ trend(d.k)+'<span class="own">'+owned+'</span>'+
+ '<div class="step"><button data-b="'+d.k+'|-10">−10</button><button data-b="'+d.k+'|-1">−1</button>'+
+ '<button data-b="'+d.k+'|1">+1</button><button data-b="'+d.k+'|10">+10</button></div></div>';}
+function tabSup(){
+ $('tab-sup').innerHTML=SUPDEF.map(supRow).join('')+
+ '<p class="note">🧊 Ice melts overnight — only buy what you\'ll use today!</p>';
+ wireBuys();}
+function wireBuys(){document.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const p=b.dataset.b.split('|');buy(p[0],+p[1]);});}
+function recRow(label,val,min,max,unit,key,isPrice){
+ const disp=isPrice?fmt(val):val;
+ return '<div class="srow"><div class="nm"><b>'+label+'</b><small>'+min+'–'+max+' '+unit+'</small></div>'+
+ '<div class="step"><button data-r="'+key+'|-1">−</button></div><span class="val">'+disp+'</span>'+
+ '<div class="step"><button data-r="'+key+'|1">+</button></div></div>';}
+function tabRec(){
+ const cg=costGlass(),mg=S.price-cg;
+ $('tab-rec').innerHTML=
+ recRow('🍋 Lemons / pitcher',S.rl,1,12,'lemons','rl')+
+ recRow('🧂 Sugar / pitcher',S.rs,1,12,'scoops','rs')+
+ recRow('🧊 Ice / glass',S.ric,0,4,'cubes','ric')+
+ recRow('💲 Price / glass',S.price,'0.10','10.00','dollars','price',true)+
+ '<div class="kv"><span>Cost per glass</span><b class="neg">'+fmt(cg)+'</b></div>'+
+ '<div class="kv"><span>Margin per glass</span><b class="'+(mg>=0?'pos':'neg')+'">'+fmt(mg)+'</b></div>'+
+ '<p class="note">1 pitcher = 8 glasses. Perfect recipe ≈ 6🍋 6🧂 2🧊.</p>';
+ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const p=b.dataset.r.split('|');adjRec(p[0],+p[1]);});}
+function tabRent(){
+ let h='<h2>📍 CHOOSE LOCATION</h2>';
+ LOCS.forEach((l,i)=>{
+  const pop=clamp(S.rep+(i===S.loc?5:0)-(i*2),0,100),sat=clamp(S.rep+10-Math.abs(S.price-2)*15,5,100);
+  h+='<div class="pick'+(S.loc===i?' on':'')+'" data-loc="'+i+'"><div class="em">'+l.em+'</div>'+
+  '<div><b>'+l.n+'</b><small>'+l.d+' · 👥 '+l.traffic+' foot traffic</small>'+
+  '<div class="bar"><i style="width:'+pop+'%"></i></div></div>'+
+  '<span class="cost">'+fmt(l.rent)+'/day</span></div>';});
+ $('tab-rent').innerHTML=h;
+ document.querySelectorAll('[data-loc]').forEach(r=>r.onclick=()=>{S.loc=+r.dataset.loc;A.sfx.click();renderTab('rent');hud();});}
+function tabUpg(){
+ let h='<h2>🔧 STAND UPGRADES</h2><p class="note">One-time purchases. They stack!</p>';
+ UPGRADES.forEach(u=>{
+  const owned=!!S.upgrades[u.id];
+  h+='<div class="pick'+(owned?' on owned':'')+'" data-upg="'+u.id+'"><div class="em">'+u.em+'</div>'+
+  '<div><b>'+u.n+'</b><small>'+u.d+'</small></div>'+
+  '<span class="cost">'+(owned?'OWNED':fmt(u.cost))+'</span></div>';});
+ h+='<h2>🏪 STAND</h2>';
+ STANDS.forEach((st,i)=>{const owned=S.owned[i],cur=S.stand===i;
+  h+='<div class="pick'+(cur?' on':'')+'" data-stand="'+i+'"><div class="em">'+st.em+'</div>'+
+  '<div><b>'+st.n+'</b><small>serves up to '+st.cap+'/day'+(owned?' · owned':'')+'</small></div>'+
+  '<span class="cost">'+(owned?(cur?'IN USE':'USE'):fmt(st.cost))+'</span></div>';});
+ $('tab-upg').innerHTML=h;
+ document.querySelectorAll('[data-upg]').forEach(r=>r.onclick=()=>buyUpgrade(r.dataset.upg));
+ document.querySelectorAll('[data-stand]').forEach(r=>r.onclick=()=>setStand(+r.dataset.stand));}
+function tabStaff(){
+ let h='<h2>🧑‍🍳 STAFF</h2><p class="note">Each staffer serves customers faster, keeps lines short, and adds patience.<br>Wage: '+fmt(STAFF_WAGE)+'/day each · max '+MAXSTAFF+'.</p>';
+ S.staff.forEach((s,i)=>{
+  h+='<div class="srow"><div class="ic">🧑‍🍳</div><div class="nm"><b>Staffer #'+(i+1)+'</b>'+
+  '<small>'+fmt(s.wage)+'/day · serves +1 line at a time</small></div>'+
+  '<div class="step"><button data-fire="'+i+'">FIRE</button></div></div>';});
+ if(!S.staff.length)h+='<p class="note">No staff yet — it\'s just you and the lemons.</p>';
+ if(S.staff.length<MAXSTAFF)h+='<button class="btn green" id="hireBtn">🤝 HIRE STAFFER ('+fmt(STAFF_WAGE)+'/day)</button>';
+ else h+='<p class="note">Full crew! ('+MAXSTAFF+'/'+MAXSTAFF+')</p>';
+ $('tab-staff').innerHTML=h;
+ const hb=$('hireBtn');if(hb)hb.onclick=hireStaff;
+ document.querySelectorAll('[data-fire]').forEach(b=>b.onclick=()=>fireStaff(+b.dataset.fire));}
+function tabMkt(){
+ let h='<h2>📣 ADVERTISING</h2><p class="note">Ads run for today only.</p>';
+ ADS.forEach((a,i)=>{
+  h+='<div class="pick'+(S.ad===i?' on':'')+'" data-ad="'+i+'"><div class="em">'+a.em+'</div>'+
+  '<div><b>'+a.n+'</b><small>+'+a.t+' customers today</small></div>'+
+  '<span class="cost">'+fmt(a.cost)+'</span></div>';});
+ $('tab-mkt').innerHTML=h;
+ document.querySelectorAll('[data-ad]').forEach(r=>r.onclick=()=>setAd(+r.dataset.ad));}
+function resCardsHTML(L){
+ return '<div class="statgrid">'+
+ '<div class="statbox"><small>🥤 GLASSES SOLD</small><b>'+L.sold+'</b></div>'+
+ '<div class="statbox"><small>💵 REVENUE</small><b>'+fmt(L.rev)+'</b></div>'+
+ '<div class="statbox"><small>🧾 SUPPLY COST</small><b class="neg">−'+fmt(L.supCost)+'</b></div>'+
+ '<div class="statbox"><small>🏠 RENT</small><b class="neg">−'+fmt(L.rent)+'</b></div>'+
+ '<div class="statbox"><small>📣 ADS</small><b class="neg">−'+fmt(L.ad)+'</b></div>'+
+ '<div class="statbox"><small>🧑‍🍳 WAGES</small><b class="neg">−'+fmt(L.wages)+'</b></div></div>'+
+ '<div class="kv"><span>🚶 Walked away</span><b>'+L.walk+'</b></div>'+
+ '<div class="kv"><span>⭐ Reputation</span><b>'+(L.repD>=0?'+':'')+L.repD+' → ⭐'+S.rep+'</b></div>'+
+ '<div class="kv"><span>🌤️ Weather was</span><b>'+L.wx.t+'°F '+CONDEMOJI[L.wx.c]+' '+L.wx.c+'</b></div>';}
+function tabResults(){
+ const R=S.records;
+ let h='<h2>📊 RESULTS & RECORDS</h2>';
+ if(S.last){h+='<p class="note">DAY '+S.last.day+' recap</p>'+resCardsHTML(S.last);}
+ else h+='<p class="note">No days played yet. Open your stand!</p>';
+ h+='<div class="statgrid">'+
+ '<div class="statbox"><small>🏆 BEST DAY PROFIT</small><b>'+(R.bestProfit>-1e8?fmt(R.bestProfit):'—')+'</b></div>'+
+ '<div class="statbox"><small>🥤 MOST CUPS / DAY</small><b>'+(R.mostCups||'—')+'</b></div>'+
+ '<div class="statbox"><small>💰 TOTAL PROFIT</small><b>'+fmt(S.tot)+'</b></div>'+
+ '<div class="statbox"><small>📅 DAYS PLAYED</small><b>'+(S.dayN-1)+'</b></div></div>';
+ $('tab-results').innerHTML=h;}
+
+/* ---------- day simulation (canvas street scene) ---------- */
+let cv,ctx,custs=[],queue=[],rafId=0,speed=1,dayOver=false,frame=0;
+const STAND_X=452,SIDE_Y=252;
 function startDay(){
-  S.day={sold:0,rev:0,uL:0,uS:0,uI:0,uC:0,rent:LOCS[S.loc].rent,ad:ADS[S.ad].cost,repD:0};
-  const wm=wMult(S.wt),base=LOCS[S.loc].traffic+ADS[S.ad].t;
-  let n=Math.min(STANDS[S.stand].cap,Math.round(base*wm*(0.7+S.rep/100*0.6)*rnd(0.8,1.2)));
-  n=Math.max(0,n);S.day.left=n;S.day.queue=n;
-  $('standSign').textContent=fmt(S.price)+' / glass';
-  $('dSold').textContent='0';$('dRev').textContent='$0.00';$('dLeft').textContent=n;
-  $('dayMsg').textContent=n?('A crowd of ~'+n+' might stop by…'):'Nobody\'s coming. Rough day ahead.';
-  $('street').className=S.wt.c==='Rain'?'rain':S.wt.c==='Cloudy'?'cloudy':'';
-  show('scr-day');speed=1;$('btnSpd').textContent='1×';A.sfx.power();
-  dayTimer=setInterval(dayTick,450);
-}
-function dayTick(){
-  const D=S.day;if(D.left<=0){endDay();return;}
-  D.left--;$('dLeft').textContent=D.left;
-  const el=document.createElement('div');el.className='cust';el.textContent=PEOPLE[ri(0,PEOPLE.length-1)];
-  el.style.left='-8%';$('street').appendChild(el);
-  requestAnimationFrame(()=>{el.style.left='52%';});
-  setTimeout(()=>serve(el),520/speed);
-}
-function serve(el){
-  const D=S.day;
-  const wm=wMult(S.wt);
-  const wtp=1.60*wm*rnd(0.7,1.3)*(0.6+S.rep/100);
-  const needL=S.rl/8,needS=S.rs/8;
-  let face='😐';
-  const bye=()=>{el.style.left='108%';setTimeout(()=>el.remove(),600/speed);};
-  if(S.cups<1||S.lemons<needL||S.sugar<needS||S.ice<S.ric){ // sold out
-    soldOut(el);return;
-  }
-  if(S.price>wtp){face=Math.random()<.4?'😒':'😐';}
-  else{
-    const sat=clamp(100-(Math.abs(S.rl-6)*8+Math.abs(S.rs-6)*8+Math.abs(S.ric-2)*10),5,100);
-    if(sat<45){face='😞';S.rep=Math.max(0,S.rep-2);D.repD-=2;A.sfx.bad();}
-    else{
-      S.cups--;S.lemons-=needL;S.sugar-=needS;S.ice-=S.ric;
-      D.uC++;D.uI+=S.ric;D.uL+=needL;D.uS+=needS;
-      S.cash+=S.price;D.rev+=S.price;D.sold++;
-      S.rep=Math.min(100,S.rep+1);D.repD++;
-      face=sat>80?'😋':'🙂';
-      coin();float('+'+fmt(S.price),el);
-      $('dSold').textContent=D.sold;$('dRev').textContent=fmt(D.rev);hud();
-    }
-  }
-  const f=document.createElement('div');f.className='face';f.textContent=face;
-  f.style.left='52%';f.style.bottom='38%';$('street').appendChild(f);
-  setTimeout(()=>f.remove(),1100/speed);bye();
-}
-function soldOut(el){
-  const f=document.createElement('div');f.className='face';f.textContent='😕';
-  f.style.left='52%';f.style.bottom='38%';$('street').appendChild(f);
-  setTimeout(()=>f.remove(),1100);
-  el.style.left='108%';setTimeout(()=>el.remove(),600);
-  $('dayMsg').textContent='⚠️ SOLD OUT! You ran dry.';
-  A.sfx.bad();clearInterval(dayTimer);dayTimer=null;
-  setTimeout(endDay,1400);
-}
-function float(txt,el){
-  const f=document.createElement('div');f.className='floater';f.textContent=txt;
-  f.style.left='52%';f.style.bottom='46%';$('street').appendChild(f);
-  setTimeout(()=>f.remove(),1200/speed);
-}
-function coin(){try{A.sfx.tone({f:1568,t:.07,type:'square',v:.07});A.sfx.tone({f:2093,t:.12,type:'square',v:.07,delay:.07});}catch(e){}}
-function endDay(){
-  const D0=S.day;if(D0&&D0.over)return;if(D0)D0.over=true;
-  if(dayTimer){clearInterval(dayTimer);dayTimer=null;}
-  document.querySelectorAll('.cust,.face,.floater').forEach(e=>e.remove());
-  const D=S.day;
-  const supCost=D.uL*S.cL+D.uS*S.cS+D.uI*S.cI+D.uC*S.cC;
-  S.cash-=D.rent;
-  const profit=D.rev-supCost-D.rent-D.ad;
-  S.tot+=profit;
-  $('rDay').textContent=S.dayN;$('rSold').textContent=D.sold;$('rRev').textContent=fmt(D.rev);
-  $('rCost').textContent='−'+fmt(supCost);$('rLoc').textContent=LOCS[S.loc].n;$('rRent').textContent='−'+fmt(D.rent);
-  $('rAd').textContent='−'+fmt(D.ad);
-  $('rRep').innerHTML=(D.repD>=0?'+':'')+D.repD+' → ⭐'+S.rep;
-  $('rWx').textContent=S.wt.t+'°F '+CONDEMOJI[S.wt.c]+' '+S.wt.c;
-  const rp=$('rProf');rp.textContent=(profit>=0?'+':'−')+fmt(Math.abs(profit));rp.className='big '+(profit>=0?'pos':'neg');
-  if(profit>=0)A.sfx.win();else A.sfx.lose();
-  const nw=S.cash+invVal();
-  if(nw>S.peak)S.peak=nw;
-  [100,500,1000].forEach(m=>{if(!S.miles[m]&&nw>=m){S.miles[m]=1;const e=$('mile');e.innerHTML='🎉 NET WORTH '+fmt(m)+'! 🎉';e.classList.add('show');A.sfx.win();setTimeout(()=>e.classList.remove('show'),2200);}});
-  save();show('scr-results');hud();
-}
+ const wm=wMult(S.wt),base=traffic()+ADS[S.ad].t;
+ let n=Math.min(effCap(),Math.round(base*wm*(0.7+S.rep/100*0.6)*rnd(0.8,1.2)));
+ n=Math.max(0,n);
+ S.day={sold:0,rev:0,uL:0,uS:0,uI:0,uC:0,rent:LOCS[S.loc].rent,ad:ADS[S.ad].cost,repD:0,
+  walk:0,wages:S.staff.length*STAFF_WAGE,total:n,toSpawn:n,spawnT:0,soldout:false,endT:0,wx:{t:S.wt.t,c:S.wt.c}};
+ custs=[];queue=[];dayOver=false;speed=1;frame=0;
+ show('scr-day');updateDayHud();
+ $('btnSpd').textContent='1×';
+ $('dayMsg').textContent=n?('The stand is open! ~'+n+' thirsty folks may stop by…'):'Nobody\'s coming today. Brutal.';
+ cv=$('cv');ctx=cv.getContext('2d');
+ A.sfx.unlock();A.sfx.power();
+ cancelAnimationFrame(rafId);let last=performance.now();
+ const loop=t=>{const dt=Math.min(.1,(t-last)/1000)*speed;last=t;
+  updateDay(dt);drawDay();if(!dayOver)rafId=requestAnimationFrame(loop);};
+ rafId=requestAnimationFrame(loop);}
+function patience(){return 14+(S.upgrades.chairs?15:0)+S.staff.length*6;}
+function spawnCust(){
+ const fromLeft=Math.random()<.5;
+ const c={e:pick(PEOPLE),x:fromLeft?-30:670,y:SIDE_Y+rnd(-6,6),state:'arrive',mood:null,moodT:0,
+  qT:0,serveT:0,coin:0,coinT:0,walkSpd:rnd(55,95)};
+ c.slot=queue.length;queue.push(c);custs.push(c);}
+function slotX(i){return STAND_X-56-42*i;}
+function updateDay(dt){
+ const D=S.day;if(!D||dayOver)return;frame+=dt;
+ if(D.soldout){D.endT-=dt;if(D.endT<=0){finishDay();}moveCusts(dt);return;}
+ // spawn
+ D.spawnT-=dt;
+ if(D.toSpawn>0&&D.spawnT<=0){spawnCust();D.toSpawn--;D.spawnT=clamp(50/Math.max(1,D.total),.22,1.4);}
+ const pat=patience();
+ for(let i=custs.length-1;i>=0;i--){const c=custs[i];
+  if(c.state==='arrive'){
+   const tx=slotX(c.slot),dx=tx-c.x,step=c.walkSpd*dt;
+   if(Math.abs(dx)<=Math.max(4,step)){c.x=tx;c.state='queued';}
+   else c.x+=Math.sign(dx)*step;
+  }else if(c.state==='queued'){
+   const qi=queue.indexOf(c);
+   const tx=slotX(qi);c.x+=(tx-c.x)*Math.min(1,dt*6);
+   c.qT+=dt;
+   if(c.qT>pat){ // stormed off: line too long
+    c.mood='😠';S.rep=clamp(S.rep-1,0,100);D.repD--;D.walk++;
+    removeFromQueue(c);c.state='leaveAngry';A.sfx.bad();updateDayHud();hud();continue;}
+   if(qi===0&&Math.abs(tx-c.x)<4){c.state='serve';c.serveT=.55/(1+S.staff.length*.6);}
+  }else if(c.state==='serve'){
+   c.serveT-=dt;
+   if(c.serveT<=0){
+    const okSale=resolveSale(c);
+    removeFromQueue(c);
+    if(!okSale){continue;} // sold out handled inside
+    c.state=c.mood==='😠'||c.mood==='😞'?'leaveAngry':'leave';
+    if(c.coin)c.coinT=1.1;}
+  }else if(c.state==='leave'||c.state==='leaveAngry'){
+   c.x+=(c.state==='leave'?1:-1)*c.walkSpd*1.4*dt;
+   if(c.moodT>0)c.moodT-=dt;
+   if(c.coinT>0)c.coinT-=dt;
+   if(c.x>680||c.x<-40)custs.splice(i,1);
+  }}
+ if(D.toSpawn===0&&custs.length===0)finishDay();}
+function moveCusts(dt){ // after sold out: everyone drifts off
+ for(let i=custs.length-1;i>=0;i--){const c=custs[i];
+  c.x+=(c.x<320?-1:1)*c.walkSpd*dt;
+  if(c.moodT>0)c.moodT-=dt;
+  if(c.x>680||c.x<-40)custs.splice(i,1);}}
+function removeFromQueue(c){const i=queue.indexOf(c);if(i>=0)queue.splice(i,1);}
+function resolveSale(c){
+ const D=S.day,wm=wMult(S.wt);
+ const wtp=1.60*wm*rnd(0.7,1.3)*(0.6+S.rep/100);
+ const needL=lemPerGlass(),needS=S.rs/8;
+ if(S.cups<1||S.lemons<needL||S.sugar<needS||S.ice<S.ric){soldOut();return false;}
+ const sat=clamp(100-(Math.abs(S.rl-6)*8+Math.abs(S.rs-6)*8+Math.abs(S.ric-2)*10),5,100);
+ if(sat<45){c.mood='😞';c.moodT=1.4;S.rep=clamp(S.rep-2,0,100);D.repD-=2;A.sfx.bad();return true;}
+ if(S.price>wtp*1.5){c.mood='😠';c.moodT=1.4;S.rep=clamp(S.rep-1,0,100);D.repD--;D.walk++;A.sfx.bad();return true;}
+ if(S.price>wtp&&Math.random()>0.35){c.mood='😐';c.moodT=1.2;D.walk++;return true;}
+ S.cups--;S.lemons-=needL;S.sugar-=needS;S.ice-=S.ric;
+ D.uC++;D.uI+=S.ric;D.uL+=needL;D.uS+=needS;
+ S.cash+=S.price;D.rev+=S.price;D.sold++;
+ S.rep=clamp(S.rep+1,0,100);D.repD++;
+ c.mood=sat>80?'😋':'🙂';c.moodT=1.4;c.coin=1;
+ A.sfx.good();updateDayHud();hud();
+ return true;}
+function soldOut(){
+ const D=S.day;if(D.soldout)return;D.soldout=true;D.endT=1.6;
+ custs.forEach(c=>{if(c.state==='queued'||c.state==='arrive'){c.mood='😕';c.moodT=1.2;}});
+ queue=[];
+ $('dayMsg').textContent='⚠️ SOLD OUT! The stand ran dry.';
+ A.sfx.bad();}
+function skipDay(){
+ const D=S.day;if(!D||dayOver)return;
+ while(D.toSpawn>0){D.toSpawn--;
+  const c={mood:null};
+  if(!resolveSale(c))break;}
+ custs=[];queue=[];
+ finishDay();}
+function updateDayHud(){
+ const D=S.day;if(!D)return;
+ $('dSold').textContent=D.sold;$('dRev').textContent=fmt(D.rev);
+ $('dLeft').textContent=D.toSpawn+queue.length;}
+function finishDay(){
+ const D=S.day;if(!D||dayOver)return;dayOver=true;
+ cancelAnimationFrame(rafId);
+ const supCost=D.uL*S.cL+D.uS*S.cS+D.uI*S.cI+D.uC*S.cC;
+ S.cash-=D.rent+D.wages;
+ const profit=D.rev-supCost-D.rent-D.ad-D.wages;
+ S.tot+=profit;
+ S.last={day:S.dayN,sold:D.sold,rev:D.rev,supCost:supCost,rent:D.rent,ad:D.ad,wages:D.wages,
+  walk:D.walk,repD:D.repD,profit:profit,wx:D.wx};
+ const R=S.records;
+ if(profit>R.bestProfit)R.bestProfit=profit;
+ if(D.sold>R.mostCups)R.mostCups=D.sold;
+ $('rDay').textContent=S.dayN;
+ $('resCards').innerHTML=resCardsHTML(S.last);
+ const rp=$('rProf');rp.textContent=(profit>=0?'+':'−')+fmt(Math.abs(profit));
+ rp.className='big '+(profit>=0?'pos':'neg');
+ if(profit>=0)A.sfx.win();else A.sfx.lose();
+ const nw=S.cash+invVal();
+ if(nw>S.peak)S.peak=nw;
+ [100,500,1000].forEach(m=>{if(!S.miles[m]&&nw>=m){S.miles[m]=1;const e=$('mile');
+  e.textContent='🎉 NET WORTH '+fmt(m)+'! 🎉';e.classList.add('show');A.sfx.win();
+  setTimeout(()=>e.classList.remove('show'),2200);}});
+ save();show('scr-results');hud();}
+
+/* ---------- canvas street scene ---------- */
+function drawDay(){
+ const D=S.day;if(!D)return;
+ const W=640,H=360,c=S.wt.c;
+ // sky
+ let g=ctx.createLinearGradient(0,0,0,220);
+ if(c==='Sunny'){g.addColorStop(0,'#7ec8f0');g.addColorStop(1,'#cfeef7');}
+ else if(c==='Cloudy'){g.addColorStop(0,'#8e99a6');g.addColorStop(1,'#c3ccd4');}
+ else{g.addColorStop(0,'#4c5866');g.addColorStop(1,'#75808e');}
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,220);
+ if(c==='Sunny'){ctx.fillStyle='#ffdf3f';ctx.beginPath();ctx.arc(90,60,34,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,223,63,.3)';ctx.beginPath();ctx.arc(90,60,48,0,7);ctx.fill();}
+ // clouds
+ ctx.fillStyle=c==='Rain'?'#5d6874':'rgba(255,255,255,.92)';
+ const cxo=(frame*12)%720;
+ for(let i=0;i<3;i++){const x=((i*260+cxo)%720)-40,y=50+i*36;
+  ctx.beginPath();ctx.arc(x,y,26,0,7);ctx.arc(x+28,y+6,32,0,7);ctx.arc(x+58,y,24,0,7);ctx.fill();}
+ // rain
+ if(c==='Rain'){ctx.strokeStyle='rgba(174,194,224,.7)';ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<40;i++){const x=(i*47+frame*300)%640,y=(i*89+frame*420)%230;
+   ctx.moveTo(x,y);ctx.lineTo(x-8,y+16);}
+  ctx.stroke();}
+ // houses
+ const houses=[[30,'#e8a37c','#b56545'],[180,'#a3c6e8','#5b7fa6'],[560,'#d9b3e8','#8e5aa6']];
+ houses.forEach(h=>{ctx.fillStyle=h[1];ctx.fillRect(h[0],140,90,80);
+  ctx.fillStyle=h[2];ctx.beginPath();ctx.moveTo(h[0]-10,140);ctx.lineTo(h[0]+45,100);ctx.lineTo(h[0]+100,140);ctx.fill();
+  ctx.fillStyle='#5a3c00';ctx.fillRect(h[0]+36,180,20,40);
+  ctx.fillStyle='#fffbe8';ctx.fillRect(h[0]+10,152,18,16);ctx.fillRect(h[0]+62,152,18,16);});
+ // trees
+ [[150],[350],[600]].forEach((t,i)=>{const x=t[0];
+  ctx.fillStyle='#6b4a2a';ctx.fillRect(x-6,170,12,55);
+  ctx.fillStyle=i===1?'#2f8f2f':'#3aa53a';
+  ctx.beginPath();ctx.arc(x,150,30,0,7);ctx.arc(x-20,165,22,0,7);ctx.arc(x+20,165,22,0,7);ctx.fill();});
+ // sidewalk + road
+ ctx.fillStyle='#b9b9b9';ctx.fillRect(0,222,640,52);
+ ctx.fillStyle='#8f8f8f';for(let x=0;x<640;x+=64)ctx.fillRect(x,222,3,52);
+ ctx.fillStyle='#4a4a4a';ctx.fillRect(0,274,640,86);
+ ctx.fillStyle='#ffdf3f';for(let x=0;x<640;x+=56)ctx.fillRect(x,312,32,6);
+ drawStand();
+ // customers
+ ctx.textAlign='center';
+ custs.forEach(c=>{
+  ctx.font='30px serif';ctx.fillText(c.e,c.x,c.y);
+  if(c.mood&&c.moodT>0){ctx.font='20px serif';
+   ctx.fillStyle='rgba(255,251,232,.95)';
+   ctx.beginPath();ctx.arc(c.x+14,c.y-38,15,0,7);ctx.fill();
+   ctx.fillText(c.mood,c.x+14,c.y-31);}
+  if(c.coinT>0){ctx.font='bold 15px Fredoka,sans-serif';ctx.fillStyle='#ffdf3f';
+   ctx.fillText('+'+fmt(S.price),c.x,c.y-52-(1.1-c.coinT)*30);}});
+ // staffers behind counter
+ ctx.font='30px serif';
+ S.staff.forEach((s,i)=>ctx.fillText('🧑‍🍳',STAND_X-70+i*34,196));}
+function drawStand(){
+ const x=STAND_X;
+ // awning poles
+ ctx.fillStyle='#6b4a2a';ctx.fillRect(x-72,120,8,110);ctx.fillRect(x+64,120,8,110);
+ // striped awning
+ for(let i=0;i<10;i++){ctx.fillStyle=i%2?'#fffbe8':'#ffcf3f';ctx.fillRect(x-80+i*16,96,16,26);}
+ ctx.fillStyle='#8a5a00';ctx.fillRect(x-80,96,160,5);
+ // scallops
+ ctx.fillStyle='#ffcf3f';
+ for(let i=0;i<10;i+=2){ctx.beginPath();ctx.arc(x-72+i*16,122,8,0,Math.PI);ctx.fill();}
+ // counter
+ ctx.fillStyle='#8a5a2e';ctx.fillRect(x-80,200,160,58);
+ ctx.fillStyle='#6b4a2a';ctx.fillRect(x-80,200,160,10);
+ ctx.fillStyle='#a06a3a';for(let i=0;i<5;i++)ctx.fillRect(x-80+i*33,210,3,48);
+ // pitcher + lemons on counter
+ ctx.fillStyle='rgba(174,214,241,.9)';ctx.fillRect(x-58,168,30,34);
+ ctx.fillStyle='#ffdf3f';ctx.fillRect(x-58,178,30,24);
+ ctx.font='24px serif';ctx.fillText('🍋',x+18,196);ctx.fillText('🍋',x+44,192);
+ // big lemon sign with price
+ ctx.fillStyle='#fffbe8';ctx.strokeStyle='#8a5a00';ctx.lineWidth=4;
+ roundRect(x-78,40,156,52,10);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#5a3c00';ctx.font='bold 17px Fredoka,sans-serif';ctx.textAlign='center';
+ ctx.fillText('🍋 '+fmt(S.price)+' 🍋',x,66);
+ ctx.font='bold 12px Fredoka,sans-serif';ctx.fillText('ICE COLD!',x,84);}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);
+ ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+ ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+/* ---------- between days ---------- */
 function nextDay(){
-  S.ice=0; // melts overnight
-  S.dayN++;S.day=null;S.wt=S.wf;S.wf=rollWx();rollPrices();S.ad=0;
-  save();
-  if(S.cash<2&&invVal()<2){ // bankrupt
-    $('oDays').textContent=S.dayN-1;$('oPeak').textContent=fmt(S.peak);
-    const t=$('oTot');t.textContent=(S.tot>=0?'+':'−')+fmt(Math.abs(S.tot));t.className=S.tot>=0?'pos':'neg';
-    A.store.set('lemonade',null);A.sfx.lose();show('scr-over');return;
-  }
-  renderMorning();show('scr-morning');
-}
+ S.ice=S.upgrades.ice?Math.floor(S.ice/2):0; // melts overnight
+ S.dayN++;S.day=null;S.wt=S.wf;S.wf=rollWx();rollPrices();S.ad=0;
+ save();
+ if(S.cash<2&&invVal()<2){
+  $('oDays').textContent=S.dayN-1;$('oPeak').textContent=fmt(S.peak);
+  const t=$('oTot');t.textContent=(S.tot>=0?'+':'−')+fmt(Math.abs(S.tot));t.className=S.tot>=0?'pos':'neg';
+  A.store.set('lemonade',null);A.sfx.lose();show('scr-over');return;}
+ renderMorning();show('scr-morning');}
 
 /* ---------- wiring ---------- */
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
-  ['sup','rec','biz'].forEach(k=>$('tab-'+k).style.display=k===t.dataset.t?'block':'none');A.sfx.click();});
-$('btnStart').onclick=()=>{A.sfx.unlock();startDay();};
-$('btnSpd').onclick=()=>{speed=speed===1?3:1;$('btnSpd').textContent=speed+'×';A.sfx.click();
-  if(dayTimer){clearInterval(dayTimer);dayTimer=setInterval(dayTick,speed===1?450:150);}};
+ renderTab(t.dataset.t);A.sfx.click();});
+$('btnStart').onclick=()=>{startDay();};
+$('btnSpd').onclick=()=>{speed=speed===1?3:1;$('btnSpd').textContent=speed+'×';A.sfx.click();};
+$('btnSkip').onclick=()=>{A.sfx.click();skipDay();};
 $('btnNext').onclick=()=>{A.sfx.click();nextDay();};
-$('btnNew').onclick=()=>{A.sfx.unlock();newGame();renderMorning();show('scr-morning');hud();};
-$('btnAgain').onclick=()=>{A.sfx.unlock();newGame();renderMorning();show('scr-morning');hud();};
-$('btnContinue').onclick=()=>{A.sfx.unlock();S=A.store.get('lemonade',null);renderMorning();show('scr-morning');hud();};
+$('btnNew').onclick=()=>{A.sfx.unlock();newGame();renderMorning();show('scr-morning');};
+$('btnAgain').onclick=()=>{A.sfx.unlock();newGame();renderMorning();show('scr-morning');};
+$('btnContinue').onclick=()=>{A.sfx.unlock();const s=loadSv();if(s){S=s;renderMorning();show('scr-morning');}};
 
 (function init(){
-  const sv=A.store.get('lemonade',null);
-  if(sv&&sv.cash!=null){$('btnContinue').style.display='block';$('contDay').textContent='· DAY '+sv.dayN;
-    $('btnContinue').onclick=()=>{A.sfx.unlock();S=sv;renderMorning();show('scr-morning');hud();};}
-  show('scr-title');
+ const sv=loadSv();
+ if(sv){$('btnContinue').style.display='block';$('contDay').textContent=sv.dayN;}
+ show('scr-title');
+ try{A.sfx.unlock();}catch(e){}
 })();
-window.__lem={newGame,buy,adjRec,setAd,setStand,startDay,dayTick,serve,endDay,nextDay,invVal,
-  get S(){return S;},set S(v){S=v;}};
+window.__lem={newGame,buy,adjRec,setAd,setStand,buyUpgrade,hireStaff,fireStaff,startDay,skipDay,
+ updateDay,drawDay,endDay:finishDay,nextDay,invVal,costGlass,renderMorning,
+ get S(){return S;},set S(v){S=v;},
+ get dayActive(){return !dayOver&&!!S.day;},
+ get custDbg(){return custs.map(c=>({st:c.state,x:Math.round(c.x),slot:c.slot,qi:queue.indexOf(c),qT:Math.round(c.qT)}));},
+ get screen(){let r='?';document.querySelectorAll('main section').forEach(s=>{if(s.classList.contains('on'))r=s.id;});return r;},
+ load(){const s=loadSv();if(s)S=s;}};
 })();
 </script>
 </body>

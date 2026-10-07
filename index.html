@@ -850,6 +850,38 @@
     </div>
   </div>
 
+  <div id="dkongModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>DONKEY KONG</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="dkongHi">0</span></span>
+          <button class="icon-btn" id="dkongPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('dkongModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="dkongCanvas"></canvas></div>
+      <div class="game-hud"><span id="dkongScore">0</span><span id="dkongBest" class="newbest hidden">NEW BEST!</span></div>
+      <div id="dkongTouch" class="zoo-tools"></div>
+    </div>
+  </div>
+
+  <div id="joustModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>JOUST</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="joustHi">0</span></span>
+          <button class="icon-btn" id="joustPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('joustModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="joustCanvas"></canvas></div>
+      <div class="game-hud"><span id="joustScore">0</span><span id="joustBest" class="newbest hidden">NEW BEST!</span></div>
+      <div id="joustTouch" class="zoo-tools"></div>
+    </div>
+  </div>
+
   <div id="siniModal" class="game-modal hidden">
     <div class="game-panel wide">
       <div class="game-panel-head">
@@ -972,6 +1004,8 @@
   <script src="js/pinball.js"></script>
   <script src="js/centipede.js"></script>
   <script src="js/sinistar.js"></script>
+  <script src="js/joust.js"></script>
+  <script src="js/donkeykong.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -1019,6 +1053,10 @@
         icon: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.4"/><circle cx="10.5" cy="12" r="2.4"/><circle cx="16" cy="12" r="2.4"/><circle cx="21" cy="12" r="2.4"/></svg>' },
       { id: 'sini', title: 'Sinistar', hi: 'sini', accent: '#ff3355', modal: 'siniModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="9" cy="10" r="1.6"/><circle cx="15" cy="10" r="1.6"/><path d="M8 15.5h8"/></svg>' },
+      { id: 'joust', title: 'Joust', hi: 'joust', accent: '#ffaa00', modal: 'joustModal',
+        icon: '<svg viewBox="0 0 24 24"><path d="M5 19l7-11 7 11"/><circle cx="12" cy="5" r="2"/></svg>' },
+      { id: 'dkong', title: 'Donkey Kong', hi: 'dkong', accent: '#ff5555', modal: 'dkongModal',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c2-6 5-9 8-9s6 3 8 9"/></svg>' },
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
       { id: 'snake', title: 'Snake', hi: 'snake', accent: '#a6ff00', modal: 'snakeModal',
