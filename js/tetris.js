@@ -1,425 +1,421 @@
-(function() {
+/* Tetris — neon overhaul. 7-bag, ghost piece, hold queue, combos,
+ * back-to-back bonus, lock delay, particle line clears. */
+(function () {
+  'use strict';
+  const A = Arcade;
   const canvas = document.getElementById('tetrisCanvas');
-  const context = canvas.getContext('2d');
-  const scoreElement = document.getElementById('tetrisScore');
-  const startButton = document.getElementById('startTetrisButton');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('tetrisScore');
+  const hiEl = document.getElementById('tetrisHi');
+  const bestEl = document.getElementById('tetrisBest');
+  const pauseBtn = document.getElementById('tetrisPause');
 
-  // Get Tetris control buttons
-  const leftBtn = document.getElementById('tetrisLeft');
-  const rightBtn = document.getElementById('tetrisRight');
-  const rotateBtn = document.getElementById('tetrisRotate');
-  const downBtn = document.getElementById('tetrisDown');
+  const COLS = 10, ROWS = 20, CELL = 26;
+  const BOARD_X = 96, BOARD_W = COLS * CELL, BOARD_H = ROWS * CELL;
+  const W = BOARD_X + BOARD_W + 88, H = BOARD_H;
+  A.fitCanvas(canvas, W, H);
 
-  // Define canvas dimensions and block scale
-  const BOARD_WIDTH = 12;
-  const BOARD_HEIGHT = 20;
-  const BLOCK_SIZE = 20; // Each Tetris block will be 20x20 pixels
+  const particles = new A.Particles();
+  const floaters = new A.Floaters();
+  const shake = new A.Shake();
 
-  // Set canvas dimensions based on block size and board dimensions
-  canvas.width = BOARD_WIDTH * BLOCK_SIZE;
-  canvas.height = BOARD_HEIGHT * BLOCK_SIZE;
-
-  // Scale the drawing context so that 1 unit in context is BLOCK_SIZE pixels
-  context.scale(BLOCK_SIZE, BLOCK_SIZE);
-
-  let arena = []; // The main game board
-  let dropCounter = 0;
-  let dropInterval = 1000; // Time in ms for piece to drop one unit
-  let lastTime = 0;
-  let score = 0;
-  let level = 1;
-  let linesCleared = 0;
-  const levelThreshold = 10; // Lines to clear to advance a level
-  let animationId = null; // To store the requestAnimationFrame ID
-
-  let player = {
-    pos: {x: 0, y: 0},
-    matrix: null,
-    isPowerUp: false,
+  const COLORS = {
+    T: ['#c026d3', '#f0abfc'], J: ['#2563eb', '#93c5fd'], L: ['#ea580c', '#fdba74'],
+    O: ['#ca8a04', '#fde047'], S: ['#16a34a', '#86efac'], Z: ['#dc2626', '#fca5a5'],
+    I: ['#0891b2', '#a5f3fc']
   };
+  const SHAPES = {
+    T: [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
+    J: [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
+    L: [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
+    O: [[4, 4], [4, 4]],
+    S: [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
+    Z: [[6, 6, 0], [0, 6, 6], [0, 0, 0]],
+    I: [[0, 0, 0, 0], [7, 7, 7, 7], [0, 0, 0, 0], [0, 0, 0, 0]]
+  };
+  const ORDER = ['T', 'J', 'L', 'O', 'S', 'Z', 'I'];
+  const LINE_SCORE = [0, 100, 300, 500, 800];
+  const GRAVITY = [0.8, 0.72, 0.63, 0.55, 0.47, 0.38, 0.3, 0.22, 0.15, 0.1, 0.08, 0.06, 0.05, 0.04, 0.03];
 
-  // Tetromino piece definitions
-  const pieces = 'TJLOSZI';
-  const colors = [
-    null,        // 0: Empty
-    '#FF0D72',   // 1: T
-    '#0DC2FF',   // 2: J
-    '#0DFF72',   // 3: L
-    '#F538FF',   // 4: O
-    '#FF8E0D',   // 5: S
-    '#FFE138',   // 6: Z
-    '#3877FF',   // 7: I
-  ];
-  const powerUpColor = '#FFD700'; // Color for power-up blocks
+  let arena, bag, queue, hold, canHold;
+  let cur; // {type, matrix, x, y}
+  let score, level, lines, combo, b2b, best, newBest;
+  let dropAcc, lockAcc, state;
+  let clearAnim; // {rows:[], t}
+  let dasDir, dasAcc, arrAcc; // auto-shift
 
-  /**
-   * Creates a matrix (2D array) filled with zeros.
-   * Represents the game board or a tetromino piece.
-   * @param {number} w - Width of the matrix.
-   * @param {number} h - Height of the matrix.
-   * @returns {Array<Array<number>>} The created matrix.
-   */
-  function createMatrix(w, h) {
-    const matrix = [];
-    while (h--) {
-      matrix.push(new Array(w).fill(0));
-    }
-    return matrix;
+  const startOverlay = A.wireStartOverlay('tetrisModal', startGame);
+  const overOverlay = A.gameOverOverlay('tetrisModal');
+
+  function reset() {
+    arena = Array.from({ length: ROWS }, () => new Array(COLS).fill(null));
+    bag = []; queue = [];
+    refillQueue();
+    hold = null; canHold = true;
+    score = 0; level = 1; lines = 0; combo = -1; b2b = false; newBest = false;
+    best = A.getHi('tetris'); hiEl.textContent = best;
+    dropAcc = 0; lockAcc = 0; clearAnim = null;
+    dasDir = 0; dasAcc = 0; arrAcc = 0;
+    particles.clear(); floaters.clear();
+    state = 'ready';
+    spawnPiece();
+    paintScore();
+    bestEl.classList.add('hidden');
   }
 
-  /**
-   * Creates a Tetromino piece based on its type.
-   * @param {string} type - Type of the piece (T, J, L, O, S, Z, I).
-   * @param {boolean} isPower - Whether the piece is a power-up.
-   * @returns {Array<Array<number>>} The matrix representing the piece.
-   */
-  function createPiece(type, isPower = false) {
-    let piece;
-    switch (type) {
-      case 'T':
-        piece = [[0, 1, 0], [1, 1, 1], [0, 0, 0]];
-        break;
-      case 'J':
-        piece = [[0, 2, 0], [0, 2, 0], [2, 2, 0]];
-        break;
-      case 'L':
-        piece = [[0, 3, 0], [0, 3, 0], [0, 3, 3]];
-        break;
-      case 'O':
-        piece = [[4, 4], [4, 4]];
-        break;
-      case 'S':
-        piece = [[0, 5, 5], [5, 5, 0], [0, 0, 0]];
-        break;
-      case 'Z':
-        piece = [[6, 6, 0], [0, 6, 6], [0, 0, 0]];
-        break;
-      case 'I':
-        piece = [[0, 7, 0, 0], [0, 7, 0, 0], [0, 7, 0, 0], [0, 7, 0, 0]];
-        break;
-    }
-    // If it's a power-up, set all its blocks to the power-up color index (7)
-    if (isPower) {
-      for (let y = 0; y < piece.length; y++) {
-        for (let x = 0; x < piece[y].length; x++) {
-          if (piece[y][x] !== 0) piece[y][x] = 8; // Use 8 for power-up color index
-        }
-      }
-    }
-    return piece;
+  function startGame() {
+    reset();
+    A.bumpPlays('tetris');
+    state = 'playing';
+    loop.start();
   }
-  // Add power-up color to the colors array
-  colors[8] = powerUpColor;
 
-  /**
-   * Checks for collision between the player's piece and the arena.
-   * @param {Array<Array<number>>} arena - The game board matrix.
-   * @param {object} player - The player object with matrix and position.
-   * @returns {boolean} True if collision, false otherwise.
-   */
-  function collide(arena, player) {
-    const m = player.matrix;
-    const o = player.pos;
-    for (let y = 0; y < m.length; y++) {
-      for (let x = 0; x < m[y].length; x++) {
-        // Check if block exists in player matrix, and if corresponding arena cell is occupied or out of bounds
-        if (m[y][x] !== 0 &&
-           (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-          return true;
-        }
-      }
+  function refillQueue() {
+    while (queue.length < 5) {
+      if (!bag.length) { bag = ORDER.slice(); for (let i = bag.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [bag[i], bag[j]] = [bag[j], bag[i]]; } }
+      queue.push(bag.pop());
+    }
+  }
+
+  function spawnPiece(forcedType) {
+    const type = forcedType || queue.shift();
+    refillQueue();
+    cur = { type, matrix: SHAPES[type].map(r => r.slice()), x: 3, y: 0 };
+    if (type === 'O') cur.x = 4;
+    canHold = true;
+    dropAcc = 0; lockAcc = 0;
+    if (collide(cur.matrix, cur.x, cur.y)) die();
+  }
+
+  function collide(m, px, py) {
+    for (let y = 0; y < m.length; y++) for (let x = 0; x < m[y].length; x++) {
+      if (!m[y][x]) continue;
+      const ax = px + x, ay = py + y;
+      if (ax < 0 || ax >= COLS || ay >= ROWS) return true;
+      if (ay >= 0 && arena[ay][ax]) return true;
     }
     return false;
   }
 
-  /**
-   * Merges the player's piece into the arena.
-   * @param {Array<Array<number>>} arena - The game board matrix.
-   * @param {object} player - The player object with matrix and position.
-   */
-  function merge(arena, player) {
-    player.matrix.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          arena[y + player.pos.y][x + player.pos.x] = value;
-        }
-      });
+  function rotateM(m, dir) {
+    const n = m.length;
+    const r = Array.from({ length: n }, () => new Array(n).fill(0));
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) r[y][x] = dir > 0 ? m[n - 1 - x][y] : m[x][n - 1 - y];
+    return r;
+  }
+
+  function tryRotate(dir) {
+    if (state !== 'playing' || !cur) return;
+    const kicks = [[0, 0], [-1, 0], [1, 0], [0, -1], [-2, 0], [2, 0]];
+    const rm = rotateM(cur.matrix, dir);
+    for (const [kx, ky] of kicks) {
+      if (!collide(rm, cur.x + kx, cur.y + ky)) {
+        cur.matrix = rm; cur.x += kx; cur.y += ky;
+        lockAcc = 0; A.sfx.tick(); return;
+      }
+    }
+  }
+
+  function tryMove(dx) {
+    if (state !== 'playing' || !cur) return;
+    if (!collide(cur.matrix, cur.x + dx, cur.y)) { cur.x += dx; lockAcc = 0; }
+  }
+
+  function softDrop() {
+    if (state !== 'playing' || !cur) return;
+    if (!collide(cur.matrix, cur.x, cur.y + 1)) { cur.y++; score += 1; paintScore(); dropAcc = 0; }
+    else lockPiece();
+  }
+
+  function hardDrop() {
+    if (state !== 'playing' || !cur) return;
+    let d = 0;
+    while (!collide(cur.matrix, cur.x, cur.y + 1)) { cur.y++; d++; }
+    score += d * 2;
+    lockPiece();
+    A.sfx.place();
+  }
+
+  function holdPiece() {
+    if (state !== 'playing' || !cur || !canHold) return;
+    A.sfx.pop();
+    const t = cur.type;
+    if (hold) spawnPiece(hold); else spawnPiece();
+    hold = t; canHold = false;
+  }
+
+  function lockPiece() {
+    const m = cur.matrix;
+    for (let y = 0; y < m.length; y++) for (let x = 0; x < m[y].length; x++) {
+      if (m[y][x] && cur.y + y >= 0) arena[cur.y + y][cur.x + x] = cur.type;
+    }
+    sweep();
+    spawnPiece();
+  }
+
+  function sweep() {
+    const rows = [];
+    for (let y = ROWS - 1; y >= 0; y--) {
+      if (arena[y].every(c => c)) rows.push(y);
+    }
+    if (!rows.length) { combo = -1; return; }
+    const n = rows.length;
+    combo++;
+    const isTetris = n === 4;
+    let pts = LINE_SCORE[n] * level;
+    if (isTetris && b2b) pts = (pts * 1.5) | 0;
+    if (combo > 0) pts += 50 * combo * level;
+    b2b = isTetris ? true : (n > 0 ? false : b2b);
+    score += pts;
+    lines += n;
+    const newLevel = ((lines / 10) | 0) + 1;
+    if (newLevel !== level) {
+      level = newLevel;
+      floaters.add(BOARD_X + BOARD_W / 2, 120, 'LEVEL ' + level, '#ffd700', 26);
+      A.sfx.power();
+    }
+    // juice
+    rows.forEach(y => {
+      for (let x = 0; x < COLS; x++) {
+        const t = arena[y][x];
+        particles.burst(BOARD_X + x * CELL + CELL / 2, y * CELL + CELL / 2,
+          { n: 4, colors: [COLORS[t][0], COLORS[t][1], '#ffffff'], speed: 200, life: 0.6, size: 3 });
+      }
     });
+    clearAnim = { rows, t: 0 };
+    if (n === 4) { shake.add(0.35); floaters.add(BOARD_X + BOARD_W / 2, 200, b2b ? 'B2B TETRIS!' : 'TETRIS!', '#00f0ff', 28); }
+    else floaters.add(BOARD_X + BOARD_W / 2, 200, '+' + pts, '#a6ff00', 20);
+    if (n >= 2) A.sfx.clear(); else A.sfx.good();
+    // remove rows after flash (handled in update via clearAnim)
+    if (A.setHi('tetris', score)) { newBest = true; bestEl.classList.remove('hidden'); hiEl.textContent = score; }
+    paintScore();
   }
 
-  /**
-   * Clears full lines from the arena and updates score.
-   */
-  function arenaSweep() {
-    let rowCount = 0; // Number of lines cleared in this sweep
-    outer: for (let y = arena.length - 1; y >= 0; --y) {
-      for (let x = 0; x < arena[y].length; ++x) {
-        if (arena[y][x] === 0) {
-          continue outer; // Not a full row, move to next row
-        }
-      }
-
-      // If a full row is found, remove it and add a new empty row at the top
-      const row = arena.splice(y, 1)[0].fill(0);
-      arena.unshift(row);
-      ++y; // Adjust y because we removed a row and added one at the top
-      rowCount++;
-    }
-
-    if (rowCount > 0) {
-      // Scoring based on number of lines cleared
-      const scoreMultiplier = [0, 100, 300, 500, 800]; // Score for 0, 1, 2, 3, 4 lines
-      score += scoreMultiplier[rowCount] * level; // Score increases with level
-      linesCleared += rowCount;
-
-      // Increase level if enough lines are cleared
-      if (linesCleared >= level * levelThreshold) {
-        level++;
-        dropInterval = Math.max(100, dropInterval - 50); // Decrease drop interval, min 100ms
-      }
-      updateScore();
-    }
+  function finishSweep() {
+    if (!clearAnim) return;
+    clearAnim.rows.sort((a, b) => a - b).forEach(y => {
+      arena.splice(y, 1);
+      arena.unshift(new Array(COLS).fill(null));
+    });
+    clearAnim = null;
   }
 
-  /**
-   * Resets the player's piece to a new random one at the top.
-   * Checks for game over condition.
-   */
-  function playerReset() {
-    const pieceType = pieces[(pieces.length * Math.random()) | 0];
-    const isPower = Math.random() < 0.1; // 10% chance for a power-up
-    player.matrix = createPiece(pieceType, isPower);
-    player.isPowerUp = isPower;
-    player.pos.y = 0;
-    // Center the new piece horizontally
-    player.pos.x = (BOARD_WIDTH / 2 | 0) - (player.matrix[0].length / 2 | 0);
-
-    // Game over condition: new piece immediately collides
-    if (collide(arena, player)) {
-      gameOver();
-    }
+  function die() {
+    state = 'over';
+    A.sfx.lose();
+    setTimeout(() => {
+      overOverlay.show(
+        '<div class="go-title lost">TOP OUT</div>' +
+        '<div class="go-score">SCORE ' + score + '</div>' +
+        '<div class="go-sub">LEVEL ' + level + ' · LINES ' + lines + '</div>' +
+        '<div class="go-best">BEST ' + Math.max(best, score) + '</div>' +
+        (newBest ? '<div class="go-best">★ NEW BEST ★</div>' : '') +
+        '<button class="go-btn" id="tetrisRetry">PLAY AGAIN</button>'
+      );
+      document.getElementById('tetrisRetry').onclick = () => { overOverlay.hide(); startGame(); };
+      loop.stop();
+    }, 600);
   }
 
-  /**
-   * Rotates the player's piece.
-   * @param {number} dir - Direction of rotation (1 for clockwise, -1 for counter-clockwise).
-   */
-  function playerRotate(dir) {
-    const pos = player.pos.x;
-    let offset = 1;
-    rotate(player.matrix, dir); // Perform rotation
-    // Wall kick: if collision after rotation, try to shift horizontally
-    while (collide(arena, player)) {
-      player.pos.x += offset;
-      offset = -(offset + (offset > 0 ? 1 : -1));
-      if (offset > player.matrix[0].length + 1 || offset < -(player.matrix[0].length + 1)) {
-        rotate(player.matrix, -dir); // Revert rotation if no valid position found
-        player.pos.x = pos; // Revert horizontal position
-        return;
-      }
-    }
+  function paintScore() {
+    scoreEl.innerHTML = 'SCORE ' + score + ' <span style="color:var(--muted)">· LV ' + level + ' · LINES ' + lines + '</span>';
   }
 
-  /**
-   * Rotates a matrix.
-   * @param {Array<Array<number>>} matrix - The matrix to rotate.
-   * @param {number} dir - Direction of rotation (1 for clockwise, -1 for counter-clockwise).
-   */
-  function rotate(matrix, dir) {
-    // Transpose matrix
-    for (let y = 0; y < matrix.length; y++) {
-      for (let x = 0; x < y; x++) {
-        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+  function ghostY() {
+    let gy = cur.y;
+    while (!collide(cur.matrix, cur.x, gy + 1)) gy++;
+    return gy;
+  }
+
+  function update(dt) {
+    if (state !== 'playing') { particles.update(dt); floaters.update(dt); return; }
+
+    // line-clear flash animation
+    if (clearAnim) {
+      clearAnim.t += dt;
+      if (clearAnim.t > 0.22) finishSweep();
+    }
+
+    // DAS auto-shift
+    if (dasDir !== 0 && cur) {
+      dasAcc += dt;
+      if (dasAcc > 0.15) {
+        arrAcc += dt;
+        while (arrAcc > 0.033) { tryMove(dasDir); arrAcc -= 0.033; }
       }
     }
-    // Reverse rows or columns based on direction
-    if (dir > 0) {
-      matrix.forEach(row => row.reverse()); // Clockwise
+
+    // gravity
+    const interval = GRAVITY[Math.min(level - 1, GRAVITY.length - 1)];
+    dropAcc += dt;
+    if (dropAcc >= interval && cur) {
+      dropAcc = 0;
+      if (!collide(cur.matrix, cur.x, cur.y + 1)) { cur.y++; lockAcc = 0; }
+      else {
+        lockAcc += interval;
+        if (lockAcc > 0.5) lockPiece();
+      }
+    }
+
+    particles.update(dt); floaters.update(dt); shake.update(dt);
+  }
+
+  /* ----- rendering ----- */
+  function drawBlock(px, py, type, alpha, ghost) {
+    const x = BOARD_X + px * CELL, y = py * CELL;
+    const [c1, c2] = COLORS[type];
+    ctx.save();
+    if (alpha != null) ctx.globalAlpha = alpha;
+    if (!ghost) {
+      A.neonOn(ctx, c1, 8);
+      const g = ctx.createLinearGradient(x, y, x, y + CELL);
+      g.addColorStop(0, c2); g.addColorStop(0.5, c1); g.addColorStop(1, c1);
+      ctx.fillStyle = g;
+      A.rr(ctx, x + 1, y + 1, CELL - 2, CELL - 2, 5); ctx.fill();
+      A.neonOff(ctx);
+      // bevel highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(x + 4, y + 4, CELL - 8, 3);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillRect(x + 4, y + CELL - 7, CELL - 8, 3);
     } else {
-      matrix.reverse(); // Counter-clockwise
+      ctx.strokeStyle = c1; ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.4;
+      A.rr(ctx, x + 2, y + 2, CELL - 4, CELL - 4, 5); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawMini(matrix, type, ox, oy, cell) {
+    // center the piece in its box
+    let minX = 9, maxX = -1, minY = 9, maxY = -1;
+    matrix.forEach((row, y) => row.forEach((v, x) => { if (v) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); } }));
+    const w = (maxX - minX + 1) * cell, h = (maxY - minY + 1) * cell;
+    const [c1, c2] = COLORS[type];
+    matrix.forEach((row, y) => row.forEach((v, x) => {
+      if (!v) return;
+      const px = ox + (x - minX) * cell + (52 - w) / 2;
+      const py = oy + (y - minY) * cell + (52 - h) / 2;
+      A.neonOn(ctx, c1, 6);
+      const g = ctx.createLinearGradient(px, py, px, py + cell);
+      g.addColorStop(0, c2); g.addColorStop(1, c1);
+      ctx.fillStyle = g;
+      A.rr(ctx, px + 1, py + 1, cell - 2, cell - 2, 4); ctx.fill();
+      A.neonOff(ctx);
+    }));
+  }
+
+  function panelLabel(text, x, y) {
+    ctx.save();
+    ctx.font = '700 11px Orbitron, sans-serif';
+    ctx.textAlign = 'center'; ctx.fillStyle = '#8b93b8';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.save();
+    ctx.fillStyle = '#02030a'; ctx.fillRect(0, 0, W, H);
+    shake.apply(ctx);
+
+    // board backdrop
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#070b22'); bg.addColorStop(1, '#040614');
+    ctx.fillStyle = bg; ctx.fillRect(BOARD_X, 0, BOARD_W, BOARD_H);
+    ctx.strokeStyle = 'rgba(0,240,255,0.3)'; ctx.lineWidth = 2;
+    ctx.strokeRect(BOARD_X, 0, BOARD_W, BOARD_H);
+
+    // arena
+    const flashing = clearAnim ? (Math.sin(clearAnim.t * 60) > 0) : false;
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+      const t = arena[y][x];
+      if (!t) continue;
+      if (clearAnim && clearAnim.rows.indexOf(y) >= 0 && flashing) continue;
+      drawBlock(x, y, t);
+    }
+
+    // ghost + current
+    if (cur && state !== 'over') {
+      const gy = ghostY();
+      if (gy !== cur.y) {
+        cur.matrix.forEach((row, y) => row.forEach((v, x) => { if (v) drawBlock(cur.x + x, gy + y, cur.type, null, true); }));
+      }
+      cur.matrix.forEach((row, y) => row.forEach((v, x) => { if (v) drawBlock(cur.x + x, cur.y + y, cur.type); }));
+    }
+
+    // side panels
+    panelLabel('HOLD', 44, 20);
+    ctx.strokeStyle = 'rgba(139,147,184,0.3)';
+    ctx.strokeRect(8, 30, 72, 72);
+    if (hold) drawMini(SHAPES[hold], hold, 8, 30, 13);
+    else { ctx.save(); ctx.fillStyle = '#3a4060'; ctx.font = '11px Rajdhani'; ctx.textAlign = 'center'; ctx.fillText('empty', 44, 72); ctx.restore(); }
+
+    panelLabel('NEXT', W - 44, 20);
+    for (let i = 0; i < 3; i++) {
+      const t = queue[i];
+      ctx.strokeStyle = 'rgba(139,147,184,0.3)';
+      ctx.strokeRect(W - 80, 30 + i * 84, 72, 72);
+      if (t) drawMini(SHAPES[t], t, W - 80, 30 + i * 84, i === 0 ? 14 : 11);
+    }
+
+    particles.draw(ctx);
+    floaters.draw(ctx);
+    ctx.restore();
+
+    if (state === 'paused') {
+      ctx.save();
+      ctx.fillStyle = 'rgba(2,4,12,0.6)'; ctx.fillRect(0, 0, W, H);
+      A.glowText(ctx, 'PAUSED', W / 2, H / 2, '900 40px Orbitron, sans-serif', '#00f0ff');
+      ctx.restore();
     }
   }
 
-  /**
-   * Moves the player's piece horizontally.
-   * @param {number} dir - Direction of movement (-1 for left, 1 for right).
-   */
-  function playerMove(dir) {
-    player.pos.x += dir;
-    if (collide(arena, player)) {
-      player.pos.x -= dir; // Revert if collision
-    }
-  }
+  const loop = A.createLoop(update, render);
 
-  /**
-   * Drops the player's piece one step down.
-   * If collision, merges piece and resets for a new one.
-   */
-  function playerDrop() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-      player.pos.y--; // Move back up one step
-      merge(arena, player);
-      arenaSweep(); // Check and clear lines
-      updateScore(); // Update score display
-      playerReset(); // Get a new piece
-    }
-    dropCounter = 0; // Reset drop counter after a manual or automatic drop
-  }
-
-  /**
-   * Draws a matrix onto the canvas. Used for both arena and player piece.
-   * @param {Array<Array<number>>} matrix - The matrix to draw.
-   * @param {object} offset - X and Y offset for drawing.
-   */
-  function drawMatrix(matrix, offset) {
-    matrix.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          context.fillStyle = colors[value]; // Use color from colors array
-          context.fillRect(x + offset.x, y + offset.y, 1, 1); // Draw a single block
-          // Add a subtle border to blocks for better visual separation
-          context.strokeStyle = '#222';
-          context.lineWidth = 0.05;
-          context.strokeRect(x + offset.x, y + offset.y, 1, 1);
-        }
-      });
-    });
-  }
-
-  /**
-   * Main draw function, clears canvas and draws arena and player piece.
-   */
-  function draw() {
-    // Clear the entire canvas with the background color
-    context.fillStyle = '#000'; // Black background for the game area
-    context.fillRect(0, 0, canvas.width / BLOCK_SIZE, canvas.height / BLOCK_SIZE);
-
-    drawMatrix(arena, {x: 0, y: 0}); // Draw the settled blocks in the arena
-    drawMatrix(player.matrix, player.pos); // Draw the current falling piece
-  }
-
-  /**
-   * Game loop update function. Handles piece dropping and rendering.
-   * @param {number} time - Current timestamp from requestAnimationFrame.
-   */
-  function update(time = 0) {
-    const deltaTime = time - lastTime;
-    lastTime = time;
-
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-      playerDrop();
-    }
-
-    draw(); // Redraw everything
-    animationId = requestAnimationFrame(update); // Continue the loop
-  }
-
-  /**
-   * Updates the score and level display.
-   */
-  function updateScore() {
-    scoreElement.textContent = `Score: ${score} | Level: ${level} | Lines: ${linesCleared}`;
-  }
-
-  /**
-   * Resets game state to initial values.
-   */
-  function resetGame() {
-    arena = createMatrix(BOARD_WIDTH, BOARD_HEIGHT);
-    score = 0;
-    linesCleared = 0;
-    level = 1;
-    dropInterval = 1000;
-    updateScore();
-    playerReset();
-  }
-
-  /**
-   * Ends the game, stops the animation, and shows a game over message.
-   */
-  function gameOver() {
-    cancelAnimationFrame(animationId);
-    alert(`Game Over! Your final score: ${score}`);
-    resetGame(); // Reset game state for a new game
-  }
-
-  /**
-   * Initializes the Tetris game when the modal opens.
-   * This function is exposed globally via the IIFE.
-   */
-  window.initializeTetris = function() {
-    if (animationId) {
-      cancelAnimationFrame(animationId); // Stop any existing game loop
-    }
-    resetGame(); // Reset game state
-    lastTime = 0; // Reset lastTime for fresh animation start
-    dropCounter = 0; // Reset drop counter
-    update(); // Start the game loop
-  };
-
-  /**
-   * Stops the Tetris game loop when the modal closes.
-   * This function is exposed globally via the IIFE.
-   */
-  window.stopTetrisGame = function() {
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
-    }
-  };
-
-
-  // --- Event Listeners ---
-
-  // Keyboard controls
-  document.addEventListener('keydown', e => {
-    // Only respond to key presses if the Tetris modal is visible
-    if (document.getElementById("tetrisModal").classList.contains("hidden")) {
-      return;
-    }
-    if (e.key === 'ArrowLeft') {
-      playerMove(-1);
-    } else if (e.key === 'ArrowRight') {
-      playerMove(1);
-    } else if (e.key === 'ArrowDown') {
-      playerDrop();
-      e.preventDefault(); // Prevent page scrolling
-    } else if (e.key === 'ArrowUp' || e.key === ' ') { // ArrowUp or Space for rotation
-      playerRotate(1);
-      e.preventDefault(); // Prevent page scrolling
-    }
+  /* ----- input ----- */
+  const keyState = {};
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('tetrisModal').classList.contains('hidden')) return;
+    const k = e.key.toLowerCase();
+    if (['arrowleft', 'arrowright', 'arrowdown', 'arrowup', ' '].indexOf(k) >= 0) e.preventDefault();
+    if (e.repeat) return;
+    if (k === 'arrowleft') { tryMove(-1); dasDir = -1; dasAcc = 0; arrAcc = 0; }
+    else if (k === 'arrowright') { tryMove(1); dasDir = 1; dasAcc = 0; arrAcc = 0; }
+    else if (k === 'arrowdown') softDrop();
+    else if (k === 'arrowup' || k === 'x') tryRotate(1);
+    else if (k === 'z') tryRotate(-1);
+    else if (k === ' ') hardDrop();
+    else if (k === 'c' || k === 'shift') holdPiece();
+    else if (k === 'p') togglePause();
+    keyState[k] = true;
   });
+  document.addEventListener('keyup', (e) => {
+    const k = e.key.toLowerCase();
+    keyState[k] = false;
+    if ((k === 'arrowleft' && dasDir === -1) || (k === 'arrowright' && dasDir === 1)) dasDir = 0;
+  });
+  // allow holding down-arrow for soft drop
+  setInterval(() => {
+    if (state === 'playing' && !document.getElementById('tetrisModal').classList.contains('hidden') && keyState['arrowdown']) softDrop();
+  }, 40);
 
-  // Touch/Click controls for on-screen buttons
-  // Using both 'touchstart' for immediate mobile response and 'click' for broader compatibility
-  if (leftBtn) {
-    leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(-1); }, { passive: false });
-    leftBtn.addEventListener('click', () => playerMove(-1));
+  function togglePause() {
+    if (state === 'playing') { state = 'paused'; pauseBtn.textContent = '▶'; }
+    else if (state === 'paused') { state = 'playing'; pauseBtn.textContent = '⏸'; }
   }
-  if (rightBtn) {
-    rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(1); }, { passive: false });
-    rightBtn.addEventListener('click', () => playerMove(1));
-  }
-  if (rotateBtn) {
-    rotateBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerRotate(1); }, { passive: false });
-    rotateBtn.addEventListener('click', () => playerRotate(1));
-  }
-  if (downBtn) {
-    downBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerDrop(); }, { passive: false });
-    downBtn.addEventListener('click', () => playerDrop());
-  }
+  pauseBtn.addEventListener('click', togglePause);
 
-  // Start button event listener
-  if (startButton) {
-    startButton.addEventListener('click', () => {
-      initializeTetris(); // Call the initialization function to start a new game
-    });
-  }
+  A.bindHold(document.getElementById('tetrisLeft'), () => { tryMove(-1); dasDir = -1; dasAcc = 0; arrAcc = 0; }, () => { if (dasDir === -1) dasDir = 0; });
+  A.bindHold(document.getElementById('tetrisRight'), () => { tryMove(1); dasDir = 1; dasAcc = 0; arrAcc = 0; }, () => { if (dasDir === 1) dasDir = 0; });
+  A.bindTap(document.getElementById('tetrisRotate'), () => tryRotate(1));
+  A.bindHold(document.getElementById('tetrisDown'), softDrop);
+  A.bindTap(document.getElementById('tetrisDrop'), hardDrop);
+  A.bindTap(document.getElementById('tetrisHold'), holdPiece);
 
-  // Initial setup when the script loads (before any modals are opened)
-  // This ensures the canvas dimensions are set correctly even before the modal is first opened.
-  // No need to call resetGame() or update() here as they are called by initializeTetris()
-  // which will be triggered when the modal is opened via openTetrisModal().
+  A.registerModalGame('tetrisModal', {
+    onOpen() { reset(); overOverlay.hide(); startOverlay.show('<div class="go-title">TETRIS</div><div class="go-sub">arrows move · up/z/x rotate · space drops · c holds</div>'); loop.stop(); state = 'ready'; render(); },
+    onClose() { loop.stop(); startOverlay.hide(); overOverlay.hide(); }
+  });
+  A.trapGameKeys(document.getElementById('tetrisModal'));
+  reset(); render();
 })();

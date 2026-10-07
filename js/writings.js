@@ -18,18 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
         writingsContainer.innerHTML = ''; // Clear previous writings
         data.writings.forEach(writing => {
           const writingCard = document.createElement('div');
-          writingCard.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md');
+          writingCard.classList.add('writing-card');
 
           const title = document.createElement('h3');
-          title.classList.add('text-2xl', 'font-bold', 'mb-2');
           title.textContent = writing.title;
 
           const description = document.createElement('p');
-          description.classList.add('text-gray-400', 'mb-2');
+          description.classList.add('wdesc');
           description.textContent = writing.description;
 
           const content = document.createElement('p');
-          content.classList.add('text-gray-300');
+          content.classList.add('wbody');
           content.textContent = writing.content;
 
           writingCard.appendChild(title);

@@ -1,7 +1,22 @@
 'use strict';
 
-const particleCount = 700;
-const particlePropCount = 9;
+// Aliases the original sketch expected as globals (it was written for a
+// p5-style environment). Without these the whole background crashes.
+const cos = Math.cos;
+const sin = Math.sin;
+const HALF_PI = Math.PI / 2;
+
+// Small math helpers (self-contained so the background works anywhere).
+function rand(max) { return Math.random() * max; }
+function angle(x1, y1, x2, y2) { return Math.atan2(y2 - y1, x2 - x1); }
+function lerp(start, end, amt) { return (1 - amt) * start + amt * end; }
+function fadeInOut(life, ttl) {
+  const halfTTL = ttl / 2;
+  return life < halfTTL ? life / halfTTL : (ttl - life) / halfTTL;
+}
+
+// Fewer particles on small screens to keep the background smooth on phones.
+const particleCount = Math.min(700, Math.max(260, ((window.innerWidth * window.innerHeight) / 3200) | 0));const particlePropCount = 9;
 const particlePropsLength = particleCount * particlePropCount;
 const baseTTL = 100;
 const rangeTTL = 500;

@@ -130,18 +130,20 @@ const gameData = {
 
 function openZorkModal() {
     const modal = document.getElementById("zorkModal");
+    if (!modal) return;
     modal.classList.remove("hidden");
     startZorkGame();
 }
 
 function closeZorkModal() {
     const modal = document.getElementById("zorkModal");
+    if (!modal) return;
     modal.classList.add("hidden");
 }
 
 function startZorkGame() {
-    outputBox = document.getElementById("output");
-    inputBox = document.getElementById("input");
+    outputBox = document.getElementById("zorkOutput");
+    inputBox = document.getElementById("zorkInput");
 
     outputBox.textContent = "";
     inputBox.value = "";
