@@ -34,6 +34,22 @@
     store.set('plays:' + game, n + 1);
   }
 
+  /* Self-test: does this browser actually let us persist? Private/incognito
+     mode (and "block all cookies") silently breaks localStorage, so scores
+     would vanish on close. Detect it once and say so instead of failing mute. */
+  const storageOK = (function () {
+    try {
+      localStorage.setItem('moz:_t', '1');
+      const ok = localStorage.getItem('moz:_t') === '1';
+      localStorage.removeItem('moz:_t');
+      return !!ok;
+    } catch (e) { return false; }
+  })();
+  if (!storageOK && window.console && console.warn) {
+    console.warn('[arcade] localStorage is blocked — high scores will NOT persist after close. ' +
+      'Private/incognito mode or "block all cookies" causes this; a normal tab saves fine.');
+  }
+
   /* ---------------- audio: tiny synth, no assets ---------------- */
   const sfx = (function () {
     let ctx = null;
@@ -400,7 +416,7 @@
 
   /* ---------------- export ---------------- */
   window.Arcade = {
-    store, getHi, setHi, bumpPlays,
+    store, getHi, setHi, bumpPlays, storageOK,
     sfx, Particles, Shake, Floaters,
     createLoop,
     neonOn, neonOff, rr, glowText, drawStarfield, makeStars,
