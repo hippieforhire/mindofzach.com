@@ -165,7 +165,7 @@ const fmt=n=>'$'+n.toFixed(2),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=(a,b)=>a+Math.random()*(b-a),ri=(a,b)=>Math.floor(rnd(a,b+1));
 const pick=a=>a[ri(0,a.length-1)];
 const CONDEMOJI={Sunny:'☀️',Cloudy:'⛅',Rain:'🌧️'};
-const PEOPLE=['🚶','🚶‍♀️','🚶‍♂️','🧍','🧍‍♀️','🧍‍♂️','🏃','🏃‍♀️','🧓','👵','👦','👧'];
+const PEOPLE=['🚶','🚶‍♀️','🚶‍♂️','🧍','🧍‍♀️','🧍‍♂️','🏃','🏃‍♀️'];
 const LOCS=[
  {n:'Sidewalk',rent:0,traffic:30,em:'🚶',d:'Free, but quiet.'},
  {n:'Park',rent:20,traffic:70,em:'🌳',d:'Families and joggers.'},
@@ -405,7 +405,7 @@ function spawnCust(){
  const c={e:pick(PEOPLE),x:fromLeft?-30:670,y:SIDE_Y+rnd(-6,6),state:'arrive',mood:null,moodT:0,
   qT:0,serveT:0,coin:0,coinT:0,walkSpd:rnd(55,95)};
  c.slot=queue.length;queue.push(c);custs.push(c);}
-function slotX(i){return STAND_X-56-42*i;}
+function slotX(i){return STAND_X-56-60*i;}
 function updateDay(dt){
  const D=S.day;if(!D||dayOver)return;frame+=dt;
  if(D.soldout){D.endT-=dt;if(D.endT<=0){finishDay();}moveCusts(dt);return;}
@@ -546,16 +546,16 @@ function drawDay(){
  // customers
  ctx.textAlign='center';
  custs.forEach(c=>{
-  ctx.font='30px serif';ctx.fillText(c.e,c.x,c.y);
-  if(c.mood&&c.moodT>0){ctx.font='20px serif';
+  ctx.font='56px serif';ctx.fillText(c.e,c.x,c.y);
+  if(c.mood&&c.moodT>0){ctx.font='22px serif';
    ctx.fillStyle='rgba(255,251,232,.95)';
-   ctx.beginPath();ctx.arc(c.x+14,c.y-38,15,0,7);ctx.fill();
-   ctx.fillText(c.mood,c.x+14,c.y-31);}
+   ctx.beginPath();ctx.arc(c.x+24,c.y-70,17,0,7);ctx.fill();
+   ctx.fillText(c.mood,c.x+24,c.y-62);}
   if(c.coinT>0){ctx.font='bold 15px Fredoka,sans-serif';ctx.fillStyle='#ffdf3f';
-   ctx.fillText('+'+fmt(S.price),c.x,c.y-52-(1.1-c.coinT)*30);}});
+   ctx.fillText('+'+fmt(S.price),c.x,c.y-88-(1.1-c.coinT)*30);}});
  // staffers behind counter
- ctx.font='30px serif';
- S.staff.forEach((s,i)=>ctx.fillText('🧑‍🍳',STAND_X-70+i*34,196));}
+ ctx.font='36px serif';
+ S.staff.forEach((s,i)=>ctx.fillText('🧑‍🍳',STAND_X-70+i*40,198));}
 function drawStand(){
  const x=STAND_X;
  // awning poles
