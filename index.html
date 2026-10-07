@@ -405,7 +405,7 @@
 
     <header class="site-header">
       <h1 class="logo">MIND OF ZACH</h1>
-      <p class="tagline">A personal neon arcade. <b>17 games</b>, zero quarters required.</p>
+      <p class="tagline">A personal neon arcade. <b>18 games</b>, zero quarters required.</p>
     </header>
 
     <main class="lobby" id="games">
@@ -806,6 +806,32 @@
     </div>
   </div>
 
+  <div id="doomModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>DOOM</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="doomHi">0</span></span>
+          <button class="icon-btn" id="doomPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('doomModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="doomCanvas"></canvas></div>
+      <div class="game-hud"><span id="doomScore">0</span><span id="doomBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row">
+        <div style="display:flex;gap:0.45rem;">
+          <button class="tbtn" id="doomLeft" title="Turn left">◀</button>
+          <button class="tbtn" id="doomFwd" title="Move forward">▲</button>
+          <button class="tbtn" id="doomBack" title="Move back">▼</button>
+          <button class="tbtn" id="doomRight" title="Turn right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="doomFire" title="Fire">FIRE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/arcade.js"></script>
   <script src="js/coalesce.js"></script>
   <script src="js/wordlist.js"></script>
@@ -826,6 +852,7 @@
   <script src="js/digdug.js"></script>
   <script src="js/galaga.js"></script>
   <script src="js/bubble.js"></script>
+  <script src="js/doom.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -880,6 +907,9 @@
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         desc: 'A 90s bubble shooter: match three, drop the orphans, beat the ceiling.',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
+      { id: 'doom', title: 'DOOM', hi: 'doom', accent: '#ff3355', modal: 'doomModal',
+        desc: 'The 1993 classic in neon. Three levels of demons. Rip and tear.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M12 3c-4 0-7 3-7 7 0 2.5 1.2 4.3 3 5.5V19h8v-3.5c1.8-1.2 3-3 3-5.5 0-4-3-7-7-7z"/><circle cx="9" cy="10" r="1.6"/><circle cx="15" cy="10" r="1.6"/></svg>' },
     ];
 
     const grid = document.getElementById('cardGrid');
