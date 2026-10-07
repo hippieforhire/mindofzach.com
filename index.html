@@ -850,6 +850,52 @@
     </div>
   </div>
 
+  <div id="siniModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>SINISTAR</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="siniHi">0</span></span>
+          <button class="icon-btn" id="siniPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('siniModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="siniCanvas"></canvas></div>
+      <div class="game-hud"><span id="siniScore">0</span><span id="siniBest" class="newbest hidden">NEW BEST!</span></div>
+    </div>
+  </div>
+
+  <div id="centModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>CENTIPEDE</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="centHi">0</span></span>
+          <button class="icon-btn" id="centPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('centModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="centCanvas"></canvas></div>
+      <div class="game-hud"><span id="centScore">0</span><span id="centBest" class="newbest hidden">NEW BEST!</span></div>
+    </div>
+  </div>
+
+  <div id="pinModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>PINBALL</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="pinHi">0</span></span>
+          <button class="icon-btn" id="pinPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('pinModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="pinCanvas"></canvas></div>
+      <div class="game-hud"><span id="pinScore">0</span><span id="pinBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="zoo-tools"><button class="tbtn zoo-speed" id="pinPlunger">PLUNGE</button></div>
+    </div>
+  </div>
+
   <div id="oregModal" class="game-modal hidden">
     <div class="game-panel wide">
       <div class="game-panel-head">
@@ -923,6 +969,9 @@
   <script src="js/mines.js"></script>
   <script src="js/solitaire.js"></script>
   <script src="js/oregon.js"></script>
+  <script src="js/pinball.js"></script>
+  <script src="js/centipede.js"></script>
+  <script src="js/sinistar.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -964,6 +1013,12 @@
         icon: '<svg viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="M12 8l2.5 3.5L12 15l-2.5-3.5z"/></svg>' },
       { id: 'oreg', title: 'Oregon Trail', hi: 'oreg', accent: '#ffb300', modal: 'oregModal',
         icon: '<svg viewBox="0 0 24 24"><path d="M4 11a8 6 0 0 1 16 0z"/><circle cx="8" cy="17.5" r="2.5"/><circle cx="16" cy="17.5" r="2.5"/></svg>' },
+      { id: 'pin', title: 'Pinball', hi: 'pin', accent: '#00f0ff', modal: 'pinModal',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20l8-5 8 5"/></svg>' },
+      { id: 'cent', title: 'Centipede', hi: 'cent', accent: '#a6ff00', modal: 'centModal',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.4"/><circle cx="10.5" cy="12" r="2.4"/><circle cx="16" cy="12" r="2.4"/><circle cx="21" cy="12" r="2.4"/></svg>' },
+      { id: 'sini', title: 'Sinistar', hi: 'sini', accent: '#ff3355', modal: 'siniModal',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="9" cy="10" r="1.6"/><circle cx="15" cy="10" r="1.6"/><path d="M8 15.5h8"/></svg>' },
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
       { id: 'snake', title: 'Snake', hi: 'snake', accent: '#a6ff00', modal: 'snakeModal',
