@@ -850,6 +850,22 @@
     </div>
   </div>
 
+  <div id="mineModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>MINESWEEPER</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="mineHi">—</span></span>
+          <button class="icon-btn" id="minePause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('mineModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="mineCanvas"></canvas></div>
+      <div class="game-hud"><span id="mineScore">0</span><span id="mineBest" class="newbest hidden">NEW BEST!</span></div>
+      <div id="mineDiff" class="zoo-tools"></div>
+    </div>
+  </div>
+
   <script src="js/arcade.js"></script>
   <script src="js/coalesce.js"></script>
   <script src="js/wordlist.js"></script>
@@ -872,6 +888,7 @@
   <script src="js/bubble.js"></script>
   <script src="js/doom.js"></script>
   <script src="js/zoo.js"></script>
+  <script src="js/mines.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -907,6 +924,8 @@
         icon: '<svg viewBox="0 0 24 24"><path d="M7 8h10l-1.5 12h-7z"/><path d="M12 8V3M12 3l3 2M12 3L9 5"/><circle cx="12" cy="13" r="2.5"/></svg>' },
       { id: 'zoo', title: 'Zoo Tycoon', hi: 'zoo', accent: '#a6ff00', modal: 'zooModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="7" cy="8" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="8" r="2"/><path d="M12 11c-3.5 0-6 2.5-6 5.5 0 1.8 1.4 3 3.2 3 1.2 0 1.9-.5 2.8-.5s1.6.5 2.8.5c1.8 0 3.2-1.2 3.2-3 0-3-2.5-5.5-6-5.5z"/></svg>' },
+      { id: 'mines', title: 'Minesweeper', hi: 'mines', accent: '#39d353', modal: 'mineModal',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5 19 6M19 6h-3M19 6v3"/></svg>' },
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
       { id: 'snake', title: 'Snake', hi: 'snake', accent: '#a6ff00', modal: 'snakeModal',
