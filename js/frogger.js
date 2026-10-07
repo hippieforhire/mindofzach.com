@@ -34,11 +34,11 @@
   const CAR_COLORS = ['#ff2fd6', '#00f0ff', '#ffe14d', '#ff7b00', '#7b7bff', '#00ffd0', '#ff6b6b'];
 
   const ROAD_DEF = [
-    { row: 11, dir: -1, speed: 130, count: 4, len: 1.8 },
-    { row: 10, dir: 1, speed: 170, count: 3, len: 2.2 },
-    { row: 9, dir: -1, speed: 100, count: 5, len: 1.6 },
-    { row: 8, dir: 1, speed: 150, count: 4, len: 2.0 },
-    { row: 7, dir: -1, speed: 190, count: 3, len: 2.4 }
+    { row: 11, dir: -1, speed: 115, count: 3, len: 1.8 },
+    { row: 10, dir: 1, speed: 150, count: 2, len: 2.2 },
+    { row: 9, dir: -1, speed: 90, count: 3, len: 1.6 },
+    { row: 8, dir: 1, speed: 135, count: 3, len: 2.0 },
+    { row: 7, dir: -1, speed: 170, count: 2, len: 2.4 }
   ];
   const RIVER_DEF = [
     { row: 5, kind: 'log', dir: 1, speed: 85, count: 3, len: 3 },
@@ -157,7 +157,7 @@
     A.sfx.win();
     particles.burst(W / 2, H / 2, { n: 60, colors: ['#ffd700', '#a6ff00', '#00f0ff', '#ffffff'], speed: 360, life: 1, size: 5 });
     round++;
-    speedMul *= 1.12;
+    speedMul *= 1.07;
     homes = [false, false, false, false, false];
     buildLanes();
     respawn();
