@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Paperboy — Zach's Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05060f;
+    --neon-cyan: #00f0ff;
+    --neon-magenta: #ff2fd6;
+    --text: #e8ecff;
+    --muted: #8b93b8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  body { font-family: 'Rajdhani', sans-serif; color: var(--text); }
+  #game { position: fixed; inset: 0; }
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    display: flex; align-items: center; gap: 0.9rem;
+    padding: 0.6rem 0.9rem;
+    background: linear-gradient(rgba(5,6,15,0.88), rgba(5,6,15,0.55) 70%, transparent);
+    pointer-events: none;
+  }
+  header > * { pointer-events: auto; }
+  .back {
+    font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em;
+    color: var(--neon-cyan); text-decoration: none;
+    border: 1px solid rgba(0,240,255,0.45); border-radius: 8px; padding: 0.5rem 0.75rem;
+    text-shadow: 0 0 8px rgba(0,240,255,0.6); background: rgba(5,6,15,0.6);
+  }
+  h1 {
+    font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1rem; margin: 0;
+    letter-spacing: 0.14em; text-shadow: 0 0 16px rgba(0,240,255,0.55);
+  }
+  .hint {
+    margin-left: auto; font-size: 0.82rem; color: var(--muted);
+    background: rgba(5,6,15,0.6); border-radius: 8px; padding: 0.4rem 0.6rem;
+  }
+  @media (max-width: 560px) { .hint { display: none; } }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<header>
+  <a class="back" href="index.html">← ZACH'S PAGE</a>
+  <h1>PAPERBOY</h1>
+  <span class="hint">Touch controls appear in-game · progress saves in this browser</span>
+</header>
+<script>
+  EJS_player = '#game';
+  EJS_gameName = 'Paperboy (USA)';
+  EJS_core = 'nes';
+  EJS_gameUrl = 'roms/Paperboy (USA).nes';
+  EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+  EJS_backgroundColor = '#05060f';
+  EJS_startOnLoaded = true;
+</script>
+<script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+</body>
+</html>
