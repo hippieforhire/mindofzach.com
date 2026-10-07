@@ -13,7 +13,7 @@
             font-family: 'Rajdhani', sans-serif; color: #e8ecff;
             user-select: none; -webkit-user-select: none;
         }
-        #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+        #wrap { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 10px; }
         canvas { border: 1px solid rgba(0,240,255,0.3); border-radius: 10px; box-shadow: 0 0 50px -10px rgba(0,240,255,0.4); background: #02030a; }
         #hud {
             position: fixed; top: 12px; left: 16px; z-index: 5;
@@ -51,16 +51,25 @@
         #restartButton:hover { box-shadow: 0 0 24px rgba(0,240,255,0.6); transform: scale(1.05); }
         #controls {
             position: fixed; bottom: 14px; left: 0; width: 100%; z-index: 5;
-            display: flex; justify-content: center; gap: 14px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 0 18px; pointer-events: none;
         }
-        #controls div {
+        #controls .cgroup { display: flex; gap: 14px; pointer-events: auto; }
+        #controls .cgroup > div {
             width: 66px; height: 66px; border-radius: 16px;
             background: rgba(0,240,255,0.07); border: 1px solid rgba(0,240,255,0.4);
             display: flex; align-items: center; justify-content: center;
             color: #00f0ff; font-size: 13px; font-family: 'Orbitron', sans-serif;
             touch-action: none;
         }
-        #controls div:active { background: rgba(0,240,255,0.28); transform: scale(0.93); }
+        #controls .cgroup > div.fire {
+            width: 84px; height: 84px; border-radius: 50%;
+            border-color: rgba(255,47,214,0.65); color: #ff2fd6;
+            background: rgba(255,47,214,0.08); font-size: 22px;
+            box-shadow: 0 0 22px -6px rgba(255,47,214,0.7);
+        }
+        #controls .cgroup > div:active { background: rgba(0,240,255,0.28); transform: scale(0.93); }
+        #controls .cgroup > div.fire:active { background: rgba(255,47,214,0.3); }
         @media (hover: hover) { #controls { display: none; } }
     </style>
 </head>
@@ -80,10 +89,14 @@
         <button id="restartButton">FLY AGAIN</button>
     </div>
     <div id="controls">
-        <div id="leftBtn">◂</div>
-        <div id="thrustBtn">▲</div>
-        <div id="rightBtn">▸</div>
-        <div id="shootBtn">✦</div>
+        <div class="cgroup">
+            <div id="leftBtn">◂</div>
+            <div id="thrustBtn">▲</div>
+            <div id="rightBtn">▸</div>
+        </div>
+        <div class="cgroup">
+            <div id="shootBtn" class="fire">✦</div>
+        </div>
     </div>
 
     <script src="js/arcade.js"></script>
@@ -107,7 +120,10 @@
         let stars = A.makeStars(130, canvas.width, canvas.height);
 
         function fit() {
-            const s = Math.min(window.innerWidth / canvas.width, window.innerHeight / canvas.height);
+            // leave room for the touch controls at the bottom on touch devices
+            const touchUI = window.matchMedia && window.matchMedia('(hover: none)').matches;
+            const availH = window.innerHeight - (touchUI ? 120 : 20) - 10;
+            const s = Math.min(window.innerWidth / canvas.width, availH / canvas.height);
             canvas.style.width = (canvas.width * s * 0.98) + 'px';
             canvas.style.height = (canvas.height * s * 0.98) + 'px';
         }

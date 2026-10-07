@@ -420,6 +420,9 @@
     <main class="lobby" id="games">
       <h2 class="section-title">CHOOSE YOUR GAME</h2>
       <p class="section-sub">High scores are saved on this device. Click any cabinet to play.</p>
+      <div id="storageWarn" class="hidden" style="max-width:560px;margin:0 auto 1rem;padding:0.7rem 1rem;border:1px solid rgba(255,179,0,0.5);border-radius:12px;background:rgba(255,179,0,0.07);color:#ffd97a;font-size:0.92rem;text-align:center;">
+        ⚠ Best scores can't be saved in this browser tab — something is blocking local storage (private/incognito mode does this). Open the site in a normal tab and they'll stick.
+      </div>
       <div class="card-grid" id="cardGrid"></div>
     </main>
 
@@ -786,6 +789,11 @@
       quoteText.classList.add('swap');
       setTimeout(() => { displayRandomQuote(); quoteText.classList.remove('swap'); }, 240);
     });
+
+    /* ---------- warn when best scores can't persist (private mode etc.) ---------- */
+    if (!Arcade.storageOK) {
+      document.getElementById('storageWarn').classList.remove('hidden');
+    }
 
     /* ---------- refresh high-score chips when returning to the lobby ---------- */
     window.addEventListener('focus', () => {
