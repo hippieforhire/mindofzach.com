@@ -255,6 +255,13 @@
     .go-btn:hover { box-shadow: 0 0 22px rgba(0,240,255,0.6); transform: scale(1.05); }
 
     .touch-controls { display: flex; justify-content: center; gap: 0.7rem; margin-top: 0.9rem; flex-wrap: wrap; }
+    /* tetris: panel sits high, controls are a directional D-pad (up=rotate, like the arrow keys) */
+    #tetrisModal { align-items: flex-start; }
+    #tetrisModal .game-panel { margin-top: 0.2rem; }
+    .tetris-controls { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-top: 0.9rem; }
+    .dpad { display: grid; grid-template-columns: repeat(3, 58px); grid-auto-rows: 58px; gap: 0.45rem; }
+    .tetris-actions { display: flex; flex-direction: column; gap: 0.45rem; }
+    .tetris-actions .tbtn { width: 112px; height: 58px; font-size: 1rem; letter-spacing: 0.06em; }
     .tbtn {
       width: 58px; height: 58px; border-radius: 14px; border: 1px solid rgba(0,240,255,0.4);
       background: rgba(0,240,255,0.06); color: var(--neon-cyan); font-size: 1.4rem; cursor: pointer;
@@ -326,13 +333,19 @@
     .kb-key.wrong { border-color: #ff3355; color: #ff3355; opacity: 1; }
 
     /* wordle (dark reskin, classes driven by yetanotherwordlegame.js) */
-    #wordleBoard { display: grid; gap: 6px; justify-items: center; margin: 1rem 0; }
-    .wordle-row { display: grid; gap: 6px; }
+    #wordleBoard { display: grid; gap: 6px; justify-items: stretch; margin: 1rem auto; width: 100%; max-width: 400px; }
+    .wordle-row { display: grid; gap: 6px; width: 100%; }
+    .wordle-row.row-shake { animation: rowShake 0.45s ease; }
+    @keyframes rowShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-9px); } 40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); } 80% { transform: translateX(5px); }
+    }
     .wordle-cell {
-      width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 700; text-transform: uppercase; color: #fff;
+      width: 100%; aspect-ratio: 1; max-height: 58px; display: flex; align-items: center; justify-content: center;
+      font-size: clamp(1.15rem, 5.5vw, 1.5rem); font-weight: 700; text-transform: uppercase; color: #fff;
       border-radius: 8px; border: 2px solid rgba(139,147,184,0.4); background: rgba(255,255,255,0.04);
-      transition: all 0.25s ease; font-family: 'Orbitron', sans-serif;
+      transition: background-color 0.25s ease, border-color 0.25s ease; font-family: 'Orbitron', sans-serif;
     }
     .wordle-cell.pop { animation: cellPop 0.18s ease; }
     @keyframes cellPop { 50% { transform: scale(1.12); } }
@@ -341,17 +354,24 @@
     .wordle-cell.correct { background: #16a34a; border-color: #16a34a; box-shadow: 0 0 14px rgba(22,163,74,0.7); }
     .wordle-cell.present { background: #b8860b; border-color: #b8860b; box-shadow: 0 0 14px rgba(184,134,11,0.7); }
     .wordle-cell.absent { background: #2a2f45; border-color: #2a2f45; color: #6b7394; }
-    #wordleKeyboard { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 0.6rem; }
+    .wordle-cell.hint { background: rgba(0,240,255,0.16); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,240,255,0.5); }
+    #wordleKeyboard { display: flex; flex-direction: column; align-items: stretch; gap: 6px; margin-top: 0.6rem; width: 100%; }
+    #wordleKeyboard .wrow { display: flex; gap: 4px; width: 100%; justify-content: center; }
     .wordle-key {
-      min-width: 34px; height: 50px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(139,147,184,0.35);
+      flex: 1 1 0; min-width: 0; max-width: 46px; height: 52px; padding: 0; border-radius: 8px; border: 1px solid rgba(139,147,184,0.35);
       background: rgba(255,255,255,0.06); color: var(--text); display: inline-flex; align-items: center; justify-content: center;
-      font-weight: 700; cursor: pointer; user-select: none; font-size: 0.85rem; margin: 0 2px; transition: all 0.12s;
+      font-weight: 700; cursor: pointer; user-select: none; font-size: 0.82rem; transition: background-color 0.12s;
+      font-family: 'Rajdhani', sans-serif;
     }
     .wordle-key:hover { background: rgba(0,240,255,0.15); }
     .wordle-key.correct { background: #16a34a; border-color: #16a34a; color: #fff; }
     .wordle-key.present { background: #b8860b; border-color: #b8860b; color: #fff; }
     .wordle-key.absent { background: #1c2033; color: #4a5170; }
-    .wordle-key.wide { min-width: 58px; font-size: 0.7rem; }
+    .wordle-key.wide { flex: 1.55 1 0; max-width: 72px; font-size: 0.68rem; letter-spacing: 0.04em; }
+    .theme-letter { cursor: pointer; padding: 0 1px; border-radius: 4px; transition: background-color 0.2s; }
+    .theme-letter:hover { background: rgba(255,47,214,0.25); }
+    .theme-letter.selected { background: rgba(255,47,214,0.5); color: #fff; }
+    #rulesModal .wordle-cell { width: 52px; height: 52px; aspect-ratio: auto; flex: none; }
     #wordleInput { position: absolute; opacity: 0; pointer-events: none; }
     #wordleMessage { text-align: center; min-height: 1.6rem; color: var(--neon-amber); font-weight: 600; }
     #wordleTheme { text-align: center; color: var(--muted); margin-bottom: 0.4rem; }
@@ -476,13 +496,19 @@
       </div>
       <div class="game-canvas-wrap"><canvas id="tetrisCanvas"></canvas></div>
       <div class="game-hud"><span id="tetrisScore">SCORE 0</span><span id="tetrisBest" class="newbest hidden">NEW BEST!</span></div>
-      <div class="touch-controls">
-        <button class="tbtn" id="tetrisLeft">◀</button>
-        <button class="tbtn" id="tetrisRotate">⟳</button>
-        <button class="tbtn" id="tetrisDown">▼</button>
-        <button class="tbtn" id="tetrisRight">▶</button>
-        <button class="tbtn" id="tetrisDrop">⤓</button>
-        <button class="tbtn" id="tetrisHold">HOLD</button>
+      <div class="tetris-controls">
+        <div class="dpad">
+          <span></span>
+          <button class="tbtn" id="tetrisRotate" title="Rotate">⟳</button>
+          <span></span>
+          <button class="tbtn" id="tetrisLeft" title="Move left">◀</button>
+          <button class="tbtn" id="tetrisDown" title="Soft drop">▼</button>
+          <button class="tbtn" id="tetrisRight" title="Move right">▶</button>
+        </div>
+        <div class="tetris-actions">
+          <button class="tbtn wide-btn" id="tetrisDrop">⤓ DROP</button>
+          <button class="tbtn wide-btn" id="tetrisHold">HOLD</button>
+        </div>
       </div>
     </div>
   </div>
@@ -608,7 +634,7 @@
   <div id="wordleModal" class="game-modal hidden">
     <div class="game-panel wide" style="position:relative;">
       <div class="game-panel-head">
-        <h2>ZACHDLE</h2>
+        <h2>ZACH'S WORDLE GAME</h2>
         <div class="game-panel-meta">
           <button class="icon-btn" id="rulesButton" title="Rules">?</button>
           <button class="icon-btn" onclick="Arcade.closeModal('wordleModal')" title="Close">✕</button>
@@ -627,6 +653,10 @@
         <button class="tbtn wide-btn" id="startWordleButton">START</button>
         <button class="tbtn wide-btn" id="powerUpButton">POWER-UP</button>
         <button class="tbtn wide-btn" id="resetButton">RESET</button>
+      </div>
+      <div id="powerUpChooser" class="hidden" style="display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap;">
+        <button class="tbtn wide-btn" id="puReveal">🔍 REVEAL A LETTER</button>
+        <button class="tbtn wide-btn" id="puGuess">➕ EXTRA GUESS</button>
       </div>
     </div>
   </div>
@@ -648,6 +678,7 @@
         <div class="wordle-cell">C</div><div class="wordle-cell present">O</div><div class="wordle-cell">D</div><div class="wordle-cell">E</div>
       </div>
       <p style="text-align:center">Amber = in the word, wrong spot. Gray = not in the word.</p>
+      <p style="text-align:center;color:var(--muted);font-size:0.9rem">Every guess must fill all the boxes and be a real word — or a real title that fits the theme. New theme every day.</p>
       <div class="touch-controls">
         <button class="tbtn wide-btn" onclick="Arcade.closeModal('rulesModal')">GOT IT</button>
       </div>
@@ -656,6 +687,7 @@
 
   <script src="js/arcade.js"></script>
   <script src="js/coalesce.js"></script>
+  <script src="js/wordlist.js"></script>
   <script src="js/quotes.js"></script>
   <script src="js/writings.js"></script>
   <script src="js/snake.js"></script>
@@ -695,8 +727,8 @@
       { id: 'tictactoe', title: 'Tic Tac Toe', accent: '#00f0ff', modal: 'ticTacToeModal',
         desc: 'Face an unbeatable AI, a chill one, or a friend.',
         icon: '<svg viewBox="0 0 24 24"><path d="M8 3v18M16 3v18M3 8h18M3 16h18"/></svg>' },
-      { id: 'zachdle', title: 'Zachdle', accent: '#8b5cf6', modal: 'wordleModal',
-        desc: 'Themed word puzzles. Three rounds, six tries each.',
+      { id: 'zachdle', title: "Zach's Wordle Game", accent: '#8b5cf6', modal: 'wordleModal',
+        desc: 'Daily themed word puzzles with real Wordle rules. Three rounds, six tries each.',
         icon: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="4.6" height="4.6"/><rect x="9.7" y="4" width="4.6" height="4.6"/><rect x="15.4" y="4" width="4.6" height="4.6"/><rect x="4" y="9.7" width="4.6" height="4.6"/><rect x="9.7" y="9.7" width="4.6" height="4.6"/><rect x="4" y="15.4" width="4.6" height="4.6"/></svg>' },
       { id: 'rps', title: 'Rock Paper Scissors', accent: '#ff2fd6', modal: 'rpsModal',
         desc: 'Best of five against the machine. It holds grudges.',
