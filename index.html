@@ -850,6 +850,38 @@
     </div>
   </div>
 
+  <div id="oregModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>OREGON TRAIL</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="oregHi">0</span></span>
+          <button class="icon-btn" id="oregPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('oregModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="oregCanvas"></canvas></div>
+      <div class="game-hud"><span id="oregScore">0</span><span id="oregBest" class="newbest hidden">NEW BEST!</span></div>
+      <div id="oregChoices" class="zoo-tools"></div>
+    </div>
+  </div>
+
+  <div id="soliModal" class="game-modal hidden">
+    <div class="game-panel wide">
+      <div class="game-panel-head">
+        <h2>SOLITAIRE</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="soliHi">0</span></span>
+          <button class="icon-btn" id="soliPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('soliModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="soliCanvas"></canvas></div>
+      <div class="game-hud"><span id="soliScore">0</span><span id="soliBest" class="newbest hidden">NEW BEST!</span></div>
+      <div id="soliTools" class="zoo-tools"></div>
+    </div>
+  </div>
+
   <div id="mineModal" class="game-modal hidden">
     <div class="game-panel wide">
       <div class="game-panel-head">
@@ -889,6 +921,8 @@
   <script src="js/doom.js"></script>
   <script src="js/zoo.js"></script>
   <script src="js/mines.js"></script>
+  <script src="js/solitaire.js"></script>
+  <script src="js/oregon.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -926,6 +960,10 @@
         icon: '<svg viewBox="0 0 24 24"><circle cx="7" cy="8" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="8" r="2"/><path d="M12 11c-3.5 0-6 2.5-6 5.5 0 1.8 1.4 3 3.2 3 1.2 0 1.9-.5 2.8-.5s1.6.5 2.8.5c1.8 0 3.2-1.2 3.2-3 0-3-2.5-5.5-6-5.5z"/></svg>' },
       { id: 'mines', title: 'Minesweeper', hi: 'mines', accent: '#39d353', modal: 'mineModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5 19 6M19 6h-3M19 6v3"/></svg>' },
+      { id: 'soli', title: 'Solitaire', hi: 'soli', accent: '#ff2fd6', modal: 'soliModal',
+        icon: '<svg viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="M12 8l2.5 3.5L12 15l-2.5-3.5z"/></svg>' },
+      { id: 'oreg', title: 'Oregon Trail', hi: 'oreg', accent: '#ffb300', modal: 'oregModal',
+        icon: '<svg viewBox="0 0 24 24"><path d="M4 11a8 6 0 0 1 16 0z"/><circle cx="8" cy="17.5" r="2.5"/><circle cx="16" cy="17.5" r="2.5"/></svg>' },
       { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
         icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
       { id: 'snake', title: 'Snake', hi: 'snake', accent: '#a6ff00', modal: 'snakeModal',
