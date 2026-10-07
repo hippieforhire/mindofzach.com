@@ -251,6 +251,9 @@
     .dpad { display: grid; grid-template-columns: repeat(3, 58px); grid-auto-rows: 58px; gap: 0.45rem; }
     .tetris-actions { display: flex; flex-direction: column; gap: 0.45rem; }
     .tetris-actions .tbtn { width: 112px; height: 58px; font-size: 1rem; letter-spacing: 0.06em; }
+    .dpad-row { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-top: 0.9rem; }
+    .dpad-actions { display: flex; flex-direction: column; gap: 0.45rem; }
+    .dpad-actions .tbtn { width: 112px; height: 58px; font-size: 1rem; letter-spacing: 0.06em; }
     .tbtn {
       width: 58px; height: 58px; border-radius: 14px; border: 1px solid rgba(0,240,255,0.4);
       background: rgba(0,240,255,0.06); color: var(--neon-cyan); font-size: 1.4rem; cursor: pointer;
@@ -402,7 +405,7 @@
 
     <header class="site-header">
       <h1 class="logo">MIND OF ZACH</h1>
-      <p class="tagline">A personal neon arcade. <b>11 games</b>, zero quarters required.</p>
+      <p class="tagline">A personal neon arcade. <b>17 games</b>, zero quarters required.</p>
     </header>
 
     <main class="lobby" id="games">
@@ -670,6 +673,139 @@
     </div>
   </div>
 
+  <div id="breakoutModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>BREAKOUT</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="breakoutHi">0</span></span>
+          <button class="icon-btn" id="breakoutPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('breakoutModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="breakoutCanvas"></canvas></div>
+      <div class="game-hud"><span id="breakoutScore">0</span><span id="breakoutBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="touch-controls">
+        <button class="tbtn" id="breakoutLeft" title="Move left">◀</button>
+        <button class="tbtn" id="breakoutRight" title="Move right">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="froggerModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>FROGGER</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="froggerHi">0</span></span>
+          <button class="icon-btn" id="froggerPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('froggerModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="froggerCanvas"></canvas></div>
+      <div class="game-hud"><span id="froggerScore">0</span><span id="froggerBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row" style="justify-content:center;">
+        <div class="dpad">
+          <span></span><button class="tbtn" id="froggerUp" title="Hop up">▲</button><span></span>
+          <button class="tbtn" id="froggerLeft" title="Hop left">◀</button><button class="tbtn" id="froggerDown" title="Hop down">▼</button><button class="tbtn" id="froggerRight" title="Hop right">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pacmanModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>PAC-MAN</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="pacmanHi">0</span></span>
+          <button class="icon-btn" id="pacmanPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('pacmanModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="pacmanCanvas"></canvas></div>
+      <div class="game-hud"><span id="pacmanScore">0</span><span id="pacmanBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row" style="justify-content:center;">
+        <div class="dpad">
+          <span></span><button class="tbtn" id="pacmanUp" title="Go up">▲</button><span></span>
+          <button class="tbtn" id="pacmanLeft" title="Go left">◀</button><button class="tbtn" id="pacmanDown" title="Go down">▼</button><button class="tbtn" id="pacmanRight" title="Go right">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="digdugModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>DIG DUG</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="digdugHi">0</span></span>
+          <button class="icon-btn" id="digdugPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('digdugModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="digdugCanvas"></canvas></div>
+      <div class="game-hud"><span id="digdugScore">0</span><span id="digdugBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row">
+        <div class="dpad">
+          <span></span><button class="tbtn" id="digdugUp" title="Dig up">▲</button><span></span>
+          <button class="tbtn" id="digdugLeft" title="Dig left">◀</button><button class="tbtn" id="digdugDown" title="Dig down">▼</button><button class="tbtn" id="digdugRight" title="Dig right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="digdugPump" title="Hold to pump">PUMP</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="galagaModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>GALAGA</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="galagaHi">0</span></span>
+          <button class="icon-btn" id="galagaPause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('galagaModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="galagaCanvas"></canvas></div>
+      <div class="game-hud"><span id="galagaScore">0</span><span id="galagaBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row">
+        <div style="display:flex;gap:0.45rem;">
+          <button class="tbtn" id="galagaLeft" title="Move left">◀</button>
+          <button class="tbtn" id="galagaRight" title="Move right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="galagaFire" title="Fire">FIRE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bubbleModal" class="game-modal hidden">
+    <div class="game-panel">
+      <div class="game-panel-head">
+        <h2>BUBBLE POP</h2>
+        <div class="game-panel-meta">
+          <span class="hi-chip">BEST <span id="bubbleHi">0</span></span>
+          <button class="icon-btn" id="bubblePause" title="Pause">⏸</button>
+          <button class="icon-btn" onclick="Arcade.closeModal('bubbleModal')" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="game-canvas-wrap"><canvas id="bubbleCanvas"></canvas></div>
+      <div class="game-hud"><span id="bubbleScore">0</span><span id="bubbleBest" class="newbest hidden">NEW BEST!</span></div>
+      <div class="dpad-row">
+        <div style="display:flex;gap:0.45rem;">
+          <button class="tbtn" id="bubbleLeft" title="Aim left">◀</button>
+          <button class="tbtn" id="bubbleRight" title="Aim right">▶</button>
+        </div>
+        <div class="dpad-actions">
+          <button class="tbtn" id="bubbleFire" title="Shoot">FIRE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/arcade.js"></script>
   <script src="js/coalesce.js"></script>
   <script src="js/wordlist.js"></script>
@@ -684,6 +820,12 @@
   <script src="js/rockpaperscissors.js"></script>
   <script src="js/numberguess.js"></script>
   <script src="js/yetanotherwordlegame.js"></script>
+  <script src="js/breakout.js"></script>
+  <script src="js/frogger.js"></script>
+  <script src="js/pacman.js"></script>
+  <script src="js/digdug.js"></script>
+  <script src="js/galaga.js"></script>
+  <script src="js/bubble.js"></script>
   <script>
     /* ---------- lobby cards ---------- */
     const GAMES = [
@@ -720,6 +862,24 @@
       { id: 'ng', title: 'Number Guess', accent: '#ffb300', modal: 'ngModal',
         desc: '1 to 100. Hotter or colder. Seven tries. Trust your gut.',
         icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>' },
+      { id: 'breakout', title: 'Breakout', hi: 'breakout', accent: '#ff2fd6', modal: 'breakoutModal',
+        desc: 'Smash neon bricks. Catch multiball, wide paddle, and laser drops.',
+        icon: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="3.4"/><rect x="13" y="4" width="8" height="3.4"/><rect x="3" y="8.6" width="8" height="3.4"/><rect x="13" y="8.6" width="8" height="3.4"/><rect x="8" y="18" width="8" height="2.6"/><circle cx="12" cy="15" r="1.6"/></svg>' },
+      { id: 'frogger', title: 'Frogger', hi: 'frogger', accent: '#a6ff00', modal: 'froggerModal',
+        desc: 'Dodge traffic, ride logs and turtles, fill all five home bays.',
+        icon: '<svg viewBox="0 0 24 24"><rect x="6" y="9" width="12" height="9" rx="4"/><circle cx="9" cy="6.5" r="2.2"/><circle cx="15" cy="6.5" r="2.2"/></svg>' },
+      { id: 'pacman', title: 'Pac-Man', hi: 'pacman', accent: '#ffe14d', modal: 'pacmanModal',
+        desc: 'Eat every dot. Outsmart four ghosts. Power pellets turn the tables.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 6.4 15.4L12 12z"/></svg>' },
+      { id: 'digdug', title: 'Dig Dug', hi: 'digdug', accent: '#ff7b00', modal: 'digdugModal',
+        desc: 'Dig tunnels, pump up Pookas and Fygars, crush them with rocks.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M5 19L14 10M13 5l6 6-3 3-6-6z"/></svg>' },
+      { id: 'galaga', title: 'Galaga', hi: 'galaga', accent: '#00f0ff', modal: 'galagaModal',
+        desc: 'Diving squadrons, capture beams, and the dual fighter. Hold the line.',
+        icon: '<svg viewBox="0 0 24 24"><path d="M12 3l4 8-4-1.6L8 11zM7 13h10l-2 8h-6z"/></svg>' },
+      { id: 'bubble', title: 'Bubble Pop', hi: 'bubble', accent: '#ff2fd6', modal: 'bubbleModal',
+        desc: 'A 90s bubble shooter: match three, drop the orphans, beat the ceiling.',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="17" cy="15" r="3.4"/><circle cx="16" cy="6" r="2"/></svg>' },
     ];
 
     const grid = document.getElementById('cardGrid');
